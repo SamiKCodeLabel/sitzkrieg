@@ -1785,7 +1785,7 @@ document.addEventListener('click',e=>{
   if(el.id==='pop' ) return;
   let n='button';
   if(el.closest('.tabs')) n='menu';
-  if((el.id==='gen'||el.id==='fab') && Math.random()<FLASH_CHANCE){ flashbang(); return; }   // seltene Überraschung beim Neu-Würfeln der Karte
+  if((el.id==='gen'||el.id==='fab') && Math.random()<FLASH_CHANCE){ flashbang(); setTheme('light'); try{ localStorage.setItem('sitzkrieg-theme','light'); }catch(e){} return; }   // + Wechsel in den Tag-Modus   // seltene Überraschung beim Neu-Würfeln der Karte
   if(el.id==='gen'||el.id==='fab'||el.id==='army-gen'){ Sounds.play('dice', nextDiceVariant()); return; }
   if(el.id==='rot'){ Sounds.play('chair', nextVariant('chair')); return; }
   if(el.matches('.flyer button[data-flyer="1"]')){ Sounds.play('plane'); return; }   // Kampfflieger Ja: Flugzeug fliegt vorbei   // Karte drehen: Stuhlrücken   // dice1.mp3 in einer zufälligen Tonhöhen-Variante
