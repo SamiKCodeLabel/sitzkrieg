@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#2b2f20"/>
+  <rect x="40" y="40" width="432" height="432" rx="18" fill="#4b5320" stroke="#a89a63" stroke-width="10"/>
+  <g stroke="#22261a" stroke-width="6">
+    <rect x="84"  y="96"  width="104" height="104" fill="#a3a26a"/><rect x="204" y="96"  width="104" height="104" fill="#4c5a2c"/><rect x="324" y="96"  width="104" height="104" fill="#6d6c68"/>
+    <rect x="84"  y="216" width="104" height="104" fill="#56707a"/><rect x="204" y="216" width="104" height="104" fill="#a3a26a"/><rect x="324" y="216" width="104" height="104" fill="#574738"/>
+    <rect x="84"  y="336" width="104" height="80"  fill="#d6c99a"/><rect x="204" y="336" width="104" height="80"  fill="#4c5a2c"/><rect x="324" y="336" width="104" height="80"  fill="#a3a26a"/>
+  </g>
+  <g transform="translate(256 262) rotate(-12)">
+    <rect x="-96" y="-96" width="192" height="192" rx="30" fill="#ece4c8" stroke="#1b1d14" stroke-width="12"/>
+    <path d="M-80 -78 H60" stroke="#fff" stroke-opacity=".6" stroke-width="8" stroke-linecap="round"/>
+    <g fill="#1b1d14"><circle cx="-46" cy="-46" r="18"/><circle cx="46" cy="-46" r="18"/><circle cx="0" cy="0" r="18"/><circle cx="-46" cy="46" r="18"/><circle cx="46" cy="46" r="18"/></g>
+  </g>
+</svg>
