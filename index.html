@@ -8,9 +8,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Sitzkrieg">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
 <title>Sitzkrieg</title>
 <script>
 (function(){ var t=null; try{ t=localStorage.getItem('sitzkrieg-theme'); }catch(e){}
@@ -136,7 +133,7 @@
   select,input[type=number],input[type=text]{background:#f6ead0;border:2px solid #6f6a4a;border-radius:4px;padding:8px 10px}
   input[type=number]{width:64px}
   .seed{display:flex;align-items:center;gap:6px;color:var(--muted)}
-  .seed input{width:120px}
+  .seed input{width:190px}
   #map{display:grid;gap:3px;background:#22261a;padding:6px;border-radius:4px;margin:0 auto;
        border:3px solid var(--gold);box-shadow:0 0 0 3px #22261a,0 6px 18px rgba(0,0,0,.45)}
   .cell{border-radius:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
@@ -713,7 +710,7 @@
       <button class="sec" data-size="3x8">Groß <small>3×8</small></button>
     </div>
     <button class="sec" id="rot">↻ Drehen</button>
-    <span class="seed"><span class="lbl">Seed</span><input type="text" id="seed" inputmode="numeric" pattern="[0-9]*" enterkeyhint="go" aria-label="Seed"><button class="sec" id="load">Laden</button></span>
+    <span class="seed"><span class="lbl">Seed</span><input type="text" id="seed" enterkeyhint="go" autocomplete="off" spellcheck="false" aria-label="Seed (Karte-Armeen)"><button class="sec" id="load">Laden</button></span>
   </div>
   <div id="msg"></div>
   <div class="stats" id="stats"></div>
@@ -1445,7 +1442,7 @@ function render(){
     map.appendChild(el);
     x.p.biome==='g'?g+=x.cells.length:b+=x.cells.length;
   }
-  $('stats').textContent=`${ROWS}×${COLS} · ${current.pieces.length} Teile · ${g} grüne Felder · ${b} Stadtfelder · Seed ${current.seed}`;
+  $('stats').textContent=`${ROWS}×${COLS} · ${current.pieces.length} Teile · ${g} grüne Felder · ${b} Stadtfelder · Seed ${seedStr()}`;
   if(mset){                                   // Spielkanten: Band im Kartenrahmen, Pfeile zeigen zur Mitte
     const disp=e=>port?({left:'top',right:'bottom',top:'right',bottom:'left'})[e]:e;
     const arrow={left:'▶',right:'◀',top:'▼',bottom:'▲'};
@@ -1470,14 +1467,21 @@ const SIZE_OF={gross:'3x8',mittel:'3x6',klein:'2x4'};
 function run(seed){
   [ROWS,COLS] = $('size').value.split('x').map(Number);
   seed = seed>>>0;
-  $('seed').value=seed;
   current = {...generate(seed), seed};
-  try{ history.replaceState(null,'',`#${SIZE_NAME[$('size').value]}-${seed}`); }catch(e){}
+  updateSeed();
   document.querySelectorAll('.seg button[data-size]').forEach(b=>b.classList.toggle('on', b.dataset.size===$('size').value));
   render();
   const map=$('map'); map.classList.remove('pop'); void map.offsetWidth; map.classList.add('pop');
 }
 const newSeed = () => Math.floor(Math.random()*1e9);
+// Seed = „Karte-Armeen“: die zweite Zahl speichert Armeen, Missionstyp, Kampfflieger und „Faire Armeen“
+let armyCode=null;
+const seedStr=()=>current? (current.seed+(armyCode!=null?'-'+armyCode:'')) : '';
+function updateSeed(){
+  if(!current) return;
+  $('seed').value=seedStr();
+  try{ history.replaceState(null,'',`#${SIZE_NAME[$('size').value]}-${seedStr()}`); }catch(e){}
+}
 
 // ---------- Einstellungs-UI ----------
 
@@ -1523,9 +1527,12 @@ $('reset').onclick=()=>{ settings=structuredClone(DEFAULTS); saveSettings(); bui
 $('gen').onclick=()=>run(newSeed());
 $('fab').onclick=()=>{ if(document.body.classList.contains('on-mission')){ genArmies(); $('tab-mission').scrollIntoView({behavior:'smooth',block:'start'}); return; } run(newSeed()); $('map').scrollIntoView({behavior:'smooth',block:'start'}); };
 document.querySelectorAll('.seg button[data-size]').forEach(b=>b.onclick=()=>{ $('size').value=b.dataset.size; run(newSeed()); if(typeof genArmies==='function') genArmies(); });
-window.addEventListener('hashchange',()=>{ const h=location.hash.match(/^#(gross|mittel|klein)-(\d+)$/); if(h && (+h[2]!==current?.seed || SIZE_OF[h[1]]!==$('size').value)){ $('size').value=SIZE_OF[h[1]]; run(+h[2]); } });
+window.addEventListener('hashchange',()=>{ const h=location.hash.match(/^#(gross|mittel|klein)-(\d+)(?:-(\d+))?$/); if(!h) return;
+  const sizeCh=SIZE_OF[h[1]]!==$('size').value;
+  if(sizeCh || +h[2]!==current?.seed){ $('size').value=SIZE_OF[h[1]]; run(+h[2]); }
+  if(h[3]!=null && (sizeCh || +h[3]!==armyCode)) genArmies(+h[3]); });
 $('size').onchange=()=>run(newSeed());
-$('load').onclick=()=>run(parseInt($('seed').value,10)||0);
+$('load').onclick=()=>{ const n=($('seed').value.match(/\d+/g)||['0']).map(Number); run(n[0]); if(n.length>1) genArmies(n[1]); };
 $('seed').onkeydown=e=>{ if(e.key==='Enter') $('load').click(); };
 $('rot').onclick=()=>{ rotated=!isPortrait(); render(); };
 let rzT; window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(render,80); });
@@ -1621,6 +1628,7 @@ const FLYER_CHANCE=0.2; // bei "Ja": 20 % Chance, dass beide Spieler einen Kampf
 let flyerAllowed=true; try{ flyerAllowed=localStorage.getItem('sitzkrieg-flieger')!=='0'; }catch(e){}
 let flyerOn=false;
 const armies={};
+let arnd=Math.random;   // Zufall für die Armeen (aus dem Armee-Seed)
 // Ein Slot ist entweder ein Fahrzeug oder ein Trupp aus 2 Spezialeinheiten + Gewehrschützen (höchstens 1 General pro Trupp)
 function rollArmy(){
   const n=SLOTS[$('size').value]||8;
@@ -1629,7 +1637,7 @@ function rollArmy(){
     const small=$('size').value==='2x4'; // Klein: kein Flakgeschütz und kein Transporter
     for(const v of VEHICLES) if(!v.optional && !(small && v.notSmall)) for(let i=0;i<v.n;i++) pool.push({...v,veh:true});
     for(const p of SPECIALS) for(let i=0;i<p.n;i++) pool.push({...p,veh:false});
-    for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+    for(let i=pool.length-1;i>0;i--){ const j=Math.floor(arnd()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
     const out=[]; let ok=true, squads=0;
     for(let k=0;k<n && ok;k++){
       // Sind die Gewehrschützen aufgebraucht, gibt es nur noch Fahrzeuge
@@ -1643,7 +1651,7 @@ function rollArmy(){
     }
     if(ok){
       // Jeder General bekommt eine eigene, zufällige Fähigkeit (keine doppelt in einer Armee)
-      const ab=[...GEN_ABIL]; for(let i=ab.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ab[i],ab[j]]=[ab[j],ab[i]]; }
+      const ab=[...GEN_ABIL]; for(let i=ab.length-1;i>0;i--){ const j=Math.floor(arnd()*(i+1)); [ab[i],ab[j]]=[ab[j],ab[i]]; }
       for(const sl of out) if(!sl.veh) sl.units=sl.units.map(u=>u.key==='general'?{...u,abil:ab.shift()}:u);
       return out;
     }
@@ -1654,14 +1662,18 @@ function rollArmy(){
 // ---------- Missionstyp (gilt für beide Spieler) ----------
 const MISSIONS=[{name:'Vernichtung'},{name:'Aufmarsch',sec:'aufmarsch'},{name:'Missionsziele',sec:'missionsziele'}];
 let mission=null;
-function rollMission(){
+let armyBase=0, armyFair=true;
+const encodeArmy=()=>armyBase*12+MISSIONS.indexOf(mission)*4+(flyerOn?2:0)+(armyFair?1:0);
+function rollMission(idx){
   // Klein: immer Vernichtung
-  mission = $('size').value==='2x4' ? MISSIONS[0] : MISSIONS[Math.floor(Math.random()*MISSIONS.length)];
+  if(idx==null) idx=Math.floor(Math.random()*MISSIONS.length);
+  mission = $('size').value==='2x4' ? MISSIONS[0] : MISSIONS[idx];
+  if(armyCode!=null){ armyCode=encodeArmy(); updateSeed(); }
   $('mtype-val').textContent=mission.name;
   window.CUR_MISSION=mission; if(typeof render==='function' && current) render();
   const b=$('mtype'); b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash');
 }
-$('mtype').onclick=rollMission;
+$('mtype').onclick=()=>rollMission();
 // Generals-Fähigkeiten (aus dem Regelwerk: Abschnitt General)
 const GEN_ABIL=[...document.querySelectorAll('#general dl.abil dt')].map(dt=>({name:dt.textContent.trim(), text:dt.nextElementSibling.textContent.trim()}));
 const VEH_ORDER=['flieger','schwer','leicht','art','trans','krad'];
@@ -1688,13 +1700,24 @@ function renderArmy(side){
 // Faire Armeen: beide Seiten bekommen gleich viele Fahrzeuge (und damit gleich viele Trupps)
 let fairOn=true; try{ fairOn=localStorage.getItem('sitzkrieg-fair')!=='0'; }catch(e){}
 const vehCount=a=>a.filter(x=>x.veh).length;
-function genArmies(){
-  rollMission(); flyerOn=flyerAllowed && Math.random()<FLYER_CHANCE;
+function genArmies(code){
+  if(typeof code!=='number' || !isFinite(code)) code=null;
+  if(code==null){
+    armyBase=Math.floor(Math.random()*1e6); armyFair=fairOn;
+    flyerOn=flyerAllowed && Math.random()<FLYER_CHANCE;
+    armyCode=null; rollMission();
+  } else {
+    code=Math.floor(code); armyBase=Math.floor(code/12); armyFair=!!(code&1); flyerOn=!!(code&2);
+    armyCode=null; rollMission(Math.floor(code%12/4)%MISSIONS.length);
+  }
+  armyCode=encodeArmy(); updateSeed();
+  arnd=mulberry32((armyBase*2654435761+(SLOTS[$('size').value]||8))>>>0);
+  const fairOn_=armyFair;
   // Immer: Transporter bei beiden oder bei keinem, gleich viele Generäle.
   // Zusätzlich bei „Faire Armeen“: gleich viele Fahrzeuge.
   const hasTrans=a=>a.some(x=>x.key==='trans');
   const generals=a=>a.reduce((n,x)=>n+(x.veh?0:x.units.filter(u=>u.key==='general').length),0);
-  const matches=(a,b)=>hasTrans(a)===hasTrans(b) && generals(a)===generals(b) && (!fairOn || vehCount(a)===vehCount(b));
+  const matches=(a,b)=>hasTrans(a)===hasTrans(b) && generals(a)===generals(b) && (!fairOn_ || vehCount(a)===vehCount(b));
   let ok=false;
   for(let outer=0; outer<50 && !ok; outer++){
     armies.de=rollArmy();
@@ -1712,7 +1735,7 @@ function renderPoolInfo(){
   $('pool-veh').innerHTML=VEHICLES.filter(v=>!v.optional).map(v=>`<li>${v.n}× ${v.name}${v.notSmall?' <small>(nicht auf Klein)</small>':''}</li>`).join('')+(flyerAllowed?`<li>Kampfflieger: ${Math.round(FLYER_CHANCE*100)} % Chance pro Wurf – dann bekommen ihn beide Spieler (zusätzlich, ohne Slot)</li>`:'<li><s>Kampfflieger</s> (aus)</li>');
   $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Hat eine Seite einen Transporter, hat die andere auch einen</li><li>Beide Seiten haben gleich viele Generäle</li><li>Trupp = 2 Spezialeinheiten (max. 1 General) + ${RIFLEMEN} Gewehrschützen</li><li>Höchstens ${MAX_RIFLEMEN} Gewehrschützen pro Spieler</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
 }
-$('army-gen').onclick=genArmies;
+$('army-gen').onclick=()=>genArmies();
 function setFlyerAllowed(on){
   flyerAllowed=on; try{ localStorage.setItem('sitzkrieg-flieger',on?'1':'0'); }catch(e){}
   document.querySelectorAll('.flyer button[data-flyer]').forEach(b=>b.classList.toggle('on',(b.dataset.flyer==='1')===on));
@@ -1838,11 +1861,11 @@ function renderMapMission(ms,port){
   $('mm-txt').innerHTML=t;
 }
 buildPool();
-const m=location.hash.match(/^#(gross|mittel|klein)-(\d+)$/);
+const m=location.hash.match(/^#(gross|mittel|klein)-(\d+)(?:-(\d+))?$/);
 let startTab='gen'; try{ startTab=localStorage.getItem('sitzkrieg-tab')||'gen'; }catch(e){}
 if(m){ $('size').value = SIZE_OF[m[1]]; run(+m[2]); } else run(newSeed());
 showTab(['regeln','mission'].includes(startTab)?startTab:'gen');
-genArmies();
+genArmies(m&&m[3]!=null?+m[3]:undefined);
 </script>
 <script>
 // Einheitliche Symbole auf allen Geräten (eigene WW2-Zeichnungen, eingebettet)
