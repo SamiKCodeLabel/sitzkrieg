@@ -190,6 +190,8 @@ button.on{outline:2px solid #d8b34a}
     <div class="seg" id="sizeSeg">
       <button class="sec" data-size="2x4">Klein</button><button class="sec" data-size="3x6">Mittel</button><button class="sec" data-size="3x8">Groß</button>
     </div>
+    <h3>Kampfflieger</h3>
+    <div class="seg" id="flySeg"><button class="sec" data-fly="aus">Aus</button><button class="sec" data-fly="20">20 %</button><button class="sec" data-fly="immer">Immer</button></div>
     <h3>Spielen</h3>
     <div class="mrow"><button id="localBtn">Auf diesem Gerät</button></div>
     <div class="mrow" style="margin-top:8px"><button id="simBtn" class="sec">🤖 KI-Simulation ansehen</button></div>
@@ -475,7 +477,7 @@ function mkUnits(st,side,list){
 const alive=u=>u.veh?[]:u.members.filter(m=>m.alive);
 const isAlive=u=>u.veh?!u.dead:u.members.some(m=>m.alive);
 const abilOf=u=>{ const g=u.members.find(m=>m.k==='general'&&m.alive); return g?g.abil:null; };
-const unitAt=h=>S.units.find(u=>u.hex===h&&isAlive(u));
+const unitAt=h=>S.units.find(u=>u.hex===h&&isAlive(u)&&u.veh!=='flieger');
 const unitName=u=>u.veh?`${u.side==='de'?'♣':'♥'} ${VEH[u.veh].n}`:`${u.side==='de'?'♣':'♥'} Trupp ${u.no}`;
 
 // ---------- Hex-Raster über der Karte ----------
@@ -1970,7 +1972,7 @@ function attack(u,wn,target){
     for(const hh of area){ const t=unitAt(hh); if(!t||t===u) continue; any=true;
       if(t.veh){ const arm=armorOf(t,u.hex,above||hh!==h); const need=penNeed(W.pd,arm), r=d6();
         rec.rows.push({lbl:`${unitName(t)}: Durchschlag ${fmtN(need)}`,dice:[{v:r,ok:r>=need&&need<=6}],txt:`Panzerung ${arm}`}); if(r>=need&&need<=6) vehDamage(t,1,rec); }
-      else { const n=Math.min(hh===h?W.cap:2,alive(t).length), need=penNeed(W.pd,0); const p=Array.from({length:n},d6), k=p.filter(x=>x>=need).length;
+      else { const n=Math.min(hh===h?W.cap:1,alive(t).length), need=penNeed(W.pd,0); const p=Array.from({length:n},d6), k=p.filter(x=>x>=need).length;
         rec.rows.push({lbl:`${unitName(t)}: Durchschlag ${fmtN(need)}`,dice:p.map(v=>({v,ok:v>=need})),txt:`${n} Figur(en) unter der Scheibe → ${k} Verluste`}); applyKills(t,k,W.pd,rec); }
       if(t.side===u.side) rec.notes.push('Eigene Einheit getroffen!'); }
     if(!any) rec.notes.push('Keine Einheit unter der Scheibe.');
@@ -2014,7 +2016,7 @@ function destroyVeh(t,rec,exploded){
   if(exploded){ rec.fx2={kind:'boom',hex:h};
     for(const hh of [h,...nbrs(h)]){ const o=unitAt(hh); if(!o) continue;
       if(o.veh){ const arm=armorOf(o,h,false), r=d6(), ok=r>=penNeed(1,arm); rec.rows.push({lbl:`Explosion → ${unitName(o)}`,dice:[{v:r,ok}],txt:ok?'Schaden':'hält'}); if(ok) vehDamage(o,1,rec); }
-      else { const n=Math.min(3,alive(o).length), need=penNeed(1,0); const p=Array.from({length:n},d6), kk=p.filter(x=>x>=need).length; rec.rows.push({lbl:`Explosion → ${unitName(o)}`,dice:p.map(v=>({v,ok:v>=need})),txt:`${kk} Verluste`}); applyKills(o,kk,1,rec); } }
+      else { const n=Math.min(hh===h?3:1,alive(o).length), need=penNeed(1,0); const p=Array.from({length:n},d6), kk=p.filter(x=>x>=need).length; rec.rows.push({lbl:`Explosion → ${unitName(o)}`,dice:p.map(v=>({v,ok:v>=need})),txt:`${kk} Verluste`}); applyKills(o,kk,1,rec); } }
     addSmoke(h); }
 }
 // ---------- Transporter ----------
@@ -2024,7 +2026,7 @@ function loadUnit(v,o){ v.cargo=o.id; o.hex=-2; S.active.used=S.active.used||{};
 function unloadUnit(v,h){ const o=S.units.find(x=>x.id===v.cargo); o.hex=h; v.cargo=null; S.active.used=S.active.used||{}; S.active.used.load=true; logAdd(`${unitName(o)} steigt aus`); }
 // ---------- Aufstellung ----------
 function autoDeploy(){
-  for(const s of ['de','al']){ const z=zoneOf(s).sort((a,b)=>HEX[a].pz-HEX[b].pz); const us=S.units.filter(u=>u.side===s), used=new Set();
+  for(const s of ['de','al']){ const z=zoneOf(s).sort((a,b)=>HEX[a].pz-HEX[b].pz); const us=S.units.filter(u=>u.side===s&&u.veh!=='flieger'), used=new Set();
     const step=Math.max(1,Math.floor(z.length/us.length));
     us.forEach((u,i)=>{ const k=Math.min(z.length-1,i*step+Math.floor(step/2));
       for(let t=0;t<z.length;t++){ const hh=z[(k+t)%z.length]; if(!used.has(hh)&&passable(u,hh)){ u.hex=hh; used.add(hh); return; } }
@@ -2266,6 +2268,220 @@ function loadAssets(){
     .then(()=>{ try{ bakeSoldiers(); }catch(e){ console.error(e); } bakeVehicles(); ASSETS_READY=true; });
 }
 
+// ======================= Kampfflieger =======================
+VEH.flieger={n:'Kampfflieger',s:'✈',card:'A',mv:0,turn:0,arm:[1,1,1],air:true,w:{}};
+VEH.art.w.Flak.air=true;                                   // Flak-Waffe schießt auf Flieger
+let FLY_MODE=LS('sitzkrieg3d-flymode')||'20';               // 'aus' | '20' | 'immer'
+const isFly=u=>!!u&&u.veh==='flieger';
+const onBoard=u=>isFly(u)&&!u.dead&&!!u.state;
+const flierAt=(h,notSide)=>S.units.find(u=>onBoard(u)&&u.hex===h&&(!notSide||u.side!==notSide));
+function stepDir(h,dir,n){ let c=h; for(let i=0;i<n;i++){ const H=HEX[c]; const j=HEXKEY[(H.q+DIRS[dir][0])+','+(H.ax+DIRS[dir][1])]; if(j==null) return null; c=j; } return c; }
+const ARROW=['→','↗','↖','←','↙','↘'];
+function newState(size){
+  const seed=Math.floor(Math.random()*1e9);
+  const st={v:3,size,seed,phase:'setup',round:1,deck:[],card:null,turn:null,active:null,units:[],vp:{de:0,al:0},ready:{de:false,al:false},
+    smoke:[],wrecks:[],log:[],roll:null,winner:null,uid:1,rollId:0,fly:null,flyQ:[]};
+  const [a,b]=fairArmies(size); st.units=[...mkArmy(st,'de',a),...mkArmy(st,'al',b)];
+  const fly=FLY_MODE==='immer'||(FLY_MODE==='20'&&Math.random()<.2);
+  if(fly) for(const side of ['de','al']) st.units.push({id:st.uid++,side,veh:'flieger',no:0,members:[],dmg:0,hits:0,eff:{},face:0,dir:0,state:null,act:0,hex:-3,cargo:null});
+  return st;
+}
+function eligible(side){ const k=S.card?cardInfo(S.card).c.u:'inf';
+  return S.units.filter(u=>u.side===side&&isAlive(u)&&kindOf(u)===k&&u.act<maxAct(u)&&(isFly(u)?!u.state:u.hex>=0)); }
+function checkWin(){
+  const g=GOAL[S.size];
+  for(const s of ['de','al']){ const enemyLeft=S.units.some(u=>u.side===other(s)&&isAlive(u)&&!isFly(u));
+    if(S.vp[s]>=g||!enemyLeft){ S.phase='over'; S.winner=s; logAdd(`${SIDE[s]} gewinnt!`); return true; } }
+  return false;
+}
+// ---------- Ablauf: nach der nächsten FEINDLICHEN Karte ----------
+function endActivation(){
+  const u=S.active&&S.units.find(x=>x.id===S.active.unit); if(u) u.act++;
+  const side=u?u.side:null; S.active=null;
+  if(S.phase!=='play') return;
+  S.flyQ=side?S.units.filter(x=>onBoard(x)&&x.side!==side&&x.justIn!==true).map(x=>x.id):[];
+  S.units.forEach(x=>{ if(isFly(x)&&x.side===side) x.justIn=false; });
+  processFly();
+}
+function processFly(){
+  while(S.flyQ&&S.flyQ.length){ const f=S.units.find(x=>x.id===S.flyQ[0]);
+    if(!f||!onBoard(f)){ S.flyQ.shift(); continue; }
+    if(f.state==='abflug'){ S.flyQ.shift(); flyOut(f); continue; }
+    S.fly={unit:f.id}; S.turn=f.side; S.card=null; UI.flyW=null; return;           // Besitzer wählt den Angriff
+  }
+  S.fly=null; if(S.phase==='play') nextCard();
+}
+function finishFly(){ if(S.flyQ) S.flyQ.shift(); S.fly=null; UI.flyW=null; if(S.phase==='play') processFly(); }
+function flyIn(f,h,dir){ f.hex=h; f.dir=dir; f.face=dir; f.state='anflug'; f.justIn=true; logAdd(`${unitName(f)} im Anflug über Feld ${h} Richtung ${ARROW[dir]}`); }
+function flyOut(f){ logAdd(`${unitName(f)} verlässt das Spielfeld`); f.state=null; f.hex=-3; }
+// ---------- Angriffe ----------
+function flyTargets(f,w){ const out=new Set(); if(!f||!onBoard(f)) return out;
+  for(const h of HEX){ const d=hexDist(f.hex,h.i); if(d<1||d>R1) continue; if(!inArc({hex:f.hex,face:f.dir},h.i,60)) continue;
+    if(w==='Dogfight'){ if(flierAt(h.i,f.side)) out.add(h.i); } else out.add(h.i); }
+  return out; }
+function mgLine(start,dir){ const L=[start]; for(let i=1;i<4;i++){ const n=stepDir(start,dir,i); if(n==null) break; L.push(n); } return L; }
+function groundHit(rec,hh,pd,cap,fromAbove,src){ const t=unitAt(hh); if(!t) return false;
+  if(t.veh){ const arm=armorOf(t,src,fromAbove), need=penNeed(pd,arm), r=d6(); rec.rows.push({lbl:`${unitName(t)}: Durchschlag ${fmtN(need)}`,dice:[{v:r,ok:need<=6&&r>=need}],txt:`Panzerung ${arm}`}); if(need<=6&&r>=need) vehDamage(t,1,rec); }
+  else { const n=Math.min(cap,alive(t).length), need=penNeed(pd,0); const p=Array.from({length:n},d6), k=p.filter(x=>x>=need).length; rec.rows.push({lbl:`${unitName(t)}: Durchschlag ${fmtN(need)}`,dice:p.map(v=>({v,ok:v>=need})),txt:`${k} Verluste`}); applyKills(t,k,pd,rec); }
+  return true; }
+function flierHit(t,k,rec){
+  if(k<=0||t.dead) return; t.hits=(t.hits||0)+k; rec.notes.push(`${unitName(t)}: ${t.hits>=2?'2. Treffer – Absturz!':'1 Treffer'}`);
+  if(t.hits>=2){ let c=t.hex; for(let i=1;i<=R2;i++){ const n=stepDir(t.hex,t.dir,i); if(n==null) break; c=n; }
+    t.dead=true; t.state=null; S.vp[other(t.side)]++; dropCard(t.side,'A'); rec.notes.push(`${unitName(t)} stürzt ab und explodiert – +1 SP für ${SIDE[other(t.side)]}`);
+    rec.fx2={kind:'boom',hex:c}; for(const hh of [c,...nbrs(c)]) groundHit(rec,hh,1,hh===c?3:1,true,c); addSmoke(c);
+    if(!unitAt(c)&&!(S.wrecks||[]).some(w=>w.hex===c)) S.wrecks.push({hex:c,veh:'flieger',side:t.side,face:t.dir}); t.hex=-1; }
+}
+function flyAttack(f,w,t){
+  const rec={id:++S.rollId,side:f.side,title:`${unitName(f)} · ${w||'kein Angriff'}`,rows:[],notes:[],kills:[]}; let last=f.hex;
+  if(w==='Bombe'){ const dv=deviate(t); rec.rows.push({lbl:'Abweichwurf',dice:[{v:dv.w,ok:dv.w>=9,d20:1}],txt:dv.txt}); rec.fx={from:f.hex,to:dv.h,kind:'bomb'};
+    let any=false; for(const hh of [dv.h,...nbrs(dv.h)]) any=groundHit(rec,hh,3,hh===dv.h?3:1,true,dv.h)||any; if(!any) rec.notes.push('Keine Einheit unter der Scheibe.'); last=dv.h; }
+  if(w==='Luftschlag-MGs'){ const dv=deviate(t); rec.rows.push({lbl:'Abweichwurf (alle 4 Scheiben)',dice:[{v:dv.w,ok:dv.w>=9,d20:1}],txt:dv.txt});
+    const L=mgLine(dv.h,f.dir); rec.fx={from:f.hex,to:L[L.length-1],line:L,kind:'strafe'}; let any=false; for(const hh of L) any=groundHit(rec,hh,1,3,true,hh)||any; if(!any) rec.notes.push('Die Garbe trifft niemanden.'); last=L[L.length-1]; }
+  if(w==='Dogfight'){ const e=flierAt(t,f.side); rec.fx={from:f.hex,to:t,kind:'dog'};
+    const need=4, r=Array.from({length:10},d6), hits=r.filter(x=>x>=need).length; rec.rows.push({lbl:`Treffer ${need}+`,dice:r.map(v=>({v,ok:v>=need})),txt:`Dogfight, Fahrzeugbonus −1 → ${hits} Treffer`});
+    if(hits&&e){ const pn=penNeed(1,1), p=Array.from({length:hits},d6), k=p.filter(x=>x>=pn).length; rec.rows.push({lbl:`Durchschlag ${fmtN(pn)}`,dice:p.map(v=>({v,ok:v>=pn})),txt:`Panzerung 1 → ${k} Treffer am Flieger`}); flierHit(e,k,rec); } last=t; }
+  S.roll=rec; logAdd(`${rec.title}`+(rec.kills.length?': '+rec.kills.map(k=>k.dead+' Verluste').join(', '):''));
+  checkWin();
+}
+function flyAfterAttack(f,last){ if(f.dead) return; const n=stepDir(last,f.dir,R1); if(n==null){ flyOut(f); return; } f.hex=n; f.state='abflug'; logAdd(`${unitName(f)} im Abflug`); }
+function doFlyAttack(f,w,t){ const target=t; const before=f.hex; flyAttack(f,w,target);
+  let last=before; if(w==='Bombe'||w==='Luftschlag-MGs'){ const fx=S.roll.fx; last=fx.line?fx.line[fx.line.length-1]:fx.to; } else if(w==='Dogfight') last=target;
+  if(S.phase==='play') flyAfterAttack(f,last); finishFly(); }
+// Flak gegen Flieger (Teil von attack)
+const _attackGround=attack;
+attack=function(u,wn,target){
+  const W=wdef(u,wn);
+  if(W&&W.air){ const t=flierAt(target,u.side); const rec={id:++S.rollId,side:u.side,title:`${unitName(u)} · ${wn} (Flugabwehr)`,rows:[],notes:[],kills:[]};
+    let need=5-1+1; const why=['Fahrzeugbonus −1','Höhenunterschied +1']; if(!S.active.moved){ need--; why.push('nicht bewegt −1'); }
+    const r=Array.from({length:W.dice},d6), hits=r.filter(x=>x>=need).length; rec.rows.push({lbl:`Treffer ${need}+`,dice:r.map(v=>({v,ok:v>=need})),txt:`${why.join(', ')} → ${hits} Treffer`});
+    rec.fx={from:u.hex,to:target,kind:'flak'};
+    if(hits&&t){ const pn=penNeed(W.pd,1), p=Array.from({length:hits},d6), k=p.filter(x=>x>=pn).length; rec.rows.push({lbl:`Durchschlag ${fmtN(pn)}`,dice:p.map(v=>({v,ok:v>=pn})),txt:`→ ${k} Treffer am Flieger`}); flierHit(t,k,rec); }
+    S.active.used=S.active.used||{}; S.active.used[W.slot]=true; S.roll=rec; logAdd(rec.title); checkWin(); return; }
+  return _attackGround(u,wn,target);
+};
+const _targetsGround=targetsFor;
+targetsFor=function(u,wn){ const W=wdef(u,wn);
+  if(W&&W.air){ const out=new Set(); for(const f of S.units) if(onBoard(f)&&f.side!==u.side&&hexDist(u.hex,f.hex)<=W.range&&inArc(u,f.hex,arcOf(u,W))) out.add(f.hex); return out; }
+  return _targetsGround(u,wn); };
+// ---------- KI ----------
+function flyValue(f,w,t){
+  const P2=n=>Math.max(0,Math.min(1,(7-n)/6)), val=(hh,pd,cap)=>{ const o=unitAt(hh); if(!o) return 0; const sg=o.side===f.side?-1.2:1;
+    if(o.veh) return sg*P2(penNeed(pd,armorOf(o,hh,true)))*1.8; return sg*Math.min(cap,alive(o).length)*P2(penNeed(pd,0)); };
+  if(w==='Bombe') return ([t,...nbrs(t)].reduce((s,hh,i)=>s+val(hh,3,i?1:3),0))*.6;
+  if(w==='Luftschlag-MGs') return mgLine(t,f.dir).reduce((s,hh)=>s+val(hh,1,3),0)*.6;
+  if(w==='Dogfight') return 2.2;
+  return 0; }
+function aiFly(){ const f=S.units.find(x=>x.id===S.fly.unit); let best={e:.05,w:null,t:null};
+  for(const w of ['Bombe','Luftschlag-MGs','Dogfight']) for(const t of flyTargets(f,w)){ const e=flyValue(f,w,t); if(e>best.e) best={e,w,t}; }
+  doFlyAttack(f,best.w,best.t); return best; }
+function aiFlyPlan(f){ let best=null;
+  for(const e of S.units){ if(e.side===f.side||!isAlive(e)||e.hex<0||isFly(e)) continue;
+    for(let dir=0;dir<6;dir++){ const h=stepDir(e.hex,(dir+3)%6,2); if(h==null) continue; f.hex=h; f.dir=dir; f.state='anflug';
+      let sc=0; for(const w of ['Bombe','Luftschlag-MGs']) for(const t of flyTargets(f,w)) sc=Math.max(sc,flyValue(f,w,t));
+      if(!best||sc>best.sc) best={sc,hex:h,dir}; } }
+  f.hex=-3; f.state=null; return best; }
+const _aiPlan=aiPlan;
+aiPlan=function(side){ const fl=eligible(side).find(isFly); if(fl){ const p=aiFlyPlan(fl); return p?{unit:fl.id,fly:true,hex:p.hex,dir:p.dir,score:p.sc}:null; } return _aiPlan(side); };
+// ---------- 3D-Flugzeug ----------
+const _procVehicle=procVehicle;
+procVehicle=function(side,k){ if(k!=='flieger') return _procVehicle(side,k);
+  const g=new THREE.Group(), c=VCOL[side], M=mat(c.main), D=mat(c.dark), K=mat(0x1f1f1a);
+  const fus=mesh(new THREE.CylinderGeometry(.09,.06,1.05,10),M,0,0,0); fus.rotation.z=Math.PI/2; g.add(fus);
+  g.add(mesh(new THREE.BoxGeometry(.32,.025,1.3),M,.05,0,0)); g.add(mesh(new THREE.BoxGeometry(.18,.02,.46),D,-.44,.02,0));
+  g.add(mesh(new THREE.BoxGeometry(.14,.18,.02),D,-.46,.1,0)); g.add(mesh(new THREE.BoxGeometry(.16,.07,.1),mat(0x8fb3c4),.12,.09,0));
+  const prop=mesh(new THREE.CylinderGeometry(.2,.2,.01,16),new THREE.MeshBasicMaterial({color:0x222222,transparent:true,opacity:.35}),.53,0,0); prop.rotation.z=Math.PI/2; g.add(prop);
+  const mk=side==='de'?0x1a1a1a:0xe8e8e8; g.add(mesh(new THREE.BoxGeometry(.12,.03,.12),mat(mk),.05,.015,.45)); g.add(mesh(new THREE.BoxGeometry(.12,.03,.12),mat(mk),.05,.015,-.45));
+  return g; };
+const _unitGroup=unitGroup;
+unitGroup=function(u){ const g=_unitGroup(u); if(isFly(u)&&g.userData.body){ g.userData.body.position.y=2.1; g.userData.body.scale.setScalar(1.9);
+    g.children.forEach(o=>{ if(o.isSprite) o.position.y=2.75; }); g.userData.ring.position.y=.05; } return g; };
+const _playFx=playFx;
+playFx=function(rec){ const f=rec&&rec.fx; if(!f||!['bomb','strafe','dog','flak'].includes(f.kind)) return _playFx(rec);
+  if(rec.fx2&&HEX[rec.fx2.hex]) setTimeout(()=>boom(hexPos(rec.fx2.hex,.2)),900);
+  const a=hexPos(f.from,2.1), b=hexPos(f.to,.2);
+  if(f.kind==='bomb') lob(a,b,()=>{ boom(b); boom(hexPos(f.to,.1)); },0x2b2d23,500);
+  if(f.kind==='strafe') (f.line||[f.to]).forEach((hh,i)=>{ const p=hexPos(hh,.15); for(let k=0;k<3;k++) tracer(a,p,i*120+k*40); });
+  if(f.kind==='dog'){ const c=hexPos(f.to,2.1); for(let k=0;k<6;k++) tracer(a,c,k*70); }
+  if(f.kind==='flak'){ const c=hexPos(f.to,2.1), s=hexPos(f.from,.4); for(let k=0;k<6;k++) setTimeout(()=>{ flash(c.clone().add(new THREE.Vector3((Math.random()-.5)*.8,(Math.random()-.5)*.5,(Math.random()-.5)*.8)),0xffa040,.6,250); puff(c.clone(),0x3a3632,.25,900,.2); },k*120); tracer(s,c,0); }
+};
+const _expKills=expKills;
+expKills=function(u,wn,t,moved){ const W=wdef(u,wn); if(W&&W.air) return flierAt(t,u.side)?2.5:0; return _expKills(u,wn,t,moved); };
+// ---------- Bedienung ----------
+const _onHex=onHex;
+onHex=function(i){
+  if(S&&S.phase==='play'&&S.fly&&myTurn()){ const f=S.units.find(x=>x.id===S.fly.unit);
+    if(UI.flyW&&flyTargets(f,UI.flyW).has(i)){ doFlyAttack(f,UI.flyW,i); commit(); maybeDuel(S.roll); return; }
+    return; }
+  if(S&&S.phase==='play'&&S.active&&myTurn()){ const au=S.units.find(x=>x.id===S.active.unit);
+    if(isFly(au)&&!au.state){ UI.flyHex=i; render(); return; }
+    if(isFly(au)&&UI.action==='dog'&&flyTargets(au,'Dogfight').has(i)){ const rec0=S.active; flyAttack(au,'Dogfight',i); S.active=rec0; S.active.used={dog:true}; UI.action=null; commit(); return; } }
+  const g=S&&flierAt(i); if(g&&!unitAt(i)&&(!S.active||UI.action==null)){ showInfo(g); }
+  return _onHex(i);
+};
+const _renderBottom=renderBottom;
+renderBottom=function(){
+  const P=$('prompt'), A=$('actions');
+  if(S.phase==='play'&&S.fly&&ME.mode!=='sim'){ A.innerHTML=''; const f=S.units.find(x=>x.id===S.fly.unit), sp=`<b class="${f.side}">${SIDE[f.side]}</b>`;
+    if(!myTurn()){ P.innerHTML=`${sp}: Kampfflieger greift an – warte …`; return; }
+    P.innerHTML=`${sp} · <b>Kampfflieger greift an</b>: ${UI.flyW?'Ziel antippen (vor dem Flieger, Reichweite 1)':'Bewaffnung wählen'}`;
+    for(const w of ['Bombe','Luftschlag-MGs','Dogfight']){ const n=flyTargets(f,w).size; if(!n) continue;
+      A.appendChild(btn(w,()=>{ UI.flyW=w; render(); },(UI.flyW===w?'on ':'')+'sec',w==='Bombe'?'Gr. Scheibe, Durchschlag 3':w==='Dogfight'?'10 W6 gegen Flieger':'4 Kl. Scheiben in Flugrichtung')); }
+    A.appendChild(btn('Kein Angriff',()=>{ doFlyAttack(f,null,null); commit(); },'sec','weiterfliegen'));
+    return; }
+  if(S.phase==='play'&&S.active&&myTurn()&&ME.mode!=='sim'){ const au=S.units.find(x=>x.id===S.active.unit);
+    if(isFly(au)){ A.innerHTML=''; const sp=`<b class="${au.side}">${SIDE[au.side]}</b>`;
+      if(!au.state){ P.innerHTML=`${sp} · <b>Kampfflieger</b>: ${UI.flyHex==null?'Feld antippen, über dem er auftaucht':'Flugrichtung wählen'}`;
+        if(UI.flyHex!=null) ARROW.forEach((a,d)=>A.appendChild(btn(a,()=>{ flyIn(au,UI.flyHex,d); UI.flyHex=null; commit(); },'sec')));
+        return; }
+      P.innerHTML=`${sp} · <b>Kampfflieger im Anflug</b>: greift nach der nächsten feindlichen Karte an.`+(flyTargets(au,'Dogfight').size&&!(S.active.used&&S.active.used.dog)?' Feindlicher Flieger in Reichweite!':'');
+      if(flyTargets(au,'Dogfight').size&&!(S.active.used&&S.active.used.dog)) A.appendChild(btn('Dogfight',()=>{ UI.action=UI.action==='dog'?null:'dog'; render(); },UI.action==='dog'?'on':'sec','sofort angreifen'));
+      A.appendChild(btn('Fertig',()=>{ UI.action=null; endActivation(); commit(); },'sec','Aktivierung beenden'));
+      return; } }
+  return _renderBottom();
+};
+const _render=render;
+render=function(){ _render(); if(!S||S.phase!=='play') return;
+  const mark=(set,col,op=.45)=>{ for(const i of set){ const m=G.hl[i]; m.visible=true; m.material.color.set(col); m.material.opacity=op; } };
+  if(S.fly){ G.hl.forEach(m=>m.visible=false); const f=S.units.find(x=>x.id===S.fly.unit); if(f&&myTurn()&&UI.flyW) mark(flyTargets(f,UI.flyW),0xff7a40,.55); }
+  else if(S.active&&myTurn()){ const au=S.units.find(x=>x.id===S.active.unit);
+    if(isFly(au)&&!au.state&&UI.flyHex!=null) mark([UI.flyHex],0x9fd0ff,.7);
+    if(isFly(au)&&UI.action==='dog') mark(flyTargets(au,'Dogfight'),0xff7a40,.55); }
+  $('card').innerHTML=S.fly?'<small>✈ Luftangriff</small>':$('card').innerHTML;
+};
+const _renderInfo=renderInfo;
+renderInfo=function(){ const u=S&&S.units.find(x=>x.id===(UI.sel||(S.active&&S.active.unit)||UI.info)); const el=$('unitInfo');
+  if(isFly(u)){ el.innerHTML=`<b>${unitName(u)}</b> · ${u.dead?'abgestürzt':u.state==='anflug'?'im Anflug':u.state==='abflug'?'im Abflug':'in Bereitschaft'} · Treffer ${u.hits||0}/2${u.state?' · Richtung '+ARROW[u.dir]:''}<br>`+
+      `<small>Bombe (RW 1, D 3, Gr. Scheibe) · Luftschlag-MGs (RW 1, D 1, 4 Kl. Scheiben in Flugrichtung) · Dogfight (RW 1, D 1, 10 W6). Angriff nach der nächsten feindlichen Karte, Schusswinkel nach vorne.</small>`; el.classList.add('show'); return; }
+  return _renderInfo(); };
+// ---------- Simulation mit Fliegern ----------
+simLoop=async function(){
+  if(SIM.busy) return; SIM.busy=true;
+  try{
+    while(SIM.on&&S&&S.phase==='play'){
+      while(SIM.pause&&SIM.on) await new Promise(r=>setTimeout(r,200));
+      if(!SIM.on) break;
+      if(S.fly){ const f=S.units.find(x=>x.id===S.fly.unit); SIM.text=`${unitName(f)} greift an`; focusOn(f.hex); render(); await wait(700); const b=aiFly(); SIM.text=b.w?`${unitName(f)}: ${b.w}`:`${unitName(f)} fliegt weiter`; commit(); await wait(b.w?2600:600); continue; }
+      if(!S.turn){ nextCard(); commit(); continue; }
+      const side=S.turn, {c}=cardInfo(S.card); const plan=aiPlan(side); if(!plan){ endActivationFor(); continue; }
+      const u=S.units.find(x=>x.id===plan.unit);
+      SIM.text=`${SIDE[side]} zieht Karte ${c.r} – ${unitName(u)}`; UI.sel=u.id; if(u.hex>=0) focusOn(u.hex); render(); await wait(900);
+      S.active={unit:u.id,moved:false,shot:false,used:{},turns:0}; UI.sel=null; logAdd(`${unitName(u)} wird aktiviert`); commit(); await wait(400);
+      if(plan.fly){ flyIn(u,plan.hex,plan.dir); SIM.text=`${unitName(u)} im Anflug ${ARROW[plan.dir]}`; focusOn(plan.hex); commit(); await wait(1200);
+        const dt=[...flyTargets(u,'Dogfight')][0]; if(dt!=null){ flyAttack(u,'Dogfight',dt); commit(); await wait(2200); }
+        if(S.phase==='play'){ endActivation(); commit(); } await wait(400); continue; }
+      if(plan.moved){ SIM.text=`${unitName(u)} rückt vor`+(!u.veh&&terOf(plan.hex).cover?' in Deckung':''); moveUnit(u,plan.hex); focusOn(plan.hex); commit(); await wait(1100); }
+      if(S.phase!=='play') break;
+      if(u.veh&&plan.face!=null&&plan.face!==u.face){ u.face=plan.face; commit(); await wait(300); }
+      for(let k=0;k<(u.veh?2:1)&&S.phase==='play';k++){ const sh=bestShot(u,S.active.moved); if(!(sh&&sh.e>0.05)) break;
+        const t=unitAt(sh.t)||flierAt(sh.t,u.side); SIM.text=`${unitName(u)} feuert mit ${sh.w}`+(t?` auf ${unitName(t)}`:''); render(); await wait(400);
+        attack(u,sh.w,sh.t); commit(); await wait(2300); }
+      if(S.phase!=='play') break;
+      endActivation(); SIM.text=''; commit(); await wait(450);
+    }
+  } finally { SIM.busy=false; render(); }
+};
+
+document.querySelectorAll('#flySeg button').forEach(b=>{ b.classList.toggle('on',b.dataset.fly===FLY_MODE); b.onclick=()=>{ FLY_MODE=b.dataset.fly; LS('sitzkrieg3d-flymode',FLY_MODE); document.querySelectorAll('#flySeg button').forEach(x=>x.classList.toggle('on',x===b)); }; });
 // ---------- Start ----------
 function resize(){ renderer.setSize(innerWidth,innerHeight,false); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); }
 addEventListener('resize',()=>{ resize(); if(S) fitCamera(); }); resize();
