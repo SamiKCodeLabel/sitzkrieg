@@ -1483,7 +1483,7 @@ function startDuel(id,att,seed){
   const fl=new THREE.Sprite(new THREE.SpriteMaterial({color:0xffc860,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false})); fl.scale.setScalar(.35); fl.position.set(0,0,-.88); gun.add(fl); DUEL.flash=fl;
   $('duel').hidden=false; document.body.classList.add('dueling'); $('d-feed').innerHTML=''; duelMsg(`DUELL<small>${SIDE[att]} greift an – ${SIDE[me]} (du) gegen ${SIDE[en]}</small>`);
   $('d-hpv').textContent=D_HP; $('d-hpb').style.width='100%'; $('d-ammo').textContent=D_MAG;
-  if(!document.body.classList.contains('touch')) setTimeout(()=>{ try{ $('dc').requestPointerLock(); }catch(e){} },300);
+  if(!document.body.classList.contains('touch')) feed('Ins Bild klicken zum Zielen · Esc gibt die Maus frei');
   duelResize(); DUEL.raf=requestAnimationFrame(duelLoop);
 }
 function duelMsg(h,ms){ $('d-msg').innerHTML=h; clearTimeout(DUEL.mt); if(ms!==0) DUEL.mt=setTimeout(()=>{ if(!DUEL.over) $('d-msg').innerHTML=''; },ms||2400); }
@@ -1500,7 +1500,7 @@ function wireDuelInput(){
   const dc=$('dc');
   addEventListener('keydown',e=>{ if(!DUEL.on) return; DUEL.keys[e.code]=true; if(e.code==='KeyR') duelReload(); if(e.code==='Space'&&DUEL.pos.y<=0.01) DUEL.vy=4.6; });
   addEventListener('keyup',e=>{ if(DUEL.on) DUEL.keys[e.code]=false; });
-  dc.addEventListener('mousedown',e=>{ if(!DUEL.on) return; if(document.pointerLockElement!==dc){ try{ dc.requestPointerLock(); }catch(_){} } DUEL.firing=true; });
+  dc.addEventListener('mousedown',e=>{ if(!DUEL.on||DUEL.over) return; if(document.pointerLockElement!==dc){ try{ dc.requestPointerLock(); }catch(_){} } DUEL.firing=true; });
   addEventListener('mouseup',()=>{ if(DUEL.on) DUEL.firing=false; });
   addEventListener('mousemove',e=>{ if(!DUEL.on||document.pointerLockElement!==dc) return; DUEL.yaw-=e.movementX*.0022; DUEL.pitch=Math.max(-1.4,Math.min(1.4,DUEL.pitch-e.movementY*.0022)); });
   // Touch: linker Stick bewegt, rechte Hälfte zum Umsehen
@@ -1522,6 +1522,9 @@ function wireDuelInput(){
   $('d-rel').onpointerdown=e=>{ e.stopPropagation(); duelReload(); };
   $('d-quit').onclick=()=>{ if(!DUEL.on||DUEL.over) return; send({type:'duel-dead',id:DUEL.id,side:DUEL.me,quit:true}); endDuel(DUEL.en,'Du hast aufgegeben'); };
   addEventListener('resize',duelResize);
+  // Sicherheitsnetz: außerhalb eines laufenden Duells nie die Maus gesperrt lassen
+  document.addEventListener('pointerlockchange',()=>{ if(document.pointerLockElement&&(!DUEL.on||DUEL.over)) try{ document.exitPointerLock(); }catch(e){} });
+  addEventListener('blur',()=>{ try{ document.exitPointerLock(); }catch(e){} });
 }
 function duelResize(){ if(!DUEL.cam) return; DUEL.cam.aspect=innerWidth/innerHeight; DUEL.cam.updateProjectionMatrix(); }
 function duelReload(){ if(DUEL.reload||DUEL.ammo===D_MAG) return; DUEL.reload=performance.now()+1800; $('d-ammo').textContent='…'; }
