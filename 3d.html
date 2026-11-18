@@ -408,7 +408,7 @@ const MEMBER={
 const SPEC_POOL={general:3,sniper:2,mine:2,flame:2,shotgun:2,grenade:2,mortar:2,mg:2,mech:1,medic:1};
 const ABIL={
   Feldherr:'Alle Einheiten im Trupp: Trefferwurf um 1 erleichtert, Scheiben weichen nie ab.',
-  Kartograf:'Der Trupp ignoriert unwegsames Gelände.',
+  Kartograf:'Der Trupp ignoriert unwegsames Gelände. (Im 3D-Spiel läuft jeder Trupp überall 2 Felder – außer durch Wasser.)',
   Veteran:'Der General hat statt der Pistole eine Nahkampfwaffe und ein Maschinengewehr.',
   'Unsterblicher':'Der General stirbt nur, wenn ihm 2 Schaden auf einmal zugewiesen werden oder er Schaden mit Durchschlag 3 erhält.',
   Hellseher:'Du darfst jederzeit die oberste Karte des Befehlsstapels ansehen (👁 oben).',
@@ -430,7 +430,7 @@ const TER={
   bunker:{n:'Bunker',cover:1,block:1},
   tower:{n:'Wachturm',cover:1,high:1},
   steeple:{n:'Kirchturm',cover:1,block:1,high:1},
-  wagon:{n:'Waggon',imp:1,block:1},
+  wagon:{n:'Waggon',cover:1,block:1},
   trench:{n:'Graben',rough:1,cover:1},
   hedge:{n:'Panzersperren',rough:1,cover:1},
   crates:{n:'Kisten',cover:1},
@@ -535,15 +535,14 @@ const DIRS=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
 function nbrs(i){ const h=HEX[i], out=[]; for(const [dq,dr] of DIRS){ const j=HEXKEY[(h.q+dq)+','+(h.ax+dr)]; if(j!=null) out.push(j); } return out; }
 function cubeRound(x,y,z){ let rx=Math.round(x),ry=Math.round(y),rz=Math.round(z); const dx=Math.abs(rx-x),dy=Math.abs(ry-y),dz=Math.abs(rz-z);
   if(dx>dy&&dx>dz) rx=-ry-rz; else if(dy>dz) ry=-rx-rz; else rz=-rx-ry; return {x:rx,y:ry,z:rz}; }
-function hexLine(a,b){ const n=hexDist(a,b), A=cubeOf(HEX[a]),B=cubeOf(HEX[b]), out=[];
-  for(let i=0;i<=n;i++){ const t=n?i/n:0; const c=cubeRound(A.x+(B.x-A.x)*t+1e-6,A.y+(B.y-A.y)*t+1e-6,A.z+(B.z-A.z)*t-2e-6); const j=HEXKEY[c.x+','+c.z]; if(j!=null) out.push(j); }
+function hexLine(a,b,sg=1){ const n=hexDist(a,b), A=cubeOf(HEX[a]),B=cubeOf(HEX[b]), out=[], e=1e-6*sg;
+  for(let i=0;i<=n;i++){ const t=n?i/n:0; const c=cubeRound(A.x+(B.x-A.x)*t+e,A.y+(B.y-A.y)*t+e,A.z+(B.z-A.z)*t-2*e); const j=HEXKEY[c.x+','+c.z]; if(j!=null) out.push(j); }
   return out; }
 const terOf=i=>TER[HEX[i].ter]||{};
-function hasLOS(a,b){
-  const hi=terOf(a).high;
-  for(const j of hexLine(a,b).slice(1,-1)){ const t=terOf(j); if(t.block && !(hi&&HEX[j].ter==='wald')) return false; }
-  return true;
-}
+function lineClear(a,b,sg){ const hi=terOf(a).high||terOf(b).high;
+  for(const j of hexLine(a,b,sg).slice(1,-1)){ const t=terOf(j); if(t.block && !(hi&&HEX[j].ter==='wald')) return false; } return true; }
+// symmetrisch: wer dich sieht, den siehst du auch (beide Rundungsrichtungen prüfen)
+function hasLOS(a,b){ return lineClear(a,b,1)||lineClear(a,b,-1); }
 const smokeAt=i=>S.smoke.some(s=>s.hex===i);
 function smokeOnLine(a,b){ return hexLine(a,b).some(j=>smokeAt(j)); }
 
@@ -553,7 +552,7 @@ function reach(u,par){
   cost[u.hex]=0; const q=[u.hex];
   while(q.length){ const i=q.shift();
     for(const j of nbrs(i)){ const t=terOf(j); if(t.imp||unitAt(j)) continue;
-      const c=cost[i]+((t.rough&&!kart)?2:1); if(c>budget) continue;
+      const c=cost[i]+1; if(c>budget) continue;            // immer 2 Felder – nur Wasser ist unpassierbar
       if(cost[j]==null||c<cost[j]){ cost[j]=c; par[j]=i; out.add(j); q.push(j); } } }
   return out;
 }
