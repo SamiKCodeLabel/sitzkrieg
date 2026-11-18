@@ -827,6 +827,38 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 html[data-theme="dark"] #lb-in{background:#1e2216;color:#e3dcc0;border-color:#5d5b42}
 html[data-theme="dark"] .lb-codebox b{color:#d0634f}
 @media (max-width:640px){ #lb-host{width:100%} .lb-or{display:none} #lb-in{flex:1} }
+
+/* Aufstellung */
+.tok{position:absolute;z-index:8;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;display:grid;place-items:center;
+  font:700 13px/1 var(--head);color:#151710;border:2px solid #151710;box-shadow:0 2px 5px rgba(0,0,0,.55);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.tok.de{background:#8a9db3}.tok.al{background:#a3b842}
+.tok.veh{border-radius:5px;width:38px;margin-left:-19px;font-size:11px;letter-spacing:.02em}
+.tok.gen{box-shadow:0 0 0 2px var(--gold),0 2px 5px rgba(0,0,0,.55)}
+.tok.sel{outline:3px solid #d8452c;outline-offset:2px;animation:blink 1s infinite}
+.tok.drag{z-index:20;transform:scale(1.25);cursor:grabbing;opacity:.9}
+#map.placing .cell{cursor:crosshair}
+.deploy{max-width:1000px;margin:10px auto 0;padding:8px 10px;border:1px solid #6f6a4a;background:rgba(239,231,204,.5);font-family:var(--type);font-size:.85rem}
+.deploy[hidden]{display:none}
+.dp-head{margin-bottom:6px}.dp-head b{font-family:var(--head);text-transform:uppercase;letter-spacing:.05em;color:var(--stamp)}
+.dp-head small{color:var(--muted)}
+.dp-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0;min-height:34px}
+.dp-row>b{width:16px;font-size:1.1rem}
+.deploy .tok{position:static;margin:0!important;cursor:pointer}
+main{overflow-x:clip}
+.dp-sel{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.dp-sel span{font-weight:700;flex-basis:100%}
+.dp-sel button{font-size:.78rem;padding:5px 9px}
+html[data-theme="dark"] .deploy{background:rgba(18,21,13,.62);border-color:#4a4a32}
+@media (max-width:640px){ .tok{width:24px;height:24px;margin:-12px 0 0 -12px;font-size:11px}.tok.veh{width:32px;margin-left:-16px;font-size:9px} .deploy .tok{width:30px;height:30px;font-size:13px}.deploy .tok.veh{width:38px;font-size:11px} }
+
+/* Gedrückt halten */
+.holdable{position:relative;overflow:hidden;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.holdable::after{content:"";position:absolute;left:0;bottom:0;height:100%;width:100%;background:linear-gradient(90deg,rgba(216,69,44,.35),rgba(216,69,44,.7));box-shadow:inset -3px 0 0 #f3ead0;transform:scaleX(0);transform-origin:left;pointer-events:none}
+.holdable.holding::after{transform:scaleX(1);transition:transform 1.2s linear}
+.holdable .hold-hint{display:block;font-family:var(--type);font-size:.58rem;letter-spacing:.02em;text-transform:none;opacity:.75;margin-top:2px;font-weight:400}
+#fab .hold-hint{font-size:.55rem}
+#map.fresh{animation:fresh .7s ease-out}
+@keyframes fresh{0%{filter:brightness(2.2) sepia(.6)}100%{filter:none}}
 </style>
 </head>
 <body>
@@ -2662,6 +2694,138 @@ netStatus('off','Nicht verbunden');
     if(old.role==='host'){ NET.rejoinHost=true; hostLobby(old.code); } else joinLobby(old.code);
   }
 })();
+
+// ---------- Aufstellung: Einheiten-Marker auf der Karte ----------
+const VSHORT={schwer:'SP',leicht:'LP',art:'FLAK',trans:'TR',krad:'KR',flieger:'✈'};
+let SEL=null;                                   // ausgewählte Einheit: 'de:3' / 'al:f'
+function posState(){
+  const k=lossKey()+'|'+(current?current.seed:0);
+  if(!G.pos||G.posKey!==k){ G.pos={}; G.posKey=k; }
+  return G.pos;
+}
+function unitList(side){
+  const a=sortedArmy(side), L=[];
+  if(flyerOn) L.push({id:side+':f',side,lbl:'✈',name:'Kampfflieger',veh:true,dead:isDead(side,'f',2)});
+  a.forEach((x,i)=>L.push({id:side+':'+i,side,veh:x.veh,
+    lbl:x.veh?VSHORT[x.key]||'?':String(i+1),
+    gen:!x.veh&&x.units.some(u=>u.key==='general'),
+    name:x.veh?x.name:`Trupp ${i+1}: `+x.units.map(u=>u.name+(u.abil?' ★ '+u.abil.name:'')).join(' + '),
+    dead:isDead(side,i,slotMax(x))}));
+  return L;
+}
+function gridBox(){
+  const map=$('map'), cells=map.querySelectorAll('.cell'); if(!cells.length) return null;
+  const mr=map.getBoundingClientRect(); let l=1e9,t=1e9,r=-1e9,b=-1e9;
+  cells.forEach(c=>{ const q=c.getBoundingClientRect(); l=Math.min(l,q.left); t=Math.min(t,q.top); r=Math.max(r,q.right); b=Math.max(b,q.bottom); });
+  return {l:l-mr.left-map.clientLeft,t:t-mr.top-map.clientTop,w:r-l,h:b-t,abs:{l,t,w:r-l,h:b-t}};
+}
+// logische Kartenkoordinaten (x = Spalte 0..COLS, y = Zeile 0..ROWS) <-> Anzeige-Anteile
+function toDisp(p){ return isPortrait()?{fx:(ROWS-p.y)/ROWS,fy:p.x/COLS}:{fx:p.x/COLS,fy:p.y/ROWS}; }
+function fromDisp(fx,fy){ fx=Math.min(.98,Math.max(.02,fx)); fy=Math.min(.98,Math.max(.02,fy)); return isPortrait()?{x:fy*COLS,y:ROWS*(1-fx)}:{x:fx*COLS,y:fy*ROWS}; }
+function tokenHTML(u,cls=''){ return `<span class="tok ${u.side}${u.veh?' veh':''}${u.gen?' gen':''}${cls}" data-id="${u.id}" title="${esc((u.side==='de'?'♣ ':'♥ ')+u.name)}">${u.lbl}</span>`; }
+function drawTokens(){
+  const map=$('map'); map.querySelectorAll('.tok,.tok-lbl').forEach(e=>e.remove());
+  if(!current||current.error||!armies.de) return;
+  const box=gridBox(); if(!box) return;
+  const P=posState();
+  for(const side of ['de','al']) for(const u of unitList(side)){
+    const p=P[u.id]; if(!p||u.dead) continue;
+    const d=toDisp(p);
+    map.insertAdjacentHTML('beforeend',tokenHTML(u,SEL===u.id?' sel':''));
+    const el=map.lastElementChild; el.style.left=(box.l+d.fx*box.w)+'px'; el.style.top=(box.t+d.fy*box.h)+'px';
+  }
+  map.classList.toggle('placing',!!SEL);
+  drawTray();
+}
+function drawTray(){
+  const tr=$('deploy'); if(!tr) return;
+  if(!current||current.error||!armies.de){ tr.hidden=true; return; }
+  tr.hidden=false;
+  const P=posState(); let selName='';
+  const row=side=>{ const L=unitList(side).filter(u=>!u.dead);
+    const off=L.filter(u=>!P[u.id]);
+    L.forEach(u=>{ if(u.id===SEL) selName=(side==='de'?'♣ ':'♥ ')+u.name; });
+    return `<div class="dp-row"><b class="mm-${side}">${side==='de'?'♣':'♥'}</b>${off.length?off.map(u=>tokenHTML(u,SEL===u.id?' sel':'')).join(''):'<small>alle aufgestellt</small>'}</div>`; };
+  tr.innerHTML=`<div class="dp-head"><b>Aufstellung</b> <small>${SEL?'Jetzt auf die Karte tippen, um die Einheit hinzustellen':'Einheit antippen, dann auf die Karte tippen – oder Marker ziehen'}</small></div>`+
+    row('de')+row('al')+
+    `<div class="dp-sel">${SEL?`<span>▶ ${esc(selName)}</span>${P[SEL]?'<button class="sec" id="dp-off">✕ vom Feld nehmen</button>':''}<button class="sec" id="dp-x">Abbrechen</button>`:''}<button class="sec" id="dp-clear">Alle zurück</button></div>`;
+}
+function selectUnit(id){ SEL=SEL===id?null:id; drawTokens(); }
+function placeAt(id,clientX,clientY){
+  const box=gridBox(); if(!box) return;
+  const fx=(clientX-box.abs.l)/box.abs.w, fy=(clientY-box.abs.t)/box.abs.h;
+  if(fx<-.05||fx>1.05||fy<-.05||fy>1.05) return false;
+  posState()[id]=fromDisp(fx,fy); saveG(); return true;
+}
+// Klicks: Leiste + Karte
+document.addEventListener('click',e=>{
+  const t=e.target.closest('#deploy .tok'); if(t){ selectUnit(t.dataset.id); return; }
+  if(e.target.id==='dp-x'){ SEL=null; drawTokens(); }
+  if(e.target.id==='dp-off'){ delete posState()[SEL]; SEL=null; saveG(); drawTokens(); }
+  if(e.target.id==='dp-clear'){ if(confirm('Alle Einheiten von der Karte nehmen?')){ G.pos={}; SEL=null; saveG(); drawTokens(); } }
+});
+// Karte: Marker ziehen / antippen, Platzieren; fängt vor dem Gelände-Popup ab
+let drag=null;
+$('map').addEventListener('pointerdown',e=>{
+  const t=e.target.closest('.tok'); if(!t) return;
+  e.preventDefault(); drag={id:t.dataset.id,el:t,x:e.clientX,y:e.clientY,moved:false};
+  t.setPointerCapture(e.pointerId);
+});
+$('map').addEventListener('pointermove',e=>{
+  if(!drag) return;
+  if(!drag.moved && Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<6) return;
+  drag.moved=true; drag.el.classList.add('drag');
+  const mr=$('map').getBoundingClientRect();
+  drag.el.style.left=(e.clientX-mr.left-$('map').clientLeft)+'px'; drag.el.style.top=(e.clientY-mr.top-$('map').clientTop)+'px';
+});
+const endDrag=e=>{
+  if(!drag) return; const d=drag; drag=null;
+  if(d.moved){ if(!placeAt(d.id,e.clientX,e.clientY)){ delete posState()[d.id]; saveG(); } SEL=null; drawTokens(); }
+  else selectUnit(d.id);
+  d.suppress=true; suppressClick=true; setTimeout(()=>suppressClick=false,50);
+};
+let suppressClick=false;
+$('map').addEventListener('pointerup',endDrag);
+$('map').addEventListener('pointercancel',()=>{ drag=null; drawTokens(); });
+$('map').addEventListener('click',e=>{
+  if(suppressClick||e.target.closest('.tok')){ e.stopImmediatePropagation(); return; }
+  if(SEL){ e.stopImmediatePropagation(); if(placeAt(SEL,e.clientX,e.clientY)){ SEL=null; drawTokens(); } }
+},true);
+// Leiste unter der Karte einhängen
+$('map').insertAdjacentHTML('afterend','<div id="deploy" class="deploy" hidden></div>');
+const _rDeploy=render; render=function(){ _rDeploy(); drawTokens(); };
+const _raDeploy=renderArmy; renderArmy=function(side){ _raDeploy(side); if(side==='al') drawTokens(); };
+window.addEventListener('resize',()=>requestAnimationFrame(drawTokens));
+
+
+// ---------- „Neue Karte“ gedrückt halten = komplett frische Runde ----------
+const HOLD_MS=1200;
+function freshRound(){
+  SEL=null;
+  run(newSeed()); genArmies();            // erst Karte + Armeen (Missionstyp), dann passender Stapel
+  newGame(); LOSS={}; saveLoss();
+  renderSpiel();
+  toast('Neue Runde: Karte, Armeen, Mission, Siegpunkte und Stapel neu');
+  const m=$('map'); m.classList.remove('fresh'); void m.offsetWidth; m.classList.add('fresh');
+}
+function holdable(btn,active){
+  if(!btn) return;
+  btn.classList.add('holdable');
+  let tm=null, fired=false;
+  const stop=()=>{ clearTimeout(tm); tm=null; btn.classList.remove('holding'); };
+  btn.addEventListener('pointerdown',e=>{
+    if(active&&!active()) return;
+    fired=false; btn.classList.add('holding');
+    tm=setTimeout(()=>{ fired=true; stop(); if(navigator.vibrate) try{ navigator.vibrate(60); }catch(_){} freshRound(); },HOLD_MS);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,stop));
+  btn.addEventListener('click',e=>{ if(fired){ fired=false; e.stopImmediatePropagation(); e.preventDefault(); } },true);
+  btn.addEventListener('contextmenu',e=>e.preventDefault());
+}
+$('gen').insertAdjacentHTML('beforeend','<small class="hold-hint">gedrückt halten: alles neu</small>');
+document.querySelector('#fab .lbl-map')?.insertAdjacentHTML('beforeend','<small class="hold-hint">halten: alles neu</small>');
+holdable($('gen'));
+holdable($('fab'),()=>!document.body.classList.contains('on-mission'));
 
 // erstes Zeichnen mit allen Erweiterungen
 render(); if(armies.de&&armies.al){ renderArmy('de'); renderArmy('al'); }
