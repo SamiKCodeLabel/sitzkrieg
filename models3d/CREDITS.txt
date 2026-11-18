@@ -1,0 +1,6 @@
+3D-Modelle: alle CC0 (Public Domain), über poly.pizza
+Quaternius: soldier, pines, house, barn, silo, tower, bush, rock1-3, fence, crate, sandbag, dock, boat, floorbroken, tank_de, tank_al
+CreativeTrio: church
+Kenney: fence2, barrier
+cg_world: crate2
+Isa Lousberg: cobbles
