@@ -175,6 +175,34 @@ html[data-theme="dark"] .gc-sub{color:#a9a486}
   .gc-body table.rt th,.gc-body table.rt td{font-size:.6rem!important;padding:1px 4px!important}
   .gc-body .armor{zoom:.5}
 }
+
+/* ---------- Lobby (2 Geräte live), versteckt im Popup hinter dem Knopf oben rechts ---------- */
+.net-pop{position:absolute;top:116px;right:64px;z-index:40;width:260px;background:#e6dcb8;color:#23241c;border:2px solid #4a4a32;border-radius:6px;padding:12px;box-shadow:0 0 0 3px #22261a,0 12px 30px rgba(0,0,0,.55)}
+.net-pop[hidden],.lb-off[hidden],.lb-on[hidden]{display:none!important}
+.np-head{font-family:var(--head);text-transform:uppercase;letter-spacing:.08em;color:var(--stamp);font-size:1.05rem;margin-bottom:8px}
+.np-sw{display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--head);text-transform:uppercase;letter-spacing:.04em;font-size:.9rem}
+.np-sw input{width:20px;height:20px;accent-color:#5f6838;margin:0}
+.np-hint{font-size:.78rem;line-height:1.35;margin:6px 0 10px;color:#5e5b45}
+.lb-off{display:flex;gap:8px}
+.lb-off input{flex:1;min-width:0;font:700 1.05rem var(--head);letter-spacing:.2em;text-align:center;text-transform:uppercase;padding:7px 6px;border:1px solid #6f6a4a;background:#f3ecd4;color:#23241c;border-radius:4px}
+.lb-off button,.np-btns button{padding:7px 12px;font-size:.85rem}
+.lb-on{text-align:center}
+.np-code{display:flex;align-items:center;justify-content:center;gap:10px}
+.lb-dot{width:10px;height:10px;border-radius:50%;background:#d8b34a;flex:none}
+.lb-on.ok .lb-dot{background:#6fbf3a;box-shadow:0 0 6px #6fbf3a}
+.lb-code{font-family:var(--head);font-size:2rem;letter-spacing:.25em;color:var(--stamp)}
+.lb-status{font-family:var(--type);font-size:.82rem;margin:2px 0 8px}
+.np-btns{display:flex;gap:8px;justify-content:center}
+#net-btn{position:absolute}
+#net-btn .net-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#d8b34a;display:none}
+#net-btn.wait .net-dot{display:block}
+#net-btn.live .net-dot{display:block;background:#6fbf3a;box-shadow:0 0 6px #6fbf3a}
+.lb-toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-60px);opacity:0;z-index:70;background:#22261a;color:#ece4c8;border:1px solid var(--gold);padding:8px 14px;font-family:var(--type);font-size:.9rem;border-radius:4px;transition:all .25s;pointer-events:none;max-width:90vw;text-align:center}
+.lb-toast.show{opacity:1;transform:translate(-50%,0)}
+html[data-theme="dark"] .net-pop{background:#2a2f20;color:#e3dcc0;border-color:#5d5b42}
+html[data-theme="dark"] .np-hint{color:#a9a486}
+html[data-theme="dark"] .lb-off input{background:#1e2216;color:#e3dcc0;border-color:#5d5b42}
+@media (max-width:640px){ .net-pop{top:100px;right:56px;width:min(260px,calc(100vw - 80px))} }
 </style>
 <style>
   :root{
@@ -720,6 +748,11 @@ html[data-theme="dark"] .gc-sub{color:#a9a486}
 
   /* Lautstärkeregler: unter dem Tag/Nacht-Knopf, Regler klappt hochkant heraus */
   .vol{position:absolute;top:64px;right:12px;z-index:6}
+  #net-btn{position:absolute;top:116px;right:12px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;z-index:5}
+  #net-btn svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+  #net-btn circle{fill:currentColor;stroke:none}
+  #net-btn.on{background:linear-gradient(#6b7a2c,#4b5320);color:#fff;border-color:#a3b842;box-shadow:0 0 0 2px #22261a,0 0 10px rgba(111,191,58,.7)}
+  @media (max-width:640px){ #net-btn{top:100px;right:8px;width:40px;height:40px} }
   .vol-btn{width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center}
   .vol-btn svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .vol-btn .spk{fill:currentColor}
@@ -888,6 +921,21 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <path d="M3 9h4l5-4v14l-5-4H3z" class="spk"/><path class="w1" d="M15 9.5a3.5 3.5 0 0 1 0 5"/><path class="w2" d="M17.5 7a7 7 0 0 1 0 10"/><path class="mx" d="M15.5 9.5l5 5M20.5 9.5l-5 5"/></svg></button>
     <div class="vol-pop"><input type="range" id="vol-r" min="0" max="100" step="5" aria-label="Lautstärke"><output id="vol-o"></output></div>
   </div>
+  <button id="net-btn" class="sec" type="button" aria-pressed="false" aria-label="Online-Lobby an/aus" title="Online-Lobby: zwei Geräte live verbinden"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.2"/><path d="M8.2 8.2a5.4 5.4 0 0 0 0 7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.2 5.2a9.6 9.6 0 0 0 0 13.6M18.8 5.2a9.6 9.6 0 0 1 0 13.6"/></svg><i class="net-dot"></i></button>
+  <div class="net-pop" id="net-pop" hidden role="dialog" aria-label="Online-Lobby">
+    <div class="np-head">Online-Lobby</div>
+    <label class="np-sw"><input type="checkbox" id="lb-enable"> <span>Lobby-Funktion an</span></label>
+    <p class="np-hint" id="np-hint">Ist sie an, erstellt „Neue Karte“ einmal eine Lobby. Den Code gibst du deinem Freund.</p>
+    <div class="lb-off" id="lb-off">
+      <input id="lb-in" maxlength="4" placeholder="CODE" autocomplete="off" spellcheck="false" aria-label="Lobby-Code" enterkeyhint="go">
+      <button class="sec" id="lb-join">Beitreten</button>
+    </div>
+    <div class="lb-on" id="lb-on" hidden>
+      <div class="np-code"><span class="lb-dot"></span><b class="lb-code" id="lb-code">––––</b></div>
+      <div class="lb-status" id="lb-status"></div>
+      <div class="np-btns"><button class="sec" id="lb-share">Teilen</button><button class="sec" id="lb-leave">Verlassen</button></div>
+    </div>
+  </div>
   <button id="theme" class="sec" type="button" aria-label="Tag/Nacht umschalten" title="Tag/Nacht umschalten">☾</button>
   <h1>Sitzkrieg</h1>
   <p class="sub" id="sub">Karte</p>
@@ -897,6 +945,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <button role="tab" class="sec" data-tab="spiel" id="t-spiel">🎲 Spiel</button>
     <button role="tab" class="sec" data-tab="regeln" id="t-regeln">📜 Regelwerk</button>
   </nav>
+  <div class="lb-toast" id="lb-toast" aria-live="polite"></div>
   <section id="tab-gen" class="tabpane">
   <div class="bar">
     <button id="gen" class="big">🎲 Neue Karte</button>
@@ -2081,7 +2130,7 @@ function draw(){
     const sp=(armies[c.side]||[]).filter(x=>!x.veh&&x.units&&x.units.length&&!(x.rif));
     const sl=sp[Math.floor(Math.random()*sp.length)]; c.unit=sl?sl.units[0]:null;
   }
-  S.cur=c; render();
+  S.cur=c; render(); if(window.netChanged) netChanged();
 }
 const ARROW='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24 H38 M26 11 L39 24 L26 37"/></svg>';
 function cardHTML(c){
@@ -2125,7 +2174,155 @@ function render(){
   $('sp-next').onclick=draw;
 }
 window.renderSpiel=render;
+window.spielGet=()=>({round:S.round,deck:S.deck,cur:S.cur,newRound:S.newRound});
+window.spielSet=o=>{ if(!o) return; S.round=o.round; S.deck=o.deck||[]; S.cur=o.cur||null; S.newRound=!!o.newRound; S.sig=sigNow(); render(); };
 render();
+})();
+</script>
+<script>
+// ===================== Lobby: 2 Geräte live verbinden (PeerJS / WebRTC) =====================
+(function(){
+const NET={peer:null,conn:null,role:null,code:null,applying:false,ts:0,timer:null,retry:0,lib:null,rejoin:false};
+const PREFIX='sitzkrieg2d-lobby-', ABC='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const newCode=()=>Array.from({length:4},()=>ABC[Math.floor(Math.random()*ABC.length)]).join('');
+const store=(v)=>{ try{ if(v===undefined) return JSON.parse(localStorage.getItem('sitzkrieg-lobby2d')); localStorage.setItem('sitzkrieg-lobby2d',JSON.stringify(v)); }catch(e){ return null; } };
+let toastT; function toast(t){ const el=$('lb-toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2600); }
+function loadLib(){
+  if(window.Peer) return Promise.resolve();
+  if(NET.lib) return NET.lib;
+  NET.lib=new Promise((ok,fail)=>{ const sc=document.createElement('script'); sc.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
+    sc.onload=ok; sc.onerror=()=>{ NET.lib=null; fail(new Error('offline')); }; document.head.appendChild(sc); });
+  return NET.lib;
+}
+function ui(state,text){
+  const on=!!NET.role, b=$('net-btn');
+  b.classList.toggle('live',on&&state==='on'); b.classList.toggle('wait',on&&state!=='on');
+  $('lb-off').hidden=on; $('lb-on').hidden=!on;
+  $('lb-on').classList.toggle('ok',state==='on');
+  $('lb-code').textContent=NET.code||'––––';
+  $('lb-status').textContent=text||'';
+}
+function remember(){ store(NET.role?{role:NET.role,code:NET.code,t:Date.now()}:null); }
+function snapshot(){
+  return {type:'state',ts:NET.ts,size:$('size').value,seed:current?current.seed:0,settings,
+          armies:{de:armies.de,al:armies.al},spiel:window.spielGet?spielGet():null};
+}
+function send(m){ if(NET.conn&&NET.conn.open){ try{ NET.conn.send(m); }catch(e){} } }
+function netChanged(){
+  if(NET.applying||!NET.conn) return;
+  clearTimeout(NET.timer);
+  NET.timer=setTimeout(()=>{ NET.ts=Date.now(); send(snapshot()); },60);
+}
+window.netChanged=netChanged;
+function apply(m){
+  if(m.ts && m.ts<NET.ts) return;
+  NET.applying=true;
+  try{
+    NET.ts=m.ts||Date.now();
+    if(m.settings) settings=m.settings;
+    $('size').value=m.size;
+    run(m.seed);
+    if(m.armies){ armies.de=m.armies.de; armies.al=m.armies.al; renderArmy('de'); renderArmy('al'); }
+    if(m.spiel&&window.spielSet) spielSet(m.spiel);
+    try{ buildPool(); }catch(e){}
+  } finally { NET.applying=false; }
+}
+function onData(m){
+  if(!m||typeof m!=='object') return;
+  if(m.type==='full'){ toast('Diese Lobby ist schon voll'); leave(); return; }
+  if(m.type==='hello'){ NET.ts=Date.now(); send(snapshot()); toast('Dein Freund ist in der Lobby'); }
+  else if(m.type==='state') apply(m);
+}
+function attach(conn){
+  if(NET.conn && NET.conn!==conn){ const old=NET.conn; NET.conn=null; try{ old.close(); }catch(e){} }
+  NET.conn=conn;
+  conn.on('open',()=>{ NET.retry=0; ui('on','Verbunden'); if(NET.role==='guest'){ send({type:'hello'}); toast('Mit Lobby '+NET.code+' verbunden'); } });
+  conn.on('data',onData);
+  conn.on('close',()=>{ if(NET.conn===conn) NET.conn=null; lost(); });
+  conn.on('error',()=>{});
+}
+function lost(){
+  if(!NET.role) return;
+  if(NET.role==='host'){ ui('wait','Warte auf Freund …'); toast('Freund getrennt'); return; }
+  ui('wait','Verbindung weg – verbinde neu …');
+  if(NET.retry++<20) setTimeout(()=>{ if(NET.role==='guest'&&!(NET.conn&&NET.conn.open)) connectGuest(); },2500);
+  else ui('off','Verbindung verloren');
+}
+function connectGuest(){
+  if(!NET.peer||NET.peer.destroyed) return start();
+  if(NET.peer.disconnected){ try{ NET.peer.reconnect(); }catch(e){} }
+  attach(NET.peer.connect(PREFIX+NET.code,{reliable:true}));
+}
+async function start(){
+  try{ await loadLib(); }catch(e){ NET.role=null; remember(); ui('off'); toast('Kein Internet – Lobby nicht möglich'); return; }
+  if(NET.peer){ try{ NET.peer.destroy(); }catch(e){} }
+  const p=NET.role==='host'?new Peer(PREFIX+NET.code):new Peer(); NET.peer=p;
+  p.on('open',()=>{ if(NET.role==='host'){ ui('wait','Warte auf Freund …'); remember(); } else connectGuest(); });
+  p.on('connection',c=>{
+    if(NET.role!=='host') return;
+    if(NET.conn&&NET.conn.open&&NET.conn!==c){ c.on('open',()=>{ try{ c.send({type:'full'}); }catch(e){} setTimeout(()=>c.close(),500); }); return; }
+    attach(c);
+  });
+  p.on('disconnected',()=>{ if(NET.peer===p&&!p.destroyed) setTimeout(()=>{ try{ p.reconnect(); }catch(e){} },1500); });
+  p.on('error',err=>{
+    const t=err&&err.type;
+    if(t==='unavailable-id'){ NET.code=newCode(); start(); }
+    else if(t==='peer-unavailable'){
+      if(NET.retry>0&&NET.retry<20){ lost(); return; }
+      toast('Lobby '+NET.code+' nicht gefunden'); NET.role=null; NET.code=null; remember(); ui('off');
+    } else if(['network','server-error','socket-error','socket-closed'].includes(t)){
+      ui('wait','Netzwerkproblem – versuche erneut …'); setTimeout(()=>{ if(NET.role) start(); },3000);
+    } else ui('wait','Fehler: '+(t||'unbekannt'));
+  });
+}
+function host(code){ leave(true); NET.role='host'; NET.code=code||newCode(); NET.ts=Date.now(); ui('wait','Lobby wird erstellt …'); start(); }
+function join(code){
+  if(!lbOn) setEnabled(true);
+  code=(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(code.length!==4){ toast('Der Lobby-Code hat 4 Zeichen'); return; }
+  leave(true); NET.role='guest'; NET.code=code; NET.ts=0; NET.retry=0; ui('wait','Verbinde mit '+code+' …'); remember(); start();
+}
+function leave(silent){
+  NET.role=null; remember();
+  if(NET.conn){ try{ NET.conn.close(); }catch(e){} NET.conn=null; }
+  if(NET.peer){ try{ NET.peer.destroy(); }catch(e){} NET.peer=null; }
+  NET.code=null; ui('off');
+}
+window.lobby={host,join,leave,get state(){ return {role:NET.role,code:NET.code,open:!!(NET.conn&&NET.conn.open)}; }};
+// Bedienung
+$('lb-join').onclick=()=>join($('lb-in').value);
+$('lb-in').addEventListener('keydown',e=>{ if(e.key==='Enter') $('lb-join').click(); });
+$('lb-in').addEventListener('input',e=>{ e.target.value=e.target.value.toUpperCase(); });
+$('lb-leave').onclick=()=>{ leave(); toast('Lobby verlassen'); };
+$('lb-share').onclick=async()=>{
+  const u=new URL(location.href); u.hash=''; u.search='?lobby='+NET.code; const url=u.toString(), text='Sitzkrieg-Lobby '+NET.code;
+  if(navigator.share){ try{ await navigator.share({title:text,text,url}); return; }catch(e){} }
+  try{ await navigator.clipboard.writeText(url); toast('Link kopiert'); }catch(e){ prompt('Link zum Beitreten:',url); }
+};
+// Neue Karte: ohne Lobby einmal eine Lobby erstellen, sonst einfach würfeln (und an den Freund schicken)
+const genBtn=$('gen'), prevGen=genBtn.onclick;
+genBtn.onclick=e=>{ prevGen&&prevGen.call(genBtn,e); if(enabled()&&!NET.role){ host(); toast('Lobby erstellt – Code an deinen Freund geben'); } };
+// Änderungen weitergeben
+const _run=run; run=function(seed){ _run(seed); netChanged(); };
+const _gen=genArmies; genArmies=function(code){ _gen(code); netChanged(); };
+// Ein/Aus in den Karten-Einstellungen (Standard: aus)
+let lbOn=false;
+function enabled(){ return lbOn; }
+function setEnabled(on){
+  lbOn=on; $('lb-enable').checked=on; $('net-btn').classList.toggle('on',on); $('net-btn').setAttribute('aria-pressed',on);
+  try{ localStorage.setItem('sitzkrieg-lobby-an',on?'1':'0'); }catch(e){}
+  if(!on && NET.role) leave();
+}
+$('lb-enable').onchange=()=>setEnabled($('lb-enable').checked);
+$('net-btn').onclick=e=>{ e.stopPropagation(); $('net-pop').hidden=!$('net-pop').hidden; };
+$('net-pop').addEventListener('click',e=>e.stopPropagation());
+document.addEventListener('click',()=>{ $('net-pop').hidden=true; });
+let on0=false; try{ on0=localStorage.getItem('sitzkrieg-lobby-an')==='1'; }catch(e){}
+// Beitreten per Link schaltet die Lobby-Funktion ein; sonst nach dem Neuladen wieder verbinden
+const q=new URLSearchParams(location.search).get('lobby');
+if(q){ setEnabled(true); try{ history.replaceState(null,'',location.pathname); }catch(e){} join(q); }
+else { setEnabled(on0); const r=store(); if(on0&&r&&r.code&&Date.now()-r.t<3*3600e3){ if(r.role==='host') host(r.code); else join(r.code); } }
+ui(NET.role?'wait':'off', NET.role?$('lb-status').textContent:'');
 })();
 </script>
 <script>
