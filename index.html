@@ -1713,12 +1713,16 @@ function renderArmy(side){
   // Reihenfolge: Fahrzeuge (feste Ordnung), danach Trupps
   const rank=slotRank;
   const a=[...armies[side]].sort((x,y)=>rank(x)-rank(y)), f=FACTIONS[side], el=$('army-'+side); el.className='army '+side;
+  const isPure=x=>!x.veh&&!x.units.length, firstPure=a.findIndex(isPure), pureN=a.filter(isPure).length;   // reine Gewehrschützen-Trupps als eine Zeile
   const veh=a.filter(x=>x.veh).length, sq=a.filter(x=>rifOf(x)>0).length, solo=a.filter(x=>!x.veh&&rifOf(x)===0).length, rif=a.reduce((n,x)=>n+rifOf(x),0), men=a.reduce((n,x)=>n+(x.veh?0:x.units.length+rifOf(x)),0);
   el.innerHTML=`<div class="army-head"><span class="emblem">${f.emblem}</span>
       <h3>${f.name}<small>Befehlskarten: ${f.card} · ${a.length} Slots</small></h3>
 </div>
     <div class="army-sum"><span>${veh} Fahrzeug${veh===1?'':'e'}</span><span>${sq} Trupp${sq===1?'':'s'}</span>${solo?`<span>${solo} Spezialeinheit${solo===1?'':'en'}</span>`:''}<span>${rif}/${MAX_RIFLEMEN} Gewehrschützen</span><span>${men} Soldaten</span></div>
-    <ol class="slots">${a.map((u,i)=>u.veh?`<li class="slot veh" data-veh="${u.key}" role="button" tabindex="0" title="Werte anzeigen" style="animation-delay:${i*45}ms">
+    <ol class="slots">${a.map((u,i)=>isPure(u)?(i!==firstPure?'':`<li class="slot inf rif-group" data-squad="${i}" data-side="${side}" role="button" tabindex="0" title="Waffenwerte anzeigen" style="animation-delay:${i*45}ms">
+        <span class="slot-no">${i+1}</span><span class="slot-art duo">${RIF+RIF}</span>
+        <span><span class="slot-name">${pureN}× ${RIFLEMEN} Gewehrschützen</span><br><span class="slot-tag">Trupp${pureN===1?'':'s'}</span> <span class="info-tag">ⓘ Waffen</span></span></li>`)
+      :u.veh?`<li class="slot veh" data-veh="${u.key}" role="button" tabindex="0" title="Werte anzeigen" style="animation-delay:${i*45}ms">
         <span class="slot-no">${i+1}</span><span class="slot-art">${A[u.key]}</span>
         <span><span class="slot-name">${u.name}</span><br><span class="slot-tag">Fahrzeug</span> <span class="info-tag">ⓘ Werte</span></span></li>`
       :`<li class="slot inf" data-squad="${i}" data-side="${side}" role="button" tabindex="0" title="Waffenwerte anzeigen" style="animation-delay:${i*45}ms">
