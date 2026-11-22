@@ -176,13 +176,14 @@
 
   /* ---------- Handy ---------- */
   @media (max-width:640px){
-    body{font-size:15px;padding:env(safe-area-inset-top) 0 calc(90px + env(safe-area-inset-bottom))}
+    body{font-size:15px;padding:env(safe-area-inset-top) 0 calc(16px + env(safe-area-inset-bottom))}
     main{margin:12px 10px;padding:16px 10px 14px;
          box-shadow:0 0 0 4px #22261a,0 0 0 6px var(--gold),0 8px 24px rgba(0,0,0,.6),inset 0 0 40px rgba(60,55,30,.45)}
     .sub{margin-bottom:12px;font-size:.95rem}
     .bar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .bar > #gen{display:none}
+    .bar > #gen{grid-column:1 / -1;padding:14px;font-size:1.1rem}   /* Neue Karte bleibt oben an fester Stelle */
     .seg{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr 1fr}
+    .seg[aria-label="Kartengröße"]{grid-template-columns:1fr 1fr}
     .seg button{padding:10px 4px;font-size:.9rem;line-height:1.2}
     .seg small{display:block}
     #rot{grid-column:1 / -1;padding:11px 6px;font-size:.92rem}
@@ -199,7 +200,7 @@
     th,td{padding:7px 5px;font-size:.92rem}
     details{padding:12px 10px}
     summary{padding:4px 0}
-    #fab{display:block;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:10;
+    #fab{display:none!important;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:10;
          padding:16px;font-size:1.15rem;border-radius:8px;
          box-shadow:0 0 0 2px #22261a,0 6px 20px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,220,160,.35)}
   }
@@ -514,7 +515,7 @@
   body.on-mission #fab .lbl-map{display:none} body:not(.on-mission) #fab .lbl-army{display:none}
   @media (max-width:640px){
     .tabs button{font-size:.76rem;padding:12px 2px;letter-spacing:.03em;white-space:nowrap}
-    .mbar #army-gen{display:none}
+    .mbar #army-gen{grid-column:1 / -1;padding:14px;font-size:1.1rem}
     .armies{grid-template-columns:1fr}
     .slot{grid-template-columns:26px 92px 1fr;gap:8px}
     .slot-art{height:54px}
@@ -1072,12 +1073,12 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
     <article class="rcard" id="einsturz">
       <h2>Einsturz</h2>
-      <p>Wird ein Gebäude oder eine Stellung so vernichtet, dass sie komplett einstürzt, so müssen alle Einheiten und Fahrzeuge, die sich innerhalb des Gebäudes befinden, je einen Schadenswurf vollziehen. Der Trefferwurf gelingt automatisch, da sie im einstürzenden Gebäude stehen. Der Durchschlagswurf wird mit einem Durchschlag von 3 gewürfelt.</p>
+      <p>Wird ein Gebäude oder eine Stellung so vernichtet, dass sie komplett einstürzt, so müssen alle Einheiten und Fahrzeuge, die sich innerhalb des Gebäudes befinden, je einen Trefferwurf vollziehen. Der Trefferwurf gelingt automatisch, da sie im einstürzenden Gebäude stehen. Der Durchschlagswurf wird mit einem Durchschlag von 3 gewürfelt.</p>
     </article>
 
     <article class="rcard" id="feuer">
       <h2>Feuer</h2>
-      <p>Am Ende einer Spielrunde (also immer wenn der Befehlsstapel neu gemischt wird) müssen alle Einheiten und Fahrzeuge, die sich im Feuer befinden, je einen Schadenswurf ablegen. Der Trefferwurf gelingt automatisch, da sie im brennenden Bereich stehen. Der Durchschlagswurf wird mit einem Durchschlag von 3 gewürfelt. Ein Bereich, der in Flammen steht, hört nach Abschluss der nächsten Spielrunde auf (nicht dieser). Sobald ein brennender Bereich betreten wird, muss sofort ein Durchschlagswurf vollzogen werden (wie bei Minen).</p>
+      <p>Am Ende einer Spielrunde (also immer wenn der Befehlsstapel neu gemischt wird) müssen alle Einheiten und Fahrzeuge, die sich im Feuer befinden, je einen Trefferwurf ablegen. Der Trefferwurf gelingt automatisch, da sie im brennenden Bereich stehen. Der Durchschlagswurf wird mit einem Durchschlag von 3 gewürfelt. Ein Bereich, der in Flammen steht, hört nach Abschluss der nächsten Spielrunde auf (nicht dieser). Sobald ein brennender Bereich betreten wird, muss sofort ein Durchschlagswurf vollzogen werden (wie bei Minen).</p>
     </article>
 
     <article class="rcard" id="rauch">
@@ -1103,7 +1104,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <article class="rcard" id="waffen">
       <h2>Waffen</h2>
       <div class="tw"><table class="rt">
-        <thead><tr><th>Name</th><th>Reich&shy;weite</th><th>Schadens&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
+        <thead><tr><th>Name</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody>
           <tr><td>Mörser</td><td>3</td><td>Kl. Scheibe</td><td>2</td></tr>
           <tr><td>Scharfschütze</td><td>3</td><td>1</td><td>1</td></tr>
@@ -1134,7 +1135,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         <div class="armor" data-f="4" data-s="3" data-r="2"></div>
       </div>
       <div class="tw"><table class="rt">
-        <thead><tr><th>Turmgeschütz</th><th>Reich&shy;weite</th><th>Schadens&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
+        <thead><tr><th>Turmgeschütz</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>HE</td><td>3</td><td>Gr. Scheibe</td><td>1</td></tr><tr><td>AP</td><td>3</td><td>1</td><td>4</td></tr></tbody>
         <thead><tr><th>Maschinengewehr</th><th></th><th></th><th></th></tr></thead>
         <tbody><tr><td>MG</td><td>2</td><td>5</td><td>1</td></tr></tbody>
@@ -1153,7 +1154,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         <div class="armor" data-f="3" data-s="2" data-r="1"></div>
       </div>
       <div class="tw"><table class="rt">
-        <thead><tr><th>Turmgeschütz</th><th>Reich&shy;weite</th><th>Schadens&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
+        <thead><tr><th>Turmgeschütz</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>HE</td><td>3</td><td>Kl. Scheibe</td><td>1</td></tr><tr><td>AP</td><td>3</td><td>1</td><td>3</td></tr></tbody>
         <thead><tr><th>Maschinengewehr</th><th></th><th></th><th></th></tr></thead>
         <tbody><tr><td>MG</td><td>2</td><td>5</td><td>1</td></tr></tbody>
@@ -1171,7 +1172,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         <div class="armor" data-f="1" data-s="1" data-r="1"></div>
       </div>
       <div class="tw"><table class="rt">
-        <thead><tr><th>Maschinengewehr</th><th>Reich&shy;weite</th><th>Schadens&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
+        <thead><tr><th>Maschinengewehr</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>MG</td><td>2</td><td>10</td><td>1</td></tr></tbody>
       </table></div>
     </article>
@@ -1228,7 +1229,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       </table></div>
       <p>Bei einer Explosion ist das Fahrzeug sofort komplett zerstört und die Gr. Scheibe wird mittig auf das Fahrzeug gelegt. Der Schaden ermittelt sich wie folgt:</p>
       <div class="tw"><table class="rt">
-        <thead><tr><th></th><th>Schadens&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
+        <thead><tr><th></th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>Explosion</td><td>Gr. Scheibe</td><td>1</td></tr></tbody>
       </table></div>
       <p>Ein Fahrzeug hält einem Schaden bei einer gewürfelten 1, 2, 3, 4 oder 5 stand. Erhält das Fahrzeug noch einen weiteren Schaden, so wird noch einmal gewürfelt, was dem Fahrzeug genau widerfährt (könnte noch explodieren), und dann ist es aus dem Spiel (dient noch als Deckung).</p>
@@ -1798,17 +1799,17 @@ $('pop-x').onclick=closePop;
 $('pop').addEventListener('click',e=>{ if(e.target.id==='pop') closePop(); });
 
 // ---------- Werte im Popup antippen -> passende Regelwerk-Tabelle (mit Zurück) ----------
-// Durchschlag -> Durchschlagstabelle (Zeile markiert), Schadenswurf -> Treffertabelle (Scheiben -> Abschnitt Scheiben)
+// Durchschlag -> Durchschlagstabelle (Zeile markiert), Trefferwurf -> Treffertabelle (Scheiben -> Abschnitt Scheiben)
 let popBack=null;
 const REF={
   pen:{sec:'durchschlagstabelle',t:'Durchschlagstabelle',d:v=>`Durchschlag ${v}: In Zeile ${v} unter der Panzerung des Ziels steht, welchen W6-Wurf du brauchst (X = kein Durchschlag möglich).`},
-  hit:{sec:'treffertabelle',t:'Treffertabelle',d:v=>`Schadenswurf ${v}: Du wirfst ${v} W6 – jeder Würfel, der den Trefferwert schafft, trifft. Danach folgt für jeden Treffer der Durchschlagswurf.`},
-  disc:{sec:'scheiben',t:'Kl. Scheibe und Gr. Scheibe',d:v=>`Schadenswurf ${v}: Scheibe anlegen, Abweichung würfeln – alles unter der Scheibe ist getroffen.`}
+  hit:{sec:'treffertabelle',t:'Treffertabelle',d:v=>`Trefferwurf ${v}: Du wirfst ${v} W6 – jeder Würfel, der den Trefferwert schafft, trifft. Danach folgt für jeden Treffer der Durchschlagswurf.`},
+  disc:{sec:'scheiben',t:'Kl. Scheibe und Gr. Scheibe',d:v=>`Trefferwurf ${v}: Scheibe anlegen, Abweichung würfeln – alles unter der Scheibe ist getroffen.`}
 };
 function markPen(root){
   for(const t of root.querySelectorAll('table')){
     const ths=[...t.querySelectorAll('thead th')].map(th=>th.textContent.replace(/\u00ad/g,''));
-    const cols=[[ths.findIndex(x=>/durch.?schlag/i.test(x)),'pen'],[ths.findIndex(x=>/schadens.?wurf/i.test(x)),'hit']];
+    const cols=[[ths.findIndex(x=>/durch.?schlag/i.test(x)),'pen'],[ths.findIndex(x=>/treffer.?wurf/i.test(x)),'hit']];
     for(const tr of t.querySelectorAll('tbody tr')) for(const [col,kind] of cols){
       const td=col>=0&&tr.cells[col], v=td&&td.textContent.trim(); if(!v||td.querySelector('button')) continue;
       const k=kind==='hit'&&/scheibe/i.test(v)?'disc':kind;
@@ -2057,7 +2058,7 @@ function drawCard(){
   G.roundMsg=false; G.drawn=G.deck.shift(); G.peek=false; saveG(); renderSpiel();
 }
 function roundReminders(){ const m=window.CUR_MISSION?window.CUR_MISSION.name:'', g=goal()||{}, li=[];
-  li.push('🔥 Einheiten im Feuer: Schadenswurf mit Durchschlag 3');
+  li.push('🔥 Einheiten im Feuer: Trefferwurf mit Durchschlag 3');
   li.push('💨 Rauch und Feuer aus der vorletzten Runde entfernen');
   li.push('★ Taktiker: eine gespeicherte Befehlskarte muss jetzt aktiviert werden');
   return li; }
