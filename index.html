@@ -711,7 +711,7 @@ body.on-spiel #fab{display:none!important}
 @media (max-width:640px){ .tabs button{font-size:.68rem!important;padding:12px 1px!important} }
 /* Spiel-Tab */
 #tab-spiel{max-width:1000px;margin:0 auto}
-.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.sp-grid{display:grid;grid-template-columns:1fr;gap:0 16px;max-width:640px;margin:0 auto}
 .sp-grid #calc{grid-column:1 / -1}
 .sp-grid>*{min-width:0}
 .c-form select{max-width:100%;text-overflow:ellipsis}
@@ -2061,12 +2061,8 @@ function roundReminders(){ const m=window.CUR_MISSION?window.CUR_MISSION.name:''
   li.push('★ Taktiker: eine gespeicherte Befehlskarte muss jetzt aktiviert werden');
   return li; }
 function renderSpiel(){
-  if(!$('vp-de')) return; const g=goal(), m=window.CUR_MISSION;
-  for(const s of ['de','al']){ $('vp-'+s).textContent=G.vp[s]; $('vpbar-'+s).style.width=(g?Math.min(100,G.vp[s]/g.sp*100):0)+'%'; }
-  $('vp-goal').innerHTML=g?`Ziel: <b>${g.sp} SP</b> · ${esc(m.name)}`:'';
-  const win=g?['de','al'].filter(s=>G.vp[s]>=g.sp):[];
-  $('vp-win').hidden=!win.length; $('vp-win').innerHTML=win.length===2?'Beide haben das Ziel erreicht!':win.length?`${SIDE_NAME[win[0]]} gewinnt!`:'';
-  $('round').textContent=G.round; $('deck-left').textContent=G.deck.length;
+  if(!$('deck-out')) return;
+  $('deck-left').textContent=G.deck.length;
   const out=$('deck-out');
   if(G.roundMsg) out.innerHTML=`<div class="roundend"><b>Stapel gemischt – Runde ${G.round}</b><ul>${roundReminders().map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
   else if(G.drawn){ const {s,c}=cardInfo(G.drawn), has=hasUnit(s,c.u);
@@ -2078,16 +2074,6 @@ function renderSpiel(){
 }
 $('tab-spiel').innerHTML=`
   <div class="sp-grid">
-  <article class="rcard sp" id="sp-vp">
-    <h2>Siegpunkte</h2>
-    <div class="vp-row">${['de','al'].map(s=>`<div class="vp ${s}">
-      <div class="vp-n">${SIDE_NAME[s]}</div>
-      <div class="vp-ctl"><button class="sec" data-vp="${s}" data-d="-1" aria-label="minus">−</button><span id="vp-${s}" class="vp-v">0</span><button class="sec" data-vp="${s}" data-d="1" aria-label="plus">+</button></div>
-      <div class="vp-bar"><i id="vpbar-${s}"></i></div></div>`).join('')}</div>
-    <p class="vp-goal" id="vp-goal"></p>
-    <p class="vp-win" id="vp-win" hidden></p>
-    <div class="round-row"><span>Runde</span><b id="round">1</b><button class="sec" id="sp-new" title="Siegpunkte, Runde und Stapel zurücksetzen">↺ Neues Spiel</button></div>
-  </article>
   <article class="rcard sp" id="sp-deck">
     <h2>Befehlsstapel <small>♣ Deutsche · ♥ Alliierte · leerer Stapel = neue Runde</small></h2>
     <div class="deck-row"><button class="big" id="draw">🂠 Karte aufdecken</button><span class="deck-left"><b id="deck-left">26</b> im Stapel</span></div>
@@ -2097,8 +2083,6 @@ $('tab-spiel').innerHTML=`
   </article>
   </div>
   <div id="sp-toast" class="sp-toast" aria-live="polite"></div>`;
-$('tab-spiel').addEventListener('click',e=>{ const b=e.target.closest('[data-vp]'); if(b){ G.vp[b.dataset.vp]=Math.max(0,G.vp[b.dataset.vp]+(+b.dataset.d)); saveG(); renderSpiel(); } });
-$('sp-new').onclick=()=>{ if(!confirm('Neues Spiel? Siegpunkte, Runde und Befehlsstapel werden zurückgesetzt.')) return; newGame(); renderSpiel(); toast('Neues Spiel gestartet'); };
 $('draw').onclick=drawCard;
 $('peek').onclick=()=>{ G.peek=!G.peek; saveG(); renderSpiel(); };
 $('reshuffle').onclick=()=>{ if(!confirm('Alle Karten zurück in den Stapel und neu mischen? (Die Runde zählt nicht weiter.)')) return; G.deck=buildDeck(); G.drawn=null; G.roundMsg=false; saveG(); renderSpiel(); };
