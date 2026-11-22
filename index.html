@@ -1618,7 +1618,16 @@ function buildPool(){
 $('reset').onclick=()=>{ settings=structuredClone(DEFAULTS); saveSettings(); buildPool(); run(newSeed()); };
 $('gen').onclick=()=>run(newSeed());
 $('fab').onclick=()=>{ if(document.body.classList.contains('on-mission')){ genArmies(); $('tab-mission').scrollIntoView({behavior:'smooth',block:'start'}); return; } run(newSeed()); $('map').scrollIntoView({behavior:'smooth',block:'start'}); };
-document.querySelectorAll('.seg button[data-size]').forEach(b=>b.onclick=()=>{ $('size').value=b.dataset.size; try{ localStorage.setItem('sitzkrieg-size',b.dataset.size); }catch(e){} run(newSeed()); if(typeof genArmies==='function') genArmies(); });
+// Größe wechseln ohne neu zu würfeln: jede Größe behält ihre Karte und Armeen, solange die Seite offen ist
+const SIZE_KEEP={};
+document.querySelectorAll('.seg button[data-size]').forEach(b=>b.onclick=()=>{
+  const from=$('size').value, to=b.dataset.size; if(from===to) return;
+  if(current) SIZE_KEEP[from]={seed:current.seed, de:armies.de, al:armies.al};
+  $('size').value=to; try{ localStorage.setItem('sitzkrieg-size',to); }catch(e){}
+  const k=SIZE_KEEP[to];
+  if(k){ run(k.seed); armies.de=k.de; armies.al=k.al; renderArmy('de'); renderArmy('al'); if(window.spielReset) spielReset(); }
+  else { run(newSeed()); if(typeof genArmies==='function') genArmies(); }
+});
 $('size').onchange=()=>run(newSeed());
 $('rot').onclick=()=>{ rotated=!isPortrait(); render(); };
 let rzT; window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(render,80); });
