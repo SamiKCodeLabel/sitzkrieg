@@ -866,7 +866,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <button id="army-gen" class="big">🎲 Zufällige Armeen</button>
       <div class="seg" role="group" aria-label="Kartengröße">
         <button class="sec" data-size="3x6">Normal <small>8 Slots</small></button>
-        <button class="sec" data-size="3x8">Episch <small>10 Slots</small></button>
+        <button class="sec" data-size="3x8">Episch <small>9 Slots</small></button>
       </div>
       <div class="seg flyer fair" role="group" aria-label="Faire Armeen">
         <span class="flyer-lbl">Faire Armeen</span>
@@ -1633,10 +1633,10 @@ const RIFLEMAN="<svg class=\"fig\" viewBox=\"0 0 30 42\" aria-hidden=\"true\"><g
 const VEHICLES=[
   {key:'schwer',name:'Schwerer Panzer',n:1},{key:'leicht',name:'Leichter Panzer',n:1},{key:'krad',name:'Kraftrad',n:1}];
 const SPECIALS=[
-  {key:'general',name:'General',n:3},{key:'sniper',name:'Scharfschütze',n:2},{key:'mine',name:'Minenleger',n:2},
-  {key:'flame',name:'Flammenwerfer',n:2},{key:'shotgun',name:'Schrotflinte',n:2},{key:'grenade',name:'Granatwerfer',n:2},
-  {key:'mortar',name:'Mörser',n:2},{key:'mg',name:'Maschinengewehr',n:2},{key:'mech',name:'Mechaniker',n:1},{key:'medic',name:'Mediziner',n:1}];
-const SLOTS={'3x6':8,'3x8':10};   // Episch: 3 Fahrzeuge + 7 Trupps (35 Gewehrschützen)
+  {key:'general',name:'General',n:3},{key:'sniper',name:'Scharfschütze',n:1},{key:'mine',name:'Minenleger',n:1},
+  {key:'flame',name:'Flammenwerfer',n:1},{key:'shotgun',name:'Schrotflinte',n:1},{key:'grenade',name:'Granatwerfer',n:1},
+  {key:'mortar',name:'Mörser',n:1},{key:'mg',name:'Maschinengewehr',n:1},{key:'mech',name:'Mechaniker',n:1},{key:'medic',name:'Mediziner',n:1}];
+const SLOTS={'3x6':8,'3x8':9};   // Episch: 3 Fahrzeuge + 6 Trupps (12 Spezialeinheiten = der ganze Vorrat)
 const RIFLEMEN=5; // Gewehrschützen pro Trupp
 const MAX_RIFLEMEN=35; // Gewehrschützen pro Spieler insgesamt
 const EMB={de:"<svg class=\"emb\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M43 40 L30 6 Q50 13 70 6 L57 40 L60 43 L94 30 Q87 50 94 70 L60 57 L57 60 L70 94 Q50 87 30 94 L43 60 L40 57 L6 70 Q13 50 6 30 L40 43 Z\" fill=\"#111\" stroke=\"#111\" stroke-width=\"13\" stroke-linejoin=\"round\"/><path d=\"M43 40 L30 6 Q50 13 70 6 L57 40 L60 43 L94 30 Q87 50 94 70 L60 57 L57 60 L70 94 Q50 87 30 94 L43 60 L40 57 L6 70 Q13 50 6 30 L40 43 Z\" fill=\"#111\" stroke=\"#f4f0e0\" stroke-width=\"5\" stroke-linejoin=\"round\"/></svg>",al:"<svg class=\"emb\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><circle cx=\"50\" cy=\"50\" r=\"48\" fill=\"#3f4a24\"/><circle cx=\"50\" cy=\"50\" r=\"41\" fill=\"none\" stroke=\"#f4f0e0\" stroke-width=\"6\"/><polygon fill=\"#f4f0e0\" points=\"50.0,12.0 59.1,37.5 86.1,38.3 64.7,54.8 72.3,80.7 50.0,65.5 27.7,80.7 35.3,54.8 13.9,38.3 40.9,37.5\"/></svg>"};   // Wappen: Eisernes Kreuz / Alliierter Stern im Kreis
