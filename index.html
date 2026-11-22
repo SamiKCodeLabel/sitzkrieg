@@ -860,15 +860,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <button id="army-gen" class="big">🎲 Zufällige Armeen</button>
       <div class="seg" role="group" aria-label="Kartengröße">
         <button class="sec" data-size="3x6">Normal <small>8 Slots</small></button>
-        <button class="sec" data-size="3x8">Episch <small>12 Slots</small></button>
-      </div>
-      <button class="sec mtype" id="mtype" type="button" title="Nur den Missionstyp neu würfeln">
-        <span class="mtype-lbl">🎯 Missionstyp</span><b id="mtype-val">–</b>
-      </button>
-      <div class="seg flyer" role="group" aria-label="Kampfflieger möglich">
-        <span class="flyer-lbl">✈️ Kampfflieger <small>(20 %)</small></span>
-        <button class="sec" data-flyer="1">Ja</button>
-        <button class="sec" data-flyer="0">Nein</button>
+        <button class="sec" data-size="3x8">Episch <small>10 Slots</small></button>
       </div>
       <div class="seg flyer fair" role="group" aria-label="Faire Armeen">
         <span class="flyer-lbl">Faire Armeen</span>
@@ -904,10 +896,9 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <h2>Zugabfolge</h2>
       <ol class="steps">
         <li><b>Karte aufdecken:</b>
-          <ul><li>Befehlskarte aufdecken</li><li>Ggf. mischen, dann Siegpunkte verteilen, Rauch-, sowie Feuer reduzieren, Verstärkungen ins Spiel bringen</li></ul></li>
+          <ul><li>Befehlskarte aufdecken</li><li>Ggf. mischen, dann Rauch und Feuer reduzieren</li></ul></li>
         <li><b>Trupp aktivieren:</b> Trupp wählen und folgende Aktionen in beliebiger Reihenfolge ausführen:
           <ul><li>Bewegen</li><li>Schießen</li><li>Spezialfähigkeit</li></ul></li>
-        <li><b>Kampfflieger-Aktionen:</b> Nach feindlicher Aktivierung die Kampffliegerbewegung weiter durchführen</li>
         <li><b>Siegpunkte erlangen:</b> Pro vernichteten gegnerischen Trupp und Fahrzeug je 1 Siegpunkt erhalten</li>
       </ol>
     </article>
@@ -964,7 +955,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <div class="dice"><div><b>W20: 1–8</b><span>Von Norden aus im 45°-Winkel um 1 Scheibenlänge abdriften (an Kante anlegen)</span></div><div><b>W20: 9–20</b><span>Genauer Treffer</span></div></div>
       <p>Ein Flammenwerfer, eine Schrotflinte oder das Minenlegen kann niemals abweichen.</p>
       <p>Werden bei einem Trefferwurf mehrere Scheiben ermöglicht, so werden diese jeweils einzeln mit einem W20 beim Abweichwurf ausgewürfelt, ob sie noch verschoben werden. Jede Einheit kann nur maximal 1 mal getroffen werden, selbst wenn sich die Scheiben überschneiden würden.</p>
-      <p>Ein Luftschlag-MG-Angriff von einem Kampfflieger wird zusammen verschoben.</p>
     </article>
 
     <article class="rcard" id="general">
@@ -1011,7 +1001,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
     <article class="rcard" id="mechaniker">
       <h2>Mechaniker</h2>
-      <p>Ein Mechaniker kann den Schaden von Fahrzeugen (nicht Kampffliegern) in einer Reichweite von 1 um sich herum versuchen zu verhindern. Für jeden Verlust, der dem Trupp zugefügt werden würde, darf der Spieler einen W6 werfen. Bei einer geraden Zahl kann der Verlust vermieden werden.</p>
+      <p>Ein Mechaniker kann den Schaden von Fahrzeugen in einer Reichweite von 1 um sich herum versuchen zu verhindern. Für jeden Verlust, der dem Trupp zugefügt werden würde, darf der Spieler einen W6 werfen. Bei einer geraden Zahl kann der Verlust vermieden werden.</p>
     </article>
 
     <article class="rcard" id="deckung">
@@ -1031,7 +1021,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
     <article class="rcard" id="spielaufbau">
       <h2>Spielaufbau und Topografie festlegen</h2>
-      <p>Zu Spielbeginn sollten beide Spieler genau festlegen, was auf dem Spielfeld genau Deckung gibt, zerstörbar und unzerstörbar ist, wie genau eine Sichtlinie definiert wird, was unwegsames Gelände ist, und was als erhöhte oder niedrige Position zählt. Zudem wird festgelegt, wo auf der Karte Norden ist (eine Ecke oder Kante des Spielfelds). Dann wird noch bestimmt, wo jeder Spieler startet, was die genauen Missionsziele sind (also welche der Gebäude oder Orte Siegpunkte am Ende einer Runde geben), von wo Verstärkungen eintreffen können, wie viele Verstärkungen und Einheiten jedes Typs im Spiel sein dürfen. Dann legt noch jeder Spieler seine Armee und Einheiten fest. Zudem müssen die genaue Fähigkeit jedes Generals bestimmt werden.</p>
+      <p>Zu Spielbeginn sollten beide Spieler genau festlegen, was auf dem Spielfeld genau Deckung gibt, zerstörbar und unzerstörbar ist, wie genau eine Sichtlinie definiert wird, was unwegsames Gelände ist, und was als erhöhte oder niedrige Position zählt. Zudem wird festgelegt, wo auf der Karte Norden ist (eine Ecke oder Kante des Spielfelds). Dann wird noch bestimmt, wo jeder Spieler startet und wie viele Einheiten jedes Typs im Spiel sein dürfen. Dann legt noch jeder Spieler seine Armee und Einheiten fest. Zudem müssen die genaue Fähigkeit jedes Generals bestimmt werden.</p>
     </article>
 
     <article class="rcard" id="ausmasse">
@@ -1059,13 +1049,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <p>Wenn eine Befehlskarte aufgedeckt wird und der entsprechende Spieler keine passende Einheit oder kein Fahrzeug dieses Typs mehr aktivieren kann, so wird diese Karte einfach ignoriert und die nächste aufgedeckt.</p>
     </article>
 
-    <article class="rcard" id="kampfflieger">
-      <h2>Kampfflieger</h2>
-      <p>Wird ein Kampfflieger aktiviert, so taucht dieser in eine bestimmte Richtung fliegend auf einer beliebigen Stelle des Spielplans auf und befindet sich im <b>Anflug</b>. Zunächst geschieht nichts, er kann lediglich von einem Flakgeschütz zerstört werden, da er sich nun auf dem Spielfeld befindet.</p>
-      <p>Nachdem die nächste <b>FEINDLICHE!</b> Befehlskarte (in Zugabfolge Schritt 2) vollständig fertig ist, wird der Angriff des Kampffliegers in der Zugabfolge Schritt 3 durchgeführt. Dazu wählt der Besitzer des Kampffliegers die Bewaffnung (Bombe, Luftschlag-MGs oder Dogfight). Dazu muss sich das Ziel in einem Schusswinkel von max. 45° pro Richtung und innerhalb von Reichweite 1 zum Kampfflieger befinden (es darf auch der Boden oder ein Gebäude oder Ähnliches anvisiert werden). Ein Angriff mit den Luftschlag-MGs muss einer der Flugroute entsprechenden Linie von 4 aneinander angrenzenden Kl. Scheiben entsprechen. Dann wird noch ein Abweichwurf statt einem Trefferwurf vollzogen (siehe <a href="#scheiben">Kl. und Gr. Scheibe</a>). Die Scheiben des Luftschlag-MGs werden zusammen als Einheit verschoben. Danach wird der Flieger in Reichweite 1 vom letzten Ziel in Flugrichtung weiterbewegt und befindet sich im <b>Abflug</b>. Er ist noch auf dem Spielfeld und kann theoretisch abgeschossen werden. Erst wenn die nächste <b>FEINDLICHE!</b> Befehlskarte (in Zugabfolge Schritt 2) vollständig fertig ist, verschwindet der Kampfflieger wieder vom Spielfeld. Wird ein Kampfflieger durch eine Befehlskarte aktiviert, während dieser noch auf dem Spielfeld ist, so wird die Befehlskarte ignoriert oder kann mit der passenden Generalsfähigkeit noch „gespeichert“ werden.</p>
-      <p>Ein <b>Dogfight</b>-Angriff (der Angriff Kampfflieger gegen Kampfflieger) ist auch möglich, sollte sich ein feindlicher Kampfflieger auf dem Spielfeld befinden (im An- oder Abflug). So kann der Spieler, der einen neuen Kampfflieger in der Aktivierung im Anflug ins Spiel bringt, SOFORT das feindliche Flugzeug in Reichweite 1 vor sich attackieren und den Schaden auswürfeln. Der Flieger zählt in diesem Zug noch als „im Anflug“ und fliegt nach der nächsten <b>FEINDLICHEN!</b> Befehlskarte (in Zugabfolge Schritt 2) weiter um Reichweite 1 in Flugrichtung und wechselt in den Abflug. Erst wenn danach die nächste <b>FEINDLICHE!</b> Befehlskarte (in Zugabfolge Schritt 2) vollständig fertig ist, verschwindet der Kampfflieger wieder vom Spielfeld.</p>
-    </article>
-
     <article class="rcard" id="stellung-angreifen">
       <h2>Stellung angreifen</h2>
       <p>Mit Explosivmunition oder Flammenwerfern, die eine Kl. oder Gr. Schablone beim Trefferwurf beinhalten (außer Minen, Schrotflinten oder Rauchgranaten), können auch Deckungen, sowie Wände oder ganze Gebäude niedergerissen werden.</p>
@@ -1088,28 +1071,17 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
     <article class="rcard" id="tod-von-oben">
       <h2>Tod von oben</h2>
-      <p>Mörser-, Grenadier- und Kampffliegerangriffe machen ihren Schaden von oben.</p>
-    </article>
-
-    <article class="rcard" id="flugabwehr">
-      <h2>Flugabwehr</h2>
-      <p>Ein Flakgeschütz oder ein anderer Kampfflieger darf in seiner Aktivierung, wenn die Reichweite stimmt, einen Kampfflieger angreifen. Dabei hat das Flakgeschütz immer den Nachteil vom Höhenunterschied. Erleidet ein Kampfflieger seinen 2. Treffer, so stürzt dieser in gerader Fluglinie in Reichweite 2 ab. Er explodiert mit einer Gr. Schablone mit Durchschlag 1 an diesem Ort und ist dann vollständig zerstört. Er kann noch als Deckung genutzt werden.</p>
+      <p>Mörser- und Grenadierangriffe machen ihren Schaden von oben.</p>
     </article>
 
     <article class="rcard" id="fahrzeuge">
       <h2>Fahrzeuge</h2>
-      <p>Der Fahrer und die Besatzung bleiben immer im Fahrzeug. Ist es ein Truppentransporter, so kann dieser mit seiner Spezialfähigkeit einmal pro Aktivierung einen einzigen Trupp ein- oder ausladen. Ein Transporter kann auch lediglich einen einzigen Trupp gleichzeitig transportieren, unabhängig von der Größe. Ein Transporter kann zudem als Spezialfähigkeit ein Flakgeschütz an- oder abkoppeln für den Transport, um es hinter sich her zu ziehen. Die Besatzung des Flakgeschützes ist immer am Flakgeschütz und gehört mit zu dem „Fahrzeug“.</p>
-    </article>
-
-    <article class="rcard" id="siegpunkte">
-      <h2>Siegpunkte</h2>
-      <p>In den zum Spielstart festgelegten Missionszielorten können die Spieler immer, wenn der Befehlsstapel gemischt wird, jeweils 1 Siegpunkt erhalten. Dazu muss mindestens ein Trupp dieses Missionsziel im Nahkampf berühren. Wenn mehrere Spieler dieses halten, so bekommen auch beide 1 Siegpunkt für diesen Zielort.</p>
+      <p>Der Fahrer und die Besatzung bleiben immer im Fahrzeug.</p>
     </article>
 
     <article class="rcard" id="spielende">
       <h2>Spielende</h2>
       <p>Das Spiel endet sofort, wenn ein Spieler eine zum Spielstart festgelegte Siegpunktanzahl erreicht hat oder die gesamte gegnerische Armee ausgeschaltet wurde.</p>
-      <p class="note">Richtwert: Bei 1 Flieger, 1 schweren Panzer, 1 leichten Panzer, 1 Kraftrad, 1 Transporter, 1 Flak, 7 Trupps und 3 Missionszielen sind es <b>20 Siegpunkte</b>.</p>
     </article>
 
     <article class="rcard" id="waffen">
@@ -1172,34 +1144,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       </table></div>
     </article>
 
-    <article class="rcard vehicle" id="transporter">
-      <h2>Transporter</h2>
-      <div class="vgrid">
-        <div class="tw"><table class="rt kv">
-          <tr><th>Bewegungsreichweite</th><td>3</td></tr>
-          <tr><th>Fahrzeugdrehung</th><td>90°</td></tr>
-          <tr><th>Spezialeffekt</th><td>Anhängen, Abhängen, Aufladen, Abladen, Truppentransport</td></tr>
-        </table></div>
-        <div class="armor" data-f="1" data-s="1" data-r="1"></div>
-      </div>
-    </article>
-
-    <article class="rcard vehicle" id="flakgeschuetz">
-      <h2>Flakgeschütz</h2>
-      <div class="vgrid">
-        <div class="tw"><table class="rt kv">
-          <tr><th>Bewegungsreichweite</th><td>1</td></tr>
-          <tr><th>Fahrzeugdrehung</th><td>90°</td></tr>
-          <tr><th>Spezialeffekt</th><td>Anhänger, Flugabwehr, nach vorne feuern</td></tr>
-        </table></div>
-        <div class="armor" data-f="2" data-s="1" data-r="1"></div>
-      </div>
-      <div class="tw"><table class="rt">
-        <thead><tr><th>Turmgeschütz</th><th>Reich&shy;weite</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th><th>Schadens&shy;wurf</th></tr></thead>
-        <tbody><tr><td>Flak</td><td>3</td><td>2</td><td>10</td></tr><tr><td>HE</td><td>3</td><td>1</td><td>Gr. Scheibe</td></tr><tr><td>AP</td><td>3</td><td>4</td><td>1</td></tr></tbody>
-      </table></div>
-    </article>
-
     <article class="rcard vehicle" id="kraftrad">
       <h2>Kraftrad</h2>
       <div class="vgrid">
@@ -1213,22 +1157,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <div class="tw"><table class="rt">
         <thead><tr><th>Maschinengewehr</th><th>Reich&shy;weite</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th><th>Schadens&shy;wurf</th></tr></thead>
         <tbody><tr><td>MG</td><td>2</td><td>1</td><td>10</td></tr></tbody>
-      </table></div>
-    </article>
-
-    <article class="rcard vehicle" id="kampfflieger-werte">
-      <h2>Kampfflieger <small>(Werte)</small></h2>
-      <div class="vgrid">
-        <div class="tw"><table class="rt kv">
-          <tr><th>Bewegungsreichweite</th><td>2-stufiger Angriffsflug</td></tr>
-          <tr><th>Abstand zum Ziel</th><td>1</td></tr>
-          <tr><th>Spezialeffekt</th><td>Anflug, Abflug</td></tr>
-        </table></div>
-        <div class="armor" data-f="1" data-s="1" data-r="1"></div>
-      </div>
-      <div class="tw"><table class="rt">
-        <thead><tr><th>Bewaffnung</th><th>Reich&shy;weite</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th><th>Schadens&shy;wurf</th></tr></thead>
-        <tbody><tr><td>Bombe</td><td>1</td><td>3</td><td>Gr. Scheibe</td></tr><tr><td>Luftschlag-MGs</td><td>1</td><td>1</td><td>4 Kl. Scheiben in einer Linie</td></tr><tr><td>Dogfight</td><td>1</td><td>1</td><td>10</td></tr></tbody>
       </table></div>
     </article>
 
@@ -1259,11 +1187,8 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <h2>Befehlskarten</h2>
       <div class="vgrid">
         <div class="tw"><table class="rt kv">
-          <tr><th>♠ Ass</th><td>Kampfflieger</td></tr>
           <tr><th>♠ König</th><td>Schwerer Panzer</td></tr>
           <tr><th>♠ Dame</th><td>Leichter Panzer</td></tr>
-          <tr><th>♠ Bube</th><td>Flakgeschütz</td></tr>
-          <tr><th>Zahl 10</th><td>Transporter</td></tr>
           <tr><th>Zahl 9</th><td>Kraftrad</td></tr>
           <tr><th>Zahlen 2–8</th><td>Infanterie</td></tr>
         </table></div>
@@ -1294,43 +1219,13 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     </article>
 
     <article class="rcard variant" id="vernichtung">
-      <h2><small>Spielvariante</small>Vernichtung</h2>
+      <h2><small>Mission</small>Vernichtung</h2>
       <p>Zu Spielbeginn legen die Spieler gemeinsam fest, wer wo startet. Die gesamte Armee jedes Spielers befindet sich sofort auf dem Spielfeld. Für jeden besiegten Trupp oder jedes besiegte Fahrzeug bekommt der Spieler sofort einen Siegpunkt.</p>
       <div class="tw"><table class="rt">
         <thead><tr><th>Kartengröße</th><th>Siegpunkte zum Sieg</th></tr></thead>
         <tbody>
-          <tr><td>Klein</td><td>3</td></tr>
-          <tr><td>Mittel</td><td>6</td></tr>
-          <tr><td>Groß</td><td>9</td></tr>
-        </tbody>
-      </table></div>
-    </article>
-
-    <article class="rcard variant" id="aufmarsch">
-      <h2><small>Spielvariante</small>Aufmarsch</h2>
-      <p>Zu Spielbeginn legen die Spieler gemeinsam fest, wer wo startet, und es wird festgelegt, welche der Spielkanten welchem Spieler gehören, um Reserven ins Spiel zu bringen. Die Spieler bekommen jede Runde neue Trupps aus ihrer Reserve aufs Spielfeld.</p>
-      <ul>
-        <li>Nach Runde 3 kommen die Ass-Karten (die Kampfflieger) mit ins Deck.</li>
-        <li>Transporter spawnt mit Einladen (Zahl 10 mit einer 2–8 kombinieren).</li>
-      </ul>
-      <div class="tw"><table class="rt">
-        <thead><tr><th>Kartengröße</th><th>Start&shy;trupps</th><th>Reserven jede Runde</th><th>Siegpunkte zum Sieg</th></tr></thead>
-        <tbody>
-          <tr><td>Mittel</td><td>2</td><td>2</td><td>6</td></tr>
-          <tr><td>Groß</td><td>4</td><td>2</td><td>9</td></tr>
-        </tbody>
-      </table></div>
-    </article>
-
-    <article class="rcard variant" id="missionsziele">
-      <h2><small>Spielvariante</small>Missionsziele</h2>
-      <p>Zu Spielbeginn legen die Spieler gemeinsam fest, wer wo startet, und es wird festgelegt, welche der interessanten Orte der Karte als Missionsziele dienen, die gehalten werden müssen.</p>
-      <p>Am Ende jeder Runde erhalten die Spieler für jedes gehaltene Ziel je 1 Siegpunkt. Wenn beide Spieler dasselbe Ziel halten, erhalten auch beide Spieler dafür den Siegpunkt. Zudem erhält ein Spieler für jeden besiegten Trupp oder jedes besiegte Fahrzeug auch sofort einen Siegpunkt.</p>
-      <div class="tw"><table class="rt">
-        <thead><tr><th>Kartengröße</th><th>Missions&shy;ziele</th><th>Siegpunkte zum Sieg</th></tr></thead>
-        <tbody>
-          <tr><td>Mittel</td><td>3</td><td>15</td></tr>
-          <tr><td>Groß</td><td>5</td><td>20</td></tr>
+          <tr><td>Normal</td><td>6</td></tr>
+          <tr><td>Episch</td><td>9</td></tr>
         </tbody>
       </table></div>
     </article>
@@ -1582,7 +1477,7 @@ function run(seed){
   const map=$('map'); map.classList.remove('pop'); void map.offsetWidth; map.classList.add('pop');
 }
 const newSeed = () => Math.floor(Math.random()*1e9);
-// Seed = „Karte-Armeen“: die zweite Zahl speichert Armeen, Missionstyp, Kampfflieger und „Faire Armeen“
+// Seed = „Karte-Armeen“: die zweite Zahl speichert Armeen, abgewählte Fahrzeuge und „Faire Armeen“
 let armyCode=null;
 const seedStr=()=>current? (current.seed+(armyCode!=null?'-'+armyCode:'')) : '';
 function updateSeed(){
@@ -1725,19 +1620,16 @@ const ART_FACTION={de:{"general": "<svg class=\"fig\" viewBox=\"10 -12 90 108\" 
 const RIFLEMAN_FACTION={de:"<svg class=\"fig\" viewBox=\"0 0 30 42\" aria-hidden=\"true\"><g><ellipse class=\"sh\" cx=\"15\" cy=\"40\" rx=\"9\" ry=\"1.6\"/><path class=\"tp\" d=\"M12.5 26 L10 38 L13 38 L15.5 28 Z\"/><path class=\"tp\" d=\"M15 27 L17.5 38 L20.5 38 L18.5 26 Z\"/><path class=\"dk\" d=\"M9.4 33 h4.4 v6 h-5 Z M16.6 33 h4.4 l.6 6 h-5 Z\"/><path class=\"u1\" d=\"M10.5 15 Q15 13 19.5 15 L20.5 27 Q15 28.5 9.5 27 Z\"/><rect class=\"dk\" x=\"9.6\" y=\"23\" width=\"11\" height=\"2\"/><path class=\"sk\" d=\"M12.4 8.4 Q12 13.6 15 14 Q18.4 13.6 18 8.6 Z\"/><path class=\"hl\" d=\"M9 11 Q11 10 11.2 8.4 Q11 3 15.2 3 Q19.4 3 19.6 7 L20.6 9.4 L13 9.2 Q12 11 9 11 Z\"/><path class=\"wd\" d=\"M5 27 L22 17.6 L23 19.2 L6.4 28.6 Z\"/><path class=\"mt\" d=\"M22 17.6 L28 14.4 L28.6 15.6 L23 19.2 Z\"/><circle class=\"sk\" cx=\"18.6\" cy=\"20\" r=\"1.4\"/></g></svg>",al:"<svg class=\"fig\" viewBox=\"0 0 30 42\" aria-hidden=\"true\"><g><ellipse class=\"sh\" cx=\"15\" cy=\"40\" rx=\"9\" ry=\"1.6\"/><path class=\"tp\" d=\"M12.5 26 L10 38 L13 38 L15.5 28 Z\"/><path class=\"tp\" d=\"M15 27 L17.5 38 L20.5 38 L18.5 26 Z\"/><path class=\"lg\" d=\"M9.8 33 h4 v3 h-4 Z M16.8 33 h4 v3 h-4 Z\"/><path class=\"wd2\" d=\"M9 36 h5 v3 h-5.6 Z M16.4 36 h5 l1 3 h-6 Z\"/><path class=\"u1\" d=\"M10.5 15 Q15 13 19.5 15 L20.5 27 Q15 28.5 9.5 27 Z\"/><rect class=\"dk\" x=\"9.6\" y=\"23\" width=\"11\" height=\"2\"/><path class=\"sk\" d=\"M12.4 8.4 Q12 13.6 15 14 Q18.4 13.6 18 8.6 Z\"/><path class=\"hl\" d=\"M11.2 9 Q11 3 15.2 3 Q19.4 3 19.4 9 Z\"/><path class=\"hl\" d=\"M9.6 8.6 H21 L20.6 10 H10 Z\"/><path class=\"wd\" d=\"M5 27 L22 17.6 L23 19.2 L6.4 28.6 Z\"/><path class=\"mt\" d=\"M22 17.6 L28 14.4 L28.6 15.6 L23 19.2 Z\"/><circle class=\"sk\" cx=\"18.6\" cy=\"20\" r=\"1.4\"/></g></svg>"};
 const RIFLEMAN="<svg class=\"fig\" viewBox=\"0 0 30 42\" aria-hidden=\"true\"><g><ellipse class=\"sh\" cx=\"15\" cy=\"40\" rx=\"9\" ry=\"1.6\"/><path class=\"u2\" d=\"M12.5 26 L10 38 L13 38 L15.5 28 Z\"/><path class=\"u1\" d=\"M15 27 L17.5 38 L20.5 38 L18.5 26 Z\"/><path class=\"u1\" d=\"M10.5 15 Q15 13 19.5 15 L20.5 27 Q15 28.5 9.5 27 Z\"/><rect class=\"dk\" x=\"9.6\" y=\"23\" width=\"11\" height=\"2\"/><path class=\"sk\" d=\"M12.4 8.4 Q12 13.6 15 14 Q18.4 13.6 18 8.6 Z\"/><path class=\"hl\" d=\"M11 9.6 Q11 3 15.2 3 Q19.6 3 19.6 8 L21.6 9.6 L18 9.2 Q15 8.6 12.4 9.2 L10 10 Z\"/><path class=\"wd\" d=\"M5 27 L22 17.6 L23 19.2 L6.4 28.6 Z\"/><path class=\"mt\" d=\"M22 17.6 L28 14.4 L28.6 15.6 L23 19.2 Z\"/><circle class=\"sk\" cx=\"18.6\" cy=\"20\" r=\"1.4\"/></g></svg>";
 const VEHICLES=[
-  {key:'schwer',name:'Schwerer Panzer',n:1},{key:'leicht',name:'Leichter Panzer',n:1},{key:'art',name:'Flakgeschütz',n:1,notSmall:true},
-  {key:'trans',name:'Transporter',n:1,notSmall:true},{key:'krad',name:'Kraftrad',n:1},{key:'flieger',name:'Kampfflieger',n:1,optional:true}];
+  {key:'schwer',name:'Schwerer Panzer',n:1},{key:'leicht',name:'Leichter Panzer',n:1},{key:'krad',name:'Kraftrad',n:1}];
 const SPECIALS=[
   {key:'general',name:'General',n:3},{key:'sniper',name:'Scharfschütze',n:2},{key:'mine',name:'Minenleger',n:2},
   {key:'flame',name:'Flammenwerfer',n:2},{key:'shotgun',name:'Schrotflinte',n:2},{key:'grenade',name:'Granatwerfer',n:2},
   {key:'mortar',name:'Mörser',n:2},{key:'mg',name:'Maschinengewehr',n:2},{key:'mech',name:'Mechaniker',n:1},{key:'medic',name:'Mediziner',n:1}];
-const SLOTS={'2x4':4,'3x6':8,'3x8':12};
+const SLOTS={'3x6':8,'3x8':10};   // Episch: 3 Fahrzeuge + 7 Trupps (35 Gewehrschützen)
 const RIFLEMEN=5; // Gewehrschützen pro Trupp
 const MAX_RIFLEMEN=35; // Gewehrschützen pro Spieler insgesamt
 const FACTIONS={de:{name:'Deutsche',emblem:'♣',card:'Kreuz'},al:{name:'Alliierte',emblem:'♥',card:'Herz'}};
-const FLYER_CHANCE=0.2; // bei "Ja": 20 % Chance, dass beide Spieler einen Kampfflieger bekommen
-let flyerAllowed=true; try{ flyerAllowed=localStorage.getItem('sitzkrieg-flieger')!=='0'; }catch(e){}
-let flyerOn=false;
+const flyerOn=false;   // Kampfflieger gibt es nicht mehr
 // Fahrzeuge einzeln erlauben (Ja/Nein). Im Armee-Seed als Bitmaske gespeichert: Bit gesetzt = Fahrzeug aus
 const VEH_TOGGLE=VEHICLES.filter(v=>!v.optional);
 let vehAllowed={}; try{ vehAllowed=JSON.parse(localStorage.getItem('sitzkrieg-fahrzeuge'))||{}; }catch(e){}
@@ -1751,15 +1643,14 @@ function rollArmy(){
   const n=SLOTS[$('size').value]||8;
   for(let tries=0;tries<500;tries++){
     const pool=[];
-    const small=$('size').value==='2x4'; // Klein: kein Flakgeschütz und kein Transporter
-    for(const v of VEHICLES) if(!v.optional && !(small && v.notSmall) && !vehOff(v.key)) for(let i=0;i<v.n;i++) pool.push({...v,veh:true});
+    for(const v of VEHICLES) if(!vehOff(v.key)) for(let i=0;i<v.n;i++) pool.push({...v,veh:true});
     for(const p of SPECIALS) for(let i=0;i<p.n;i++) pool.push({...p,veh:false});
     for(let i=pool.length-1;i>0;i--){ const j=Math.floor(arnd()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
     const out=[]; let ok=true, squads=0;
     for(let k=0;k<n && ok;k++){
       // Sind die Gewehrschützen aufgebraucht, gibt es nur noch Fahrzeuge
       if((squads+1)*RIFLEMEN>MAX_RIFLEMEN) for(let i=pool.length-1;i>=0;i--) if(!pool[i].veh) pool.splice(i,1);
-      const u=pool.shift(); if(!u){ if(vehMask && out.length) break; ok=false; break; }   // Fahrzeuge abgewählt: Armee hat dann weniger Slots
+      const u=pool.shift(); if(!u){ if(out.length) break; ok=false; break; }   // Vorrat leer (z. B. Fahrzeuge abgewählt): Armee hat dann weniger Slots
       if(u.veh){ out.push(u); continue; }
       const j=pool.findIndex(x=>!x.veh && !(u.key==='general' && x.key==='general'));
       if(j<0){ ok=false; break; }
@@ -1776,24 +1667,19 @@ function rollArmy(){
   return [];
 }
 
-// ---------- Missionstyp (gilt für beide Spieler) ----------
-const MISSIONS=[{name:'Vernichtung'},{name:'Aufmarsch',sec:'aufmarsch'},{name:'Missionsziele',sec:'missionsziele'}];
+// ---------- Mission (nur noch Vernichtung) ----------
+const MISSIONS=[{name:'Vernichtung'}];   // es gibt nur noch Vernichtung
 let mission=null;
 let armyBase=0, armyFair=true;
 const encodeArmy=()=>(vehMask*1e6+armyBase)*12+MISSIONS.indexOf(mission)*4+(flyerOn?2:0)+(armyFair?1:0);
-function rollMission(idx){
-  // Klein: immer Vernichtung
-  if(idx==null) idx=Math.floor(Math.random()*MISSIONS.length);
-  mission = $('size').value==='2x4' ? MISSIONS[0] : MISSIONS[idx];
+function rollMission(){
+  mission=MISSIONS[0];
   if(armyCode!=null){ armyCode=encodeArmy(); updateSeed(); }
-  $('mtype-val').textContent=mission.name;
   window.CUR_MISSION=mission; if(typeof render==='function' && current) render();
-  const b=$('mtype'); b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash');
 }
-$('mtype').onclick=()=>rollMission();
 // Generals-Fähigkeiten (aus dem Regelwerk: Abschnitt General)
 const GEN_ABIL=[...document.querySelectorAll('#general dl.abil dt')].map(dt=>({name:dt.textContent.trim(), text:dt.nextElementSibling.textContent.trim()}));
-const VEH_ORDER=['flieger','schwer','leicht','art','trans','krad'];
+const VEH_ORDER=['schwer','leicht','krad'];
 function renderArmy(side){
   const A=ART_FACTION[side]||ART, RIF=RIFLEMAN_FACTION[side]||RIFLEMAN;
   // Reihenfolge: Fahrzeuge (feste Ordnung), danach Trupps
@@ -1804,8 +1690,6 @@ function renderArmy(side){
       <h3>${f.name}<small>Befehlskarten: ${f.card} · ${a.length} Slots</small></h3>
 </div>
     <div class="army-sum"><span>${veh} Fahrzeug${veh===1?'':'e'}</span><span>${sq} Trupp${sq===1?'':'s'}</span><span>${sq*RIFLEMEN}/${MAX_RIFLEMEN} Gewehrschützen</span><span>${men} Soldaten</span></div>
-    ${flyerOn?`<div class="slot veh bonus" data-veh="flieger" role="button" tabindex="0" title="Werte anzeigen"><span class="slot-no">+</span><span class="slot-art">${A.flieger}</span>
-        <span><span class="slot-name">Kampfflieger</span><br><span class="slot-tag">Fahrzeug · Bonus</span> <span class="info-tag">ⓘ Werte</span></span></div>`:''}
     <ol class="slots">${a.map((u,i)=>u.veh?`<li class="slot veh" data-veh="${u.key}" role="button" tabindex="0" title="Werte anzeigen" style="animation-delay:${i*45}ms">
         <span class="slot-no">${i+1}</span><span class="slot-art">${A[u.key]}</span>
         <span><span class="slot-name">${u.name}</span><br><span class="slot-tag">Fahrzeug</span> <span class="info-tag">ⓘ Werte</span></span></li>`
@@ -1821,20 +1705,17 @@ function genArmies(code){
   if(typeof code!=='number' || !isFinite(code)) code=null;
   if(code==null){
     armyBase=Math.floor(Math.random()*1e6); armyFair=fairOn; vehMask=vehMaskNow();
-    flyerOn=flyerAllowed && Math.random()<FLYER_CHANCE;
     armyCode=null; rollMission();
   } else {
-    code=Math.floor(code); const cb=Math.floor(code/12); armyBase=cb%1e6; vehMask=Math.floor(cb/1e6)&31; armyFair=!!(code&1); flyerOn=!!(code&2);
-    armyCode=null; rollMission(Math.floor(code%12/4)%MISSIONS.length);
+    code=Math.floor(code); const cb=Math.floor(code/12); armyBase=cb%1e6; vehMask=Math.floor(cb/1e6)&31; armyFair=!!(code&1);
+    armyCode=null; rollMission();
   }
   armyCode=encodeArmy(); updateSeed();
   arnd=mulberry32((armyBase*2654435761+(SLOTS[$('size').value]||8))>>>0);
   const fairOn_=armyFair;
-  // Immer: Transporter bei beiden oder bei keinem, gleich viele Generäle.
-  // Zusätzlich bei „Faire Armeen“: gleich viele Fahrzeuge.
-  const hasTrans=a=>a.some(x=>x.key==='trans');
+  // Immer: gleich viele Generäle. Zusätzlich bei „Faire Armeen“: gleich viele Fahrzeuge.
   const generals=a=>a.reduce((n,x)=>n+(x.veh?0:x.units.filter(u=>u.key==='general').length),0);
-  const matches=(a,b)=>hasTrans(a)===hasTrans(b) && generals(a)===generals(b) && (!fairOn_ || vehCount(a)===vehCount(b));
+  const matches=(a,b)=>generals(a)===generals(b) && (!fairOn_ || vehCount(a)===vehCount(b));
   let ok=false;
   for(let outer=0; outer<50 && !ok; outer++){
     armies.de=rollArmy();
@@ -1849,18 +1730,11 @@ function setFair(on){
 document.querySelectorAll('.fair button').forEach(b=>b.onclick=()=>{ setFair(b.dataset.fair==='1'); genArmies(); });
 setFair(fairOn);
 function renderPoolInfo(){
-  $('pool-veh').innerHTML=VEHICLES.filter(v=>!v.optional).map(v=>vehAllowed[v.key]===false?`<li><s>${v.name}</s> (aus)</li>`:`<li>${v.n}× ${v.name}${v.notSmall?' <small>(nicht auf Klein)</small>':''}</li>`).join('')+(flyerAllowed?`<li>Kampfflieger: ${Math.round(FLYER_CHANCE*100)} % Chance pro Wurf – dann bekommen ihn beide Spieler (zusätzlich, ohne Slot)</li>`:'<li><s>Kampfflieger</s> (aus)</li>');
-  $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Hat eine Seite einen Transporter, hat die andere auch einen</li><li>Beide Seiten haben gleich viele Generäle</li><li>Trupp = 2 Spezialeinheiten (max. 1 General) + ${RIFLEMEN} Gewehrschützen</li><li>Höchstens ${MAX_RIFLEMEN} Gewehrschützen pro Spieler</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
+  $('pool-veh').innerHTML=VEHICLES.map(v=>vehAllowed[v.key]===false?`<li><s>${v.name}</s> (aus)</li>`:`<li>${v.n}× ${v.name}</li>`).join('');
+  $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Beide Seiten haben gleich viele Generäle</li><li>Trupp = 2 Spezialeinheiten (max. 1 General) + ${RIFLEMEN} Gewehrschützen</li><li>Höchstens ${MAX_RIFLEMEN} Gewehrschützen pro Spieler</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
 }
 $('army-gen').onclick=()=>genArmies();
-function setFlyerAllowed(on){
-  flyerAllowed=on; try{ localStorage.setItem('sitzkrieg-flieger',on?'1':'0'); }catch(e){}
-  document.querySelectorAll('.flyer button[data-flyer]').forEach(b=>b.classList.toggle('on',(b.dataset.flyer==='1')===on));
-  renderPoolInfo();
-}
-document.querySelectorAll('.flyer button[data-flyer]').forEach(b=>b.onclick=()=>{ setFlyerAllowed(b.dataset.flyer==='1'); genArmies(); });
-setFlyerAllowed(flyerAllowed);
-document.querySelector('.seg.flyer:not(.fair)').insertAdjacentHTML('afterend',VEH_TOGGLE.map(v=>`<div class="seg flyer veh-tg" role="group" aria-label="${v.name} möglich">
+document.querySelector('.seg.flyer.fair').insertAdjacentHTML('beforebegin',VEH_TOGGLE.map(v=>`<div class="seg flyer veh-tg" role="group" aria-label="${v.name} möglich">
   <span class="flyer-lbl">${v.name}</span><button class="sec" data-veh-on="${v.key}" data-v="1">Ja</button><button class="sec" data-veh-on="${v.key}" data-v="0">Nein</button></div>`).join(''));
 function syncVehButtons(){ document.querySelectorAll('[data-veh-on]').forEach(b=>b.classList.toggle('on',(b.dataset.v==='1')===(vehAllowed[b.dataset.vehOn]!==false))); }
 document.querySelectorAll('[data-veh-on]').forEach(b=>b.onclick=()=>{
@@ -1965,8 +1839,6 @@ document.addEventListener('click',e=>{ if(e.target.closest('.gabil')) return; co
 document.addEventListener('keydown',e=>{ const s=e.target.closest&&e.target.closest('.slot[data-squad]'); if(s&&!e.target.closest('.gabil')&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); openSquad(s.dataset.side,+s.dataset.squad); } });
 
 // ---------- Mission auf der Karte: Startzonen und Missionsziele ----------
-const OBJ_INTEREST={bunker:6,kirche:6,turm:5,hafen:5,zug:5,wohn:4,farm:4,ruine:3,graben:3,strasse:3,strand:2,wald:1,flach:1,see:0};
-const OBJ_COUNT={'3x6':3,'3x8':5};
 const markOn=true;   // Markierungen immer an
 function missionSetup(){
   const m=window.CUR_MISSION; if(!current||current.error||!m) return null;
@@ -1993,19 +1865,6 @@ function missionSetup(){
     const inPart=x.part==='all'||(x.part==='start'?c<COLS/2:c>=COLS/2);
     return ({left:c===0,right:c===COLS-1,top:rr===0&&inPart,bottom:rr===ROWS-1&&inPart})[x.e]; };
   const edgeList=[...de,...al];
-  if(m.name==='Missionsziele'){
-    const n=OBJ_COUNT[ROWS+'x'+COLS]||3;
-    const cand=current.pieces.map(p=>{
-      const cs=p.cells.map(i=>i%COLS), rs=p.cells.map(i=>Math.floor(i/COLS));
-      const cx=cs.reduce((a,b)=>a+b)/cs.length, cy=rs.reduce((a,b)=>a+b)/rs.length;
-      const edge=p.cells.every(i=>edgeList.some(e=>onEdge(i,e)));   // nicht direkt an einer Spielkante
-      return {p,cx,cy,score:(OBJ_INTEREST[p.p.key]??1)*10-(edge?200:0)-Math.abs(cx-(COLS-1)/2)*1.5+r()*6};
-    });
-    while(objectives.length<n && cand.length){
-      cand.sort((a,b)=>b.score-a.score); const c=cand.shift(); objectives.push(c.p);
-      for(const o of cand){ const d=Math.hypot(o.cx-c.cx,o.cy-c.cy); if(d<2.2) o.score-=34-d*10; }  // Ziele verteilen
-    }
-  }
   return current._ms={key,edges,objectives};
 }
 function renderMapMission(ms,port){
@@ -2018,9 +1877,7 @@ function renderMapMission(ms,port){
   const halfTxt=(x)=>{ if(x.part==='all') return ''; const d=disp(x.e); const vert=d==='left'||d==='right';
     return ' ½'; };
   const txt=list=>list.map(x=>W[disp(x.e)]+halfTxt(x)).join(' + ');
-  const edge=m.name==='Aufmarsch'?(s0.edges.de.length>1?'Start- und Reservekanten':'Start- und Reservekante'):(s0.edges.de.length>1?'Spielkanten':'Spielkante');
-  let t=`🎯 <b>${m.name}</b> · <span class="mm-de">♣ ${txt(s0.edges.de)}</span> · <span class="mm-al">♥ ${txt(s0.edges.al)}</span>`;
-  if(m.name==='Missionsziele') t+=` · <span class="mm-obj">⚑ ${s0.objectives.length} Ziele</span>`;
+    let t=`🎯 <b>${m.name}</b> · <span class="mm-de">♣ ${txt(s0.edges.de)}</span> · <span class="mm-al">♥ ${txt(s0.edges.al)}</span>`;
   $('mm-txt').innerHTML=t;
 }
 buildPool();
@@ -2117,7 +1974,7 @@ document.addEventListener('click',e=>{
   if(el.closest('.tabs')) n='menu';
   if(el.id==='gen'||el.id==='fab'||el.id==='army-gen'){ Sounds.play('dice', nextDiceVariant()); return; }
   if(el.id==='rot'){ Sounds.play('chair', nextVariant('chair')); return; }
-  if(el.matches('.flyer button[data-flyer="1"]')){ Sounds.play('plane'); return; }   // Kampfflieger Ja: Flugzeug fliegt vorbei   // Karte drehen: Stuhlrücken   // dice1.mp3 in einer zufälligen Tonhöhen-Variante
+     // Kampfflieger Ja: Flugzeug fliegt vorbei   // Karte drehen: Stuhlrücken   // dice1.mp3 in einer zufälligen Tonhöhen-Variante
   if(el.id==='theme' && document.documentElement.getAttribute('data-theme')==='dark') return;   // Blendgranate übernimmt
   Sounds.play(n);
 },true);
@@ -2128,20 +1985,20 @@ document.addEventListener('click',e=>{
 const LS=(k,v)=>{ try{ if(v===undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; } };
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const SIDE_NAME={de:'♣ Deutsche',al:'♥ Alliierte'};
-const GOALS={Vernichtung:{'2x4':{sp:3},'3x6':{sp:6},'3x8':{sp:9}},Aufmarsch:{'3x6':{sp:6,res:2},'3x8':{sp:9,res:2}},Missionsziele:{'3x6':{sp:15},'3x8':{sp:20}}};
+const GOALS={Vernichtung:{'3x6':{sp:6},'3x8':{sp:9}}};
 const goal=()=>{ const m=window.CUR_MISSION; return m&&GOALS[m.name]&&GOALS[m.name][$('size').value]||null; };
-const RANKS=[{r:'A',u:'flieger',name:'Kampfflieger'},{r:'K',u:'schwer',name:'Schwerer Panzer'},{r:'D',u:'leicht',name:'Leichter Panzer'},
-  {r:'B',u:'art',name:'Flakgeschütz'},{r:'10',u:'trans',name:'Transporter'},{r:'9',u:'krad',name:'Kraftrad'},
+const RANKS=[{r:'K',u:'schwer',name:'Schwerer Panzer'},{r:'D',u:'leicht',name:'Leichter Panzer'},{r:'9',u:'krad',name:'Kraftrad'},
   ...[2,3,4,5,6,7,8].map(z=>({r:String(z),u:'inf',name:'Infanterie-Trupp'}))];
 let G=LS('sitzkrieg-spiel2d');
 const saveG=()=>LS('sitzkrieg-spiel2d',G);
 function buildDeck(){
-  const aufm=window.CUR_MISSION&&window.CUR_MISSION.name==='Aufmarsch';
-  const d=[]; for(const s of ['de','al']) for(const c of RANKS){ if(aufm&&c.r==='A'&&(!G||G.round<=3)) continue; d.push(s+':'+c.r); }
+  const d=[]; for(const s of ['de','al']) for(const c of RANKS) d.push(s+':'+c.r);
   for(let i=d.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [d[i],d[j]]=[d[j],d[i]]; } return d;
 }
 function newGame(){ G={vp:{de:0,al:0},round:1,deck:[],drawn:null}; G.deck=buildDeck(); saveG(); }
 if(!G||!G.vp) newGame();
+{ const ok=id=>RANKS.some(c=>c.r===id.split(':')[1]);   // alte Spielstände: entfernte Karten (Ass, Bube, 10) aussortieren
+  G.deck=(G.deck||[]).filter(ok); if(G.drawn&&!ok(G.drawn)) G.drawn=null; saveG(); }
 const cardInfo=id=>{ const [s,r]=id.split(':'); return {s,c:RANKS.find(x=>x.r===r)}; };
 function cardHTML(id,small){ const {s,c}=cardInfo(id);
   return `<div class="pcard ${s}${small?' small':''}"><span class="pc-c">${s==='de'?'♣':'♥'} ${c.r}</span><span class="pc-s">${s==='de'?'♣':'♥'}</span><span class="pc-c b">${s==='de'?'♣':'♥'} ${c.r}</span></div>`; }
@@ -2154,11 +2011,8 @@ function drawCard(){
   G.roundMsg=false; G.drawn=G.deck.shift(); G.peek=false; saveG(); renderSpiel();
 }
 function roundReminders(){ const m=window.CUR_MISSION?window.CUR_MISSION.name:'', g=goal()||{}, li=[];
-  if(m==='Missionsziele') li.push('⚑ Jedes gehaltene Missionsziel (Trupp berührt es im Nahkampf): +1 SP – beide bekommen ihn, wenn beide es halten');
   li.push('🔥 Einheiten im Feuer: Schadenswurf mit Durchschlag 3');
   li.push('💨 Rauch und Feuer aus der vorletzten Runde entfernen');
-  if(m==='Aufmarsch') li.push(`⏳ Verstärkung: je ${g.res||2} Trupps aus der Reserve aufs Feld (Transporter mit 10 + 2–8)`);
-  if(m==='Aufmarsch'&&G.round===4) li.push('✈ Ab jetzt sind die Asse (Kampfflieger) mit im Deck');
   li.push('★ Taktiker: eine gespeicherte Befehlskarte muss jetzt aktiviert werden');
   return li; }
 function renderSpiel(){
