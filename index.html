@@ -330,6 +330,7 @@ html[data-theme="dark"] .gc-sub{color:#a9a486}
   table.rt th,table.rt td{border:1px solid rgba(111,106,74,.55);padding:6px 9px;white-space:normal;text-align:left;vertical-align:top}
   table.rt thead th{background:linear-gradient(var(--od),var(--od2));color:#ece4c8;font-family:var(--head);font-size:.82rem;letter-spacing:.02em}
   table.rt tbody tr:nth-child(even) td{background:rgba(150,140,90,.12)}
+  table.rt.wt td:not(:first-child),table.rt.wt th:not(:first-child){text-align:center}   /* Waffentabellen: Werte zentriert */
   table.rt.kv th{width:42%;background:rgba(150,140,90,.22);color:#23241c;font-family:var(--head);font-size:.85rem}
   table.rt.grid th,table.rt.grid td{text-align:center}
   table.rt.grid tbody th{background:linear-gradient(var(--od),var(--od2));color:#ece4c8;font-family:var(--head)}
@@ -1181,7 +1182,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
     <article class="rcard" id="waffen">
       <h2>Waffen</h2>
-      <div class="tw"><table class="rt">
+      <div class="tw"><table class="rt wt">
         <thead><tr><th>Name</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody>
           <tr><td>Mörser</td><td>3</td><td>Kl. Scheibe</td><td>2</td></tr>
@@ -1212,7 +1213,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         </table></div>
         <div class="armor" data-f="4" data-s="3" data-r="2"></div>
       </div>
-      <div class="tw"><table class="rt">
+      <div class="tw"><table class="rt wt">
         <thead><tr><th>Turmgeschütz</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>HE</td><td>3</td><td>Gr. Scheibe</td><td>1</td></tr><tr><td>AP</td><td>3</td><td>1</td><td>4</td></tr></tbody>
         <thead><tr><th>Maschinengewehr</th><th></th><th></th><th></th></tr></thead>
@@ -1231,7 +1232,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         </table></div>
         <div class="armor" data-f="3" data-s="2" data-r="1"></div>
       </div>
-      <div class="tw"><table class="rt">
+      <div class="tw"><table class="rt wt">
         <thead><tr><th>Turmgeschütz</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>HE</td><td>3</td><td>Kl. Scheibe</td><td>1</td></tr><tr><td>AP</td><td>3</td><td>1</td><td>3</td></tr></tbody>
         <thead><tr><th>Maschinengewehr</th><th></th><th></th><th></th></tr></thead>
@@ -1249,7 +1250,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         </table></div>
         <div class="armor" data-f="1" data-s="1" data-r="1"></div>
       </div>
-      <div class="tw"><table class="rt">
+      <div class="tw"><table class="rt wt">
         <thead><tr><th>Maschinengewehr</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>MG</td><td>2</td><td>10</td><td>1</td></tr></tbody>
       </table></div>
@@ -1306,7 +1307,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         <tr><th>1</th><td>Rauch</td></tr>
       </table></div>
       <p>Bei einer Explosion ist das Fahrzeug sofort komplett zerstört und die Gr. Scheibe wird mittig auf das Fahrzeug gelegt. Der Schaden ermittelt sich wie folgt:</p>
-      <div class="tw"><table class="rt">
+      <div class="tw"><table class="rt wt">
         <thead><tr><th></th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>Explosion</td><td>Gr. Scheibe</td><td>1</td></tr></tbody>
       </table></div>
@@ -1947,7 +1948,7 @@ function weaponTable(names){
   const rows=[...src.querySelectorAll('tbody tr')];
   const pick=names.map(n=>rows.find(r=>r.cells[0].textContent.trim()===n)).filter(Boolean);
   if(!pick.length) return '';
-  return `<div class="tw"><table class="rt">${src.querySelector('thead').outerHTML}<tbody>${pick.map(r=>r.outerHTML).join('')}</tbody></table></div>`;
+  return `<div class="tw"><table class="rt wt">${src.querySelector('thead').outerHTML}<tbody>${pick.map(r=>r.outerHTML).join('')}</tbody></table></div>`;
 }
 function openSquad(side,idx){
   const rank=slotRank;
