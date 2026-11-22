@@ -1660,8 +1660,8 @@ document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ showTab(b.d
   });
   document.querySelectorAll('.armor').forEach(d=>{
     const f=d.dataset.f,s=d.dataset.s,r=d.dataset.r,t=d.dataset.t||s;
-    d.innerHTML=`<span></span><span class="v" title="Front">${f}</span><span></span><span class="v" title="Seite">${s}</span><span class="c" title="Fahrtrichtung"><i>↑</i>${t}</span><span class="v" title="Seite">${s}</span><span></span><span class="v" title="Heck">${r}</span><span></span><span class="armor-cap">Panzerung</span>`;
-    d.style.gridTemplateRows='repeat(3,42px) auto';
+    d.innerHTML=`<span></span><span class="v" title="Front">${f}</span><span></span><span class="v" title="Seite">${s}</span><span class="c" title="Fahrtrichtung"><i>↑</i>${t}</span><span class="v" title="Seite">${s}</span><span></span><span class="v" title="Heck">${r}</span><span></span>`;
+    d.style.gridTemplateRows='repeat(3,42px)';
   });
   $('toc-count').textContent=`(${document.querySelectorAll('#regelwerk .rcard').length} Abschnitte)`;
   document.querySelectorAll('#regelwerk a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
