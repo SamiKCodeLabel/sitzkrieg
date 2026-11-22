@@ -1722,7 +1722,7 @@ function renderArmy(side){
   const isPure=x=>!x.veh&&!x.units.length, firstPure=a.findIndex(isPure), pureN=a.filter(isPure).length;   // reine Gewehrschützen-Trupps als eine Zeile
   const veh=a.filter(x=>x.veh).length, sq=a.filter(x=>rifOf(x)>0).length, solo=a.filter(x=>!x.veh&&rifOf(x)===0).length, rif=a.reduce((n,x)=>n+rifOf(x),0), men=a.reduce((n,x)=>n+(x.veh?0:x.units.length+rifOf(x)),0);
   el.innerHTML=`<div class="army-head"><span class="emblem">${f.emblem}</span>
-      <h3>${f.name}<small>Befehlskarten: ${f.card} · ${a.length} Slots</small></h3>
+      <h3>${f.name}</h3>
 </div>
     <ol class="slots">${a.map((u,i)=>isPure(u)?(i!==firstPure?'':`<li class="slot inf rif-group" data-squad="${i}" data-side="${side}" role="button" tabindex="0" title="Waffenwerte anzeigen" style="animation-delay:${i*45}ms">
         <span class="slot-no">${i+1}</span><span class="slot-art duo five">${RIF.repeat(RIFLEMEN)}</span>
