@@ -121,9 +121,56 @@
 .gc-body .vgrid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
 .gc-note{font-size:.9rem;margin:8px 0 0;line-height:1.45}
 .gc-note b{font-family:var(--head);letter-spacing:.04em}
+.gc-notes{padding:0 14px}
 html[data-theme="dark"] .gcard{background:#2a2f20;color:#e3dcc0;border-color:#5d5b42}
 html[data-theme="dark"] .gc-sub{color:#a9a486}
 @media (max-width:640px){ .gc-art{height:120px} .gc-name{font-size:1.25rem} .gc-body .vgrid{grid-template-columns:1fr} .gp-next{width:84px;height:84px} }
+
+/* Spiel-Tab im Handy-Querformat: alles auf einen Bildschirm */
+@media (orientation:landscape) and (max-height:560px){
+  body.on-spiel{padding-bottom:0}
+  body.on-spiel h1,body.on-spiel .sub{display:none}
+  body.on-spiel main{margin:2px 8px;padding:6px 10px}
+  body.on-spiel .tabs{margin:0 auto 8px!important;max-width:min(520px,calc(100% - 110px))!important}
+  body.on-spiel .tabs button{padding:7px 4px!important}
+  .gp{max-width:none;display:grid;grid-template-columns:112px 1fr;grid-template-rows:auto auto 1fr;gap:6px 12px;align-items:start;justify-items:center}
+  .gp-info{grid-column:1;font-size:.72rem;line-height:1.3;margin:0}
+  .gp-next{grid-column:1;width:78px;height:78px}
+  .gp-round{grid-column:1;font-size:.8rem}
+  .gcard{grid-column:2;grid-row:1 / span 3;justify-self:stretch;display:grid;grid-template-columns:minmax(130px,25%) 1fr;grid-template-rows:auto auto auto 1fr;
+         max-height:calc(100dvh - 78px);margin-right:52px;box-shadow:0 0 0 3px #22261a,0 6px 16px rgba(0,0,0,.4)}
+  .gc-top{grid-column:1 / -1;padding:5px 10px;font-size:.95rem}
+  .gc-top .gc-emb{width:28px;height:28px} .gc-top .gc-emb svg.emb{width:20px;height:20px}
+  .gc-art{grid-column:1;height:auto;min-height:0;max-height:110px;padding:8px 6px 0}
+  .gc-art svg.fig{max-height:100px}
+  .gc-art.veh svg.fig{width:95%;max-height:90px}
+  .gc-art.five svg.fig{height:auto;width:23%;max-height:none;margin-left:-4%}
+  .gc-art.five svg.fig:first-child{margin-left:0}
+  .gc-name{grid-column:1;font-size:1.05rem;margin:4px 8px 0}
+  .gc-sub{grid-column:1;font-size:.75rem;margin-bottom:4px}
+  .gc-notes{grid-column:2;grid-row:2;padding:6px 10px 0;border-left:1px dashed #6f6a4a}
+  .gcard{grid-template-rows:auto auto auto auto 1fr}
+  .gc-notes+.gc-body{grid-row:3 / span 4;padding-top:0}
+  .gc-body{grid-column:2;grid-row:2 / span 5;overflow:auto;min-height:0;padding:6px 10px 8px;border-left:1px dashed #6f6a4a}
+  .gc-body table.rt th,.gc-body table.rt td{padding:2px 5px!important;font-size:.68rem!important;line-height:1.25}
+  .gc-body table.rt.kv th{width:auto}
+  .gc-body .pen{font-size:.68rem!important;padding:0 4px!important}
+  .gc-body .vgrid{grid-template-columns:1fr auto;gap:6px}
+  .gc-body .armor{zoom:.62;margin:0 0 4px}
+  .gc-body .vgrid>*:last-child .note,.gc-body .vgrid small{display:none}
+  .gc-note{font-size:.7rem;margin:4px 0 0;line-height:1.3}
+  .gc-body .tw{margin-top:5px}
+}
+@media (orientation:landscape) and (max-height:560px) and (max-width:760px){
+  .gp{grid-template-columns:84px 1fr;gap:6px 8px}
+  .gp-next{width:62px;height:62px} .gp-next svg{width:32px;height:32px}
+  .gcard{grid-template-columns:minmax(110px,24%) 1fr!important;margin-right:46px}
+  .gc-art svg.fig{max-height:80px} .gc-art.veh svg.fig{max-height:64px}
+  .gc-name{font-size:.92rem}
+  .gc-note{font-size:.62rem!important;line-height:1.25!important}
+  .gc-body table.rt th,.gc-body table.rt td{font-size:.6rem!important;padding:1px 4px!important}
+  .gc-body .armor{zoom:.5}
+}
 </style>
 <style>
   :root{
@@ -2019,7 +2066,7 @@ function draw(){
 const ARROW='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24 H38 M26 11 L39 24 L26 37"/></svg>';
 function cardHTML(c){
   const A=ART_FACTION[c.side]||ART, RIF=RIFLEMAN_FACTION[c.side]||RIFLEMAN, F=FACTIONS[c.side];
-  let art='', name='', sub='', body='', artCls='';
+  let art='', name='', sub='', body='', notes='', artCls='';
   if(c.kind==='rif'){
     art=RIF.repeat(RIFLEMEN); artCls='five'; name=`${RIFLEMEN} Gewehrschützen`; sub='Trupp';
     body=weaponTable(['Gewehr']);
@@ -2030,8 +2077,8 @@ function cardHTML(c){
       art=A[u.abil?'general:'+u.abil.name:u.key]||A[u.key]; name=u.name; sub='Spezialeinheit';
       const names=u.abil&&u.abil.name==='Veteran'?['Nahkampfwaffe','Maschinengewehr']:(WEAPONS_OF[u.key]||[]);
       const sec=EXTRA_SECTION[u.key]&&document.querySelector('#'+EXTRA_SECTION[u.key]+' p');
-      if(u.abil) body+=`<p class="gc-note"><b>★ ${u.abil.name}:</b> ${u.abil.text}</p>`;
-      if(sec) body+=`<p class="gc-note">${sec.textContent}</p>`;
+      if(u.abil) notes+=`<p class="gc-note"><b>★ ${u.abil.name}:</b> ${u.abil.text}</p>`;
+      if(sec) notes+=`<p class="gc-note">${sec.textContent}</p>`;
       body+=weaponTable(names);
     }
   } else {
@@ -2043,7 +2090,7 @@ function cardHTML(c){
     <div class="gc-top"><span class="gc-emb">${EMB[c.side]}</span>${F.name}</div>
     <div class="gc-art army ${c.side} ${artCls}">${art}</div>
     <h3 class="gc-name">${name}</h3>${sub?`<div class="gc-sub">${sub}</div>`:''}
-    <div class="gc-body">${body}</div></div>`;
+    ${notes?`<div class="gc-notes">${notes}</div>`:''}<div class="gc-body">${body}</div></div>`;
 }
 function render(){
   const el=$('tab-spiel'); if(!el) return;
