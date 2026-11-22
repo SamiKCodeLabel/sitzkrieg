@@ -526,6 +526,8 @@
   .slot.bonus .slot-no{color:var(--stamp);border-color:var(--stamp)}
   .slot-art.duo{gap:2px}
   .slot-art.duo svg{width:50%}
+  .slot-art.duo.five{gap:0} .slot-art.duo.five svg{width:28%;flex:none;margin-left:-9%} .slot-art.duo.five svg:first-child{margin-left:0}
+  .slot-art.duo.five svg:nth-child(even){transform:translateY(-6%)}
   .slot.inf .slot-name{font-size:.92rem}
   .flyer{align-items:stretch}
   .flyer-lbl{display:flex;align-items:center;gap:4px;padding:0 10px;font-family:var(--head);text-transform:uppercase;font-size:.85rem;
@@ -1720,7 +1722,7 @@ function renderArmy(side){
 </div>
     <div class="army-sum"><span>${veh} Fahrzeug${veh===1?'':'e'}</span><span>${sq} Trupp${sq===1?'':'s'}</span>${solo?`<span>${solo} Spezialeinheit${solo===1?'':'en'}</span>`:''}<span>${rif}/${MAX_RIFLEMEN} Gewehrschützen</span><span>${men} Soldaten</span></div>
     <ol class="slots">${a.map((u,i)=>isPure(u)?(i!==firstPure?'':`<li class="slot inf rif-group" data-squad="${i}" data-side="${side}" role="button" tabindex="0" title="Waffenwerte anzeigen" style="animation-delay:${i*45}ms">
-        <span class="slot-no">${i+1}</span><span class="slot-art duo">${RIF+RIF}</span>
+        <span class="slot-no">${i+1}</span><span class="slot-art duo five">${RIF.repeat(RIFLEMEN)}</span>
         <span><span class="slot-name">${pureN}× ${RIFLEMEN} Gewehrschützen</span><br><span class="slot-tag">Trupp${pureN===1?'':'s'}</span> <span class="info-tag">ⓘ Waffen</span></span></li>`)
       :u.veh?`<li class="slot veh" data-veh="${u.key}" role="button" tabindex="0" title="Werte anzeigen" style="animation-delay:${i*45}ms">
         <span class="slot-no">${i+1}</span><span class="slot-art">${A[u.key]}</span>
