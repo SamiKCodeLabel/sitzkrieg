@@ -203,6 +203,15 @@ html[data-theme="dark"] .net-pop{background:#2a2f20;color:#e3dcc0;border-color:#
 html[data-theme="dark"] .np-hint{color:#a9a486}
 html[data-theme="dark"] .lb-off input{background:#1e2216;color:#e3dcc0;border-color:#5d5b42}
 @media (max-width:640px){ .net-pop{top:100px;right:56px;width:min(260px,calc(100vw - 80px))} }
+
+/* ---------- Neue Karte gedrückt halten = alles neu ---------- */
+#gen{position:relative;overflow:hidden;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#gen::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(190,50,30,.85),rgba(230,70,40,.95));transform:scaleX(0);transform-origin:left;transition:transform .15s ease-out;z-index:0}
+#gen>*{position:relative;z-index:1}
+#gen.charging::before{transform:scaleX(1);transition:transform var(--hold,900ms) linear}
+#gen.charging{box-shadow:0 0 0 2px #22261a,0 0 14px rgba(220,60,30,.55)}
+#gen.fired{animation:genFire .45s ease-out}
+@keyframes genFire{0%{box-shadow:0 0 0 2px #22261a,0 0 0 rgba(255,90,40,.9)}40%{box-shadow:0 0 0 2px #22261a,0 0 28px rgba(255,90,40,.95)}100%{box-shadow:none}}
 </style>
 <style>
   :root{
@@ -2391,6 +2400,36 @@ document.addEventListener('click',e=>{
   if(el.id==='theme' && document.documentElement.getAttribute('data-theme')==='dark') return;   // Blendgranate übernimmt
   Sounds.play(n);
 },true);
+</script>
+<script>
+// ===================== Neue Karte gedrückt halten: Karte, Armeen und Deck neu =====================
+(function(){
+const HOLD=900, btn=$('gen'); btn.style.setProperty('--hold',HOLD+'ms');
+// Text in ein span packen, damit er über dem roten Balken liegt
+if(!btn.querySelector('span.gen-l')){ const sp=document.createElement('span'); sp.className='gen-l'; while(btn.firstChild) sp.appendChild(btn.firstChild); btn.appendChild(sp); }
+let t=null, fired=false;
+function stop(){ clearTimeout(t); t=null; btn.classList.remove('charging'); }
+btn.addEventListener('pointerdown',e=>{
+  if(e.button>0) return; fired=false; stop();
+  void btn.offsetWidth; btn.classList.add('charging');
+  t=setTimeout(()=>{
+    t=null; fired=true; btn.classList.remove('charging');
+    btn.classList.remove('fired'); void btn.offsetWidth; btn.classList.add('fired');
+    if(navigator.vibrate) try{ navigator.vibrate(60); }catch(e){}
+    if(typeof Sounds!=='undefined') try{ Sounds.play('dice', nextDiceVariant()); }catch(e){}
+    btn.onclick&&btn.onclick();          // neue Karte (und ggf. Lobby erstellen)
+    genArmies();                          // neue Armeen -> Deck startet neu
+    if(window.spielReset) spielReset();
+    if(window.netChanged) netChanged();
+    showToast('Alles neu: Karte, Armeen und Deck');
+  },HOLD);
+});
+['pointerup','pointerleave','pointercancel'].forEach(ev=>btn.addEventListener(ev,()=>{ if(t) stop(); }));
+btn.addEventListener('contextmenu',e=>e.preventDefault());
+// Nach dem langen Drücken keinen zusätzlichen normalen Klick auslösen
+window.addEventListener('click',e=>{ if(fired && e.target.closest&&e.target.closest('#gen')){ e.stopPropagation(); e.preventDefault(); fired=false; } },true);
+function showToast(txt){ const el=$('lb-toast'); if(!el) return; el.textContent=txt; el.classList.add('show'); clearTimeout(showToast.t); showToast.t=setTimeout(()=>el.classList.remove('show'),2200); }
+})();
 </script>
 <script>
 // App-Modus: Offline-Speicher aktivieren (nur wenn die Seite über eine Web-Adresse geladen wird)
