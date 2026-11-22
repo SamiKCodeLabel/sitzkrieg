@@ -2087,13 +2087,13 @@ function cardHTML(c){
   const A=ART_FACTION[c.side]||ART, RIF=RIFLEMAN_FACTION[c.side]||RIFLEMAN, F=FACTIONS[c.side];
   let art='', name='', sub='', body='', notes='', artCls='';
   if(c.kind==='rif'){
-    art=RIF.repeat(RIFLEMEN); artCls='five'; name=`${RIFLEMEN} Gewehrschützen`; sub='Trupp';
+    art=RIF.repeat(RIFLEMEN); artCls='five'; name='Gewehrschützen';
     body=weaponTable(['Gewehr']);
   } else if(c.kind==='spec'){
     const u=c.unit;
     if(!u){ name='Spezialeinheit'; body='<p class="gc-note">Diese Armee hat keine einzelne Spezialeinheit.</p>'; }
     else{
-      art=A[u.abil?'general:'+u.abil.name:u.key]||A[u.key]; name=u.name; sub='Spezialeinheit';
+      art=A[u.abil?'general:'+u.abil.name:u.key]||A[u.key]; name=u.name;
       const names=u.abil&&u.abil.name==='Veteran'?['Nahkampfwaffe','Maschinengewehr']:(WEAPONS_OF[u.key]||[]);
       const sec=EXTRA_SECTION[u.key]&&document.querySelector('#'+EXTRA_SECTION[u.key]+' p');
       if(u.abil) notes+=`<p class="gc-note"><b>★ ${u.abil.name}:</b> ${u.abil.text}</p>`;
@@ -2101,7 +2101,7 @@ function cardHTML(c){
       body+=weaponTable(names);
     }
   } else {
-    const v=VEHICLES.find(x=>x.key===c.key); art=A[c.key]; artCls='veh'; name=v?v.name:c.key; sub='Fahrzeug';
+    const v=VEHICLES.find(x=>x.key===c.key); art=A[c.key]; artCls='veh'; name=v?v.name:c.key;
     const card=VEH_SECTION[c.key]&&document.getElementById(VEH_SECTION[c.key]);
     if(card){ const cl=card.cloneNode(true); cl.querySelector('h2')?.remove(); cl.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id')); body=cl.innerHTML; }
   }
