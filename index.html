@@ -1262,8 +1262,8 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
 <script>
 const PIECES = [
-  {key:'wald',    name:'Wald',          biome:'g', size:1, count:4, icon:'🌲'},
-  {key:'flach',   name:'Flachland',     biome:'g', size:1, count:8, icon:'🌾'},
+  {key:'wald',    name:'Wald',          biome:'g', size:1, count:3, icon:'🌲'},
+  {key:'flach',   name:'Flachland',     biome:'g', size:1, count:9, icon:'🌾'},
   {key:'zug',     name:'Zug',           biome:'g', size:2, count:1, icon:'🚂'},
   {key:'farm',    name:'Farm',          biome:'g', size:1, count:1, icon:'🐄'},
   {key:'turm',    name:'Wachturm',      biome:'g', size:1, count:1, icon:'🗼'},
@@ -1277,13 +1277,15 @@ const PIECES = [
   {key:'ruine',   name:'Ruine',         biome:'b', size:1, count:5, icon:'🏚️'},
   {key:'kirche',  name:'Kirche',        biome:'b', size:2, count:1, icon:'⛪'},
 ];
-const DEFAULTS = { counts: Object.fromEntries(PIECES.map(p=>[p.key,p.count])), bmin:0, bmax:8 };
+const DEFAULTS = { counts: Object.fromEntries(PIECES.map(p=>[p.key,p.count])), bmin:0, bmax:8, v:2 };
 let ROWS = 3;
 const ROWNAMES = 'ABC';
 
 // ---------- Einstellungen ----------
 let settings = structuredClone(DEFAULTS);
 try { const s = JSON.parse(localStorage.getItem('kartengen-settings')); if (s && s.counts) settings = {...settings, ...s, counts:{...settings.counts, ...s.counts}}; } catch(e){}
+// Ältere Einstellungen: Flachland-Maximum ist von 8 auf 9 gestiegen
+if((settings.v|0)<2){ if(settings.counts.flach===8) settings.counts.flach=9; settings.v=2; }
 // Deine Liste ist das Maximum: gespeicherte Werte darauf begrenzen
 const MAXB = PIECES.filter(p=>p.biome==='b').reduce((a,p)=>a+p.size*p.count,0);
 for(const p of PIECES) settings.counts[p.key]=Math.max(0,Math.min(p.count, settings.counts[p.key]|0));
