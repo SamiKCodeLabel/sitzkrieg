@@ -1733,7 +1733,7 @@ function renderArmy(side){
         <span><span class="slot-name">${u.units.length?u.units.map(x=>x.abil?`${x.name} <span class="gabil" role="button" tabindex="0" data-abil="${x.abil.name}" title="Erklärung anzeigen">★ ${x.abil.name}</span>`:x.name).join('<br>'):'Gewehrschützen'}</span><br><span class="slot-tag">${rifOf(u)?'Trupp':'Spezialeinheit'}</span> <span class="info-tag">ⓘ Waffen</span>
         ${rifOf(u)?`<span class="squad"><b>${u.units.length?'+ ':''}${rifOf(u)} Gewehrschützen</b><span class="men">${('<span class="mini">'+RIF+'</span>').repeat(rifOf(u))}</span></span>`:''}</span></li>`).join('')}</ol>`;
 }
-// Faire Armeen: beide Seiten bekommen gleich viele Fahrzeuge (und damit gleich viele Trupps)
+// Faire Armeen: beide Seiten bekommen dieselben Fahrzeuge
 let fairOn=true; try{ fairOn=localStorage.getItem('sitzkrieg-fair')!=='0'; }catch(e){}
 const vehCount=a=>a.filter(x=>x.veh).length;
 function genArmies(code){
@@ -1749,9 +1749,10 @@ function genArmies(code){
   arnd=mulberry32((armyBase*2654435761+(SLOTS[$('size').value]||8))>>>0);
   const fairOn_=armyFair;
   const normal=$('size').value==='3x6';
-  // Immer: gleich viele Generäle. Zusätzlich bei „Faire Armeen“: gleich viele Fahrzeuge.
+  // Immer: gleich viele Generäle. Zusätzlich bei „Faire Armeen“: dieselben Fahrzeuge.
   const generals=a=>a.reduce((n,x)=>n+(x.veh?0:x.units.filter(u=>u.key==='general').length),0);
-  const matches=(a,b)=>generals(a)===generals(b) && (!fairOn_ || vehCount(a)===vehCount(b));
+  const vehSet=a=>a.filter(x=>x.veh).map(x=>x.key).sort().join();
+  const matches=(a,b)=>generals(a)===generals(b) && (!fairOn_ || vehSet(a)===vehSet(b));
   let ok=false;
   for(let outer=0; outer<50 && !ok; outer++){
     if(normal){ armies.de=rollArmyNormal(); for(let i=0;i<400;i++){ armies.al=rollArmyNormal(); if(matches(armies.de,armies.al)){ ok=true; break; } } continue; }
