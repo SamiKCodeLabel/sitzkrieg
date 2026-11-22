@@ -810,14 +810,12 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
   <div class="bar">
     <button id="gen" class="big">🎲 Neue Karte</button>
     <select id="size" hidden>
-      <option value="2x4">Klein (2×4)</option>
-      <option value="3x6">Mittel (3×6)</option>
-      <option value="3x8" selected>Groß (3×8)</option>
+      <option value="3x6">Normal (3×6)</option>
+      <option value="3x8" selected>Episch (3×8)</option>
     </select>
     <div class="seg" role="group" aria-label="Kartengröße">
-      <button class="sec" data-size="2x4">Klein <small>2×4</small></button>
-      <button class="sec" data-size="3x6">Mittel <small>3×6</small></button>
-      <button class="sec" data-size="3x8">Groß <small>3×8</small></button>
+      <button class="sec" data-size="3x6">Normal <small>3×6</small></button>
+      <button class="sec" data-size="3x8">Episch <small>3×8</small></button>
     </div>
     <button class="sec" id="rot">↻ Drehen</button>
     <span class="seed"><span class="lbl">Seed</span><input type="text" id="seed" enterkeyhint="go" autocomplete="off" spellcheck="false" aria-label="Seed (Karte-Armeen)"><button class="sec" id="load">Laden</button></span>
@@ -861,9 +859,8 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <div class="bar mbar">
       <button id="army-gen" class="big">🎲 Zufällige Armeen</button>
       <div class="seg" role="group" aria-label="Kartengröße">
-        <button class="sec" data-size="2x4">Klein <small>4 Slots</small></button>
-        <button class="sec" data-size="3x6">Mittel <small>8 Slots</small></button>
-        <button class="sec" data-size="3x8">Groß <small>12 Slots</small></button>
+        <button class="sec" data-size="3x6">Normal <small>8 Slots</small></button>
+        <button class="sec" data-size="3x8">Episch <small>12 Slots</small></button>
       </div>
       <button class="sec mtype" id="mtype" type="button" title="Nur den Missionstyp neu würfeln">
         <span class="mtype-lbl">🎯 Missionstyp</span><b id="mtype-val">–</b>
@@ -1574,7 +1571,7 @@ function render(){
 }
 
 const SIZE_NAME={'3x8':'gross','3x6':'mittel','2x4':'klein'};
-const SIZE_OF={gross:'3x8',mittel:'3x6',klein:'2x4'};
+const SIZE_OF={gross:'3x8',mittel:'3x6',klein:'3x6'}; // Klein gibt es nicht mehr → alte Links öffnen Normal
 function run(seed){
   [ROWS,COLS] = $('size').value.split('x').map(Number);
   seed = seed>>>0;
