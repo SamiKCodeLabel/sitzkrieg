@@ -867,7 +867,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <div class="bar mbar">
       <button id="army-gen" class="big">🎲 Zufällige Armeen</button>
       <div class="seg" role="group" aria-label="Kartengröße">
-        <button class="sec" data-size="3x6">Normal <small>11 Slots</small></button>
+        <button class="sec" data-size="3x6">Normal <small>11–13 Slots</small></button>
         <button class="sec" data-size="3x8">Episch <small>9 Slots</small></button>
       </div>
       <div class="seg flyer fair" role="group" aria-label="Faire Armeen">
@@ -1638,7 +1638,7 @@ const SPECIALS=[
   {key:'general',name:'General',n:3},{key:'sniper',name:'Scharfschütze',n:1},{key:'mine',name:'Minenleger',n:1},
   {key:'flame',name:'Flammenwerfer',n:1},{key:'shotgun',name:'Schrotflinte',n:1},{key:'grenade',name:'Granatwerfer',n:1},
   {key:'mortar',name:'Mörser',n:1},{key:'mg',name:'Maschinengewehr',n:1},{key:'mech',name:'Mechaniker',n:1},{key:'medic',name:'Mediziner',n:1}];
-const SLOTS={'3x6':11,'3x8':9};   // Normal: 1 Fahrzeug + 4 Spezialeinheiten + 6 Trupps;   // Episch: 3 Fahrzeuge + 6 Trupps (12 Spezialeinheiten = der ganze Vorrat)
+const SLOTS={'3x6':11,'3x8':9};   // Normal: 1–3 Fahrzeuge + 4 Spezialeinheiten + 6 Trupps (Wert hier nur noch als Seed-Zusatz);   // Episch: 3 Fahrzeuge + 6 Trupps (12 Spezialeinheiten = der ganze Vorrat)
 const RIFLEMEN=5; // Gewehrschützen pro Trupp
 const MAX_RIFLEMEN=35; // Gewehrschützen pro Spieler insgesamt
 const EMB={de:"<svg class=\"emb\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M43 40 L30 6 Q50 13 70 6 L57 40 L60 43 L94 30 Q87 50 94 70 L60 57 L57 60 L70 94 Q50 87 30 94 L43 60 L40 57 L6 70 Q13 50 6 30 L40 43 Z\" fill=\"#111\" stroke=\"#111\" stroke-width=\"13\" stroke-linejoin=\"round\"/><path d=\"M43 40 L30 6 Q50 13 70 6 L57 40 L60 43 L94 30 Q87 50 94 70 L60 57 L57 60 L70 94 Q50 87 30 94 L43 60 L40 57 L6 70 Q13 50 6 30 L40 43 Z\" fill=\"#111\" stroke=\"#f4f0e0\" stroke-width=\"5\" stroke-linejoin=\"round\"/></svg>",al:"<svg class=\"emb\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><circle cx=\"50\" cy=\"50\" r=\"48\" fill=\"#3f4a24\"/><circle cx=\"50\" cy=\"50\" r=\"41\" fill=\"none\" stroke=\"#f4f0e0\" stroke-width=\"6\"/><polygon fill=\"#f4f0e0\" points=\"50.0,12.0 59.1,37.5 86.1,38.3 64.7,54.8 72.3,80.7 50.0,65.5 27.7,80.7 35.3,54.8 13.9,38.3 40.9,37.5\"/></svg>"};   // Wappen: Eisernes Kreuz / Alliierter Stern im Kreis
@@ -1681,11 +1681,13 @@ function rollArmy(){
   return [];
 }
 
-// Normale Karte: 1 Fahrzeug (bei beiden gleich), 4 einzelne Spezialeinheiten, 6 Trupps à 5 Gewehrschützen
+// Normale Karte: je Fahrzeugtyp höchstens 1 Fahrzeug (mindestens 1 insgesamt), 4 einzelne Spezialeinheiten, 6 Trupps à 5 Gewehrschützen
 const NORMAL_SOLO=4, NORMAL_SQUADS=6;
-function rollArmyNormal(vkey){
+function rollArmyNormal(){
   const out=[];
-  const v=VEHICLES.find(x=>x.key===vkey); if(v) out.push({...v,veh:true});
+  const vOk=VEHICLES.filter(v=>!vehOff(v.key));
+  let vs=vOk.filter(()=>arnd()<.5); if(!vs.length && vOk.length) vs=[vOk[Math.floor(arnd()*vOk.length)]];
+  for(const v of vs) out.push({...v,veh:true});
   const pool=[]; for(const p of SPECIALS) for(let i=0;i<p.n;i++) pool.push({...p});
   for(let i=pool.length-1;i>0;i--){ const j=Math.floor(arnd()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   const ab=[...GEN_ABIL]; for(let i=ab.length-1;i>0;i--){ const j=Math.floor(arnd()*(i+1)); [ab[i],ab[j]]=[ab[j],ab[i]]; }
@@ -1747,13 +1749,12 @@ function genArmies(code){
   arnd=mulberry32((armyBase*2654435761+(SLOTS[$('size').value]||8))>>>0);
   const fairOn_=armyFair;
   const normal=$('size').value==='3x6';
-  const vOk=VEHICLES.filter(v=>!vehOff(v.key)), nVeh=vOk.length?vOk[Math.floor(arnd()*vOk.length)].key:null;   // Normal: beide Seiten dasselbe Fahrzeug
   // Immer: gleich viele Generäle. Zusätzlich bei „Faire Armeen“: gleich viele Fahrzeuge.
   const generals=a=>a.reduce((n,x)=>n+(x.veh?0:x.units.filter(u=>u.key==='general').length),0);
   const matches=(a,b)=>generals(a)===generals(b) && (!fairOn_ || vehCount(a)===vehCount(b));
   let ok=false;
   for(let outer=0; outer<50 && !ok; outer++){
-    if(normal){ armies.de=rollArmyNormal(nVeh); for(let i=0;i<400;i++){ armies.al=rollArmyNormal(nVeh); if(matches(armies.de,armies.al)){ ok=true; break; } } continue; }
+    if(normal){ armies.de=rollArmyNormal(); for(let i=0;i<400;i++){ armies.al=rollArmyNormal(); if(matches(armies.de,armies.al)){ ok=true; break; } } continue; }
     armies.de=rollArmy();
     for(let i=0;i<400;i++){ armies.al=rollArmy(); if(matches(armies.de,armies.al)){ ok=true; break; } }
   }
@@ -1767,7 +1768,7 @@ document.querySelectorAll('.fair button').forEach(b=>b.onclick=()=>{ setFair(b.d
 setFair(fairOn);
 function renderPoolInfo(){
   $('pool-veh').innerHTML=VEHICLES.map(v=>vehAllowed[v.key]===false?`<li><s>${v.name}</s> (aus)</li>`:`<li>${v.n}× ${v.name}</li>`).join('');
-  $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Beide Seiten haben gleich viele Generäle</li><li>Normal: 1 Fahrzeug (bei beiden dasselbe), 4 einzelne Spezialeinheiten, 6 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Episch: Trupp = 2 Spezialeinheiten (max. 1 General) + ${RIFLEMEN} Gewehrschützen</li><li>Höchstens ${MAX_RIFLEMEN} Gewehrschützen pro Spieler</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
+  $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Beide Seiten haben gleich viele Generäle</li><li>Normal: 1–3 Fahrzeuge (je Typ höchstens 1), 4 einzelne Spezialeinheiten, 6 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Episch: Trupp = 2 Spezialeinheiten (max. 1 General) + ${RIFLEMEN} Gewehrschützen</li><li>Höchstens ${MAX_RIFLEMEN} Gewehrschützen pro Spieler</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
 }
 $('army-gen').onclick=()=>genArmies();
 $('veh-filter').insertAdjacentHTML('beforeend',VEH_TOGGLE.map(v=>`<div class="seg flyer veh-tg" role="group" aria-label="${v.name} möglich">
