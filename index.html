@@ -374,6 +374,7 @@
   /* ---------- Einstellungen ---------- */
   .settings{margin-top:20px}
   .army-settings{margin:16px 0 0}
+  #pop.nohead #pop-k,#pop.nohead #pop-t{display:none}   /* Trupp-/Einheiten-Popup ohne Kopfzeile */
   #stats,#mapmission{display:none!important}   /* Infozeile und Missionszeile über der Karte ausgeblendet */
   .veh-filter{display:flex;flex-wrap:wrap;gap:10px}
   .veh-filter .flyer{display:grid;grid-template-columns:1fr auto auto;min-width:min(100%,300px)}
@@ -1790,7 +1791,7 @@ syncGenButtons();
 function openAbil(name){
   const a=GEN_ABIL.find(x=>x.name===name); if(!a) return;
   $('pop-k').textContent='Generals-Fähigkeit'; $('pop-t').textContent='★ '+a.name; $('pop-d').textContent=a.text; $('pop-d').hidden=false;
-  $('pop-body').innerHTML=''; $('pop').classList.remove('wide'); $('pop').hidden=false; $('pop-x').focus();
+  $('pop-body').innerHTML=''; $('pop').classList.remove('wide','nohead'); $('pop').hidden=false; $('pop-x').focus();
 }
 function closePop(){ $('pop').hidden=true; popBack=null; }
 document.addEventListener('click',e=>{ const b=e.target.closest('.gabil'); if(b){ openAbil(b.dataset.abil); } });
@@ -1819,16 +1820,16 @@ function markPen(root){
 }
 function openRef(k,v){
   const R=REF[k], card=document.getElementById(R.sec); if(!card) return;
-  popBack={k:$('pop-k').textContent,t:$('pop-t').textContent,d:$('pop-d').textContent,dh:$('pop-d').hidden,body:[...$('pop-body').childNodes],wide:$('pop').classList.contains('wide')};
+  popBack={k:$('pop-k').textContent,t:$('pop-t').textContent,d:$('pop-d').textContent,dh:$('pop-d').hidden,body:[...$('pop-body').childNodes],wide:$('pop').classList.contains('wide'),nh:$('pop').classList.contains('nohead')};
   const c=card.cloneNode(true); c.querySelector('h2')?.remove(); c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
   if(k==='pen') for(const tr of c.querySelectorAll('tbody tr')) if(tr.cells[0].textContent.trim()===v) tr.classList.add('pen-hi');
   $('pop-k').textContent='Regelwerk'; $('pop-t').textContent=R.t; $('pop-d').textContent=R.d(v); $('pop-d').hidden=false;
   $('pop-body').innerHTML=`<div class="pen-nav"><button type="button" class="sec" id="pen-back">← Zurück</button><button type="button" class="sec" id="pen-rules" data-sec="${R.sec}">📜 Im Regelwerk öffnen</button></div>`;
-  $('pop-body').append(...c.childNodes); $('pop').classList.remove('wide'); $('pen-back').focus();
+  $('pop-body').append(...c.childNodes); $('pop').classList.remove('wide','nohead'); $('pen-back').focus();
 }
 function penBack(){ const b=popBack; if(!b) return; popBack=null;
   $('pop-k').textContent=b.k; $('pop-t').textContent=b.t; $('pop-d').textContent=b.d; $('pop-d').hidden=b.dh;
-  $('pop-body').innerHTML=''; $('pop-body').append(...b.body); $('pop').classList.toggle('wide',b.wide); }
+  $('pop-body').innerHTML=''; $('pop-body').append(...b.body); $('pop').classList.toggle('wide',b.wide); $('pop').classList.toggle('nohead',!!b.nh); }
 document.addEventListener('click',e=>{
   const p=e.target.closest('#pop-body button.pen'); if(p){ e.stopPropagation(); openRef(p.dataset.ref,p.dataset.v); return; }
   if(e.target.closest('#pen-back')){ penBack(); return; }
@@ -1846,7 +1847,7 @@ function openVeh(key){
     const c=card.cloneNode(true); c.querySelector('h2')?.remove(); c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
     $('pop-body').innerHTML=''; $('pop-body').append(...c.childNodes); $('pop-d').hidden=true; markPen($('pop-body'));
   } else { $('pop-body').innerHTML=''; $('pop-d').textContent='Für dieses Fahrzeug gibt es im Regelwerk noch keinen Abschnitt mit Werten.'; $('pop-d').hidden=false; }
-  $('pop').classList.add('wide'); $('pop').hidden=false; $('pop-x').focus();
+  $('pop').classList.add('wide'); $('pop').classList.remove('nohead'); $('pop').hidden=false; $('pop-x').focus();
 }
 document.addEventListener('click',e=>{ const s=e.target.closest('.slot[data-veh]'); if(s) openVeh(s.dataset.veh); });
 document.addEventListener('keydown',e=>{ const s=e.target.closest&&e.target.closest('.slot[data-veh]'); if(s&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); openVeh(s.dataset.veh); } });
@@ -1877,7 +1878,7 @@ function openSquad(side,idx){
   }
   if(rifOf(sl)) html+=`<section class="pu-unit"><div class="pu-head"><span class="pu-fig army ${side}">${RIFLEMAN_FACTION[side]||RIFLEMAN}</span><h4>${rifOf(sl)} Gewehrschützen</h4></div>${weaponTable(['Gewehr'])}</section>`;
   $('pop-k').textContent=(rifOf(sl)?'Trupp':'Spezialeinheit')+' · Waffenwerte aus dem Regelwerk'; $('pop-t').textContent=sl.units.length?sl.units.map(u=>u.name).join(' & '):`${rifOf(sl)} Gewehrschützen`;
-  $('pop-d').hidden=true; $('pop-body').innerHTML=html; markPen($('pop-body')); $('pop').classList.add('wide'); $('pop').hidden=false; $('pop-x').focus();
+  $('pop-d').hidden=true; $('pop-body').innerHTML=html; markPen($('pop-body')); $('pop').classList.add('wide','nohead'); $('pop').hidden=false; $('pop-x').focus();
 }
 document.addEventListener('click',e=>{ if(e.target.closest('.gabil')) return; const s=e.target.closest('.slot[data-squad]'); if(s) openSquad(s.dataset.side,+s.dataset.squad); });
 document.addEventListener('keydown',e=>{ const s=e.target.closest&&e.target.closest('.slot[data-squad]'); if(s&&!e.target.closest('.gabil')&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); openSquad(s.dataset.side,+s.dataset.squad); } });
