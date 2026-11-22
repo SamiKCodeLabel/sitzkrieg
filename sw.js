@@ -1,6 +1,6 @@
 // Offline-Speicher für die Sitzkrieg-App.
 // Online: immer die neueste Version laden und speichern. Offline: gespeicherte Version nutzen.
-const CACHE = 'sitzkrieg-v55';
+const CACHE = 'sitzkrieg-v57';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
@@ -9,6 +9,7 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  if (new URL(e.request.url).origin !== self.location.origin) return;   // fremde Seiten (YouTube, PeerJS) nicht anfassen
   e.respondWith(
     fetch(e.request).then(res => {
       const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return res;

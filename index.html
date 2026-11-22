@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1b1e14">
 <meta name="mobile-web-app-capable" content="yes">
@@ -212,6 +213,31 @@ html[data-theme="dark"] .lb-off input{background:#1e2216;color:#e3dcc0;border-co
 #gen.charging{box-shadow:0 0 0 2px #22261a,0 0 14px rgba(220,60,30,.55)}
 #gen.fired{animation:genFire .45s ease-out}
 @keyframes genFire{0%{box-shadow:0 0 0 2px #22261a,0 0 0 rgba(255,90,40,.9)}40%{box-shadow:0 0 0 2px #22261a,0 0 28px rgba(255,90,40,.95)}100%{box-shadow:none}}
+
+/* ---------- Musik (YouTube) im Lautsprecher-Popup ---------- */
+.mu-pop{display:none;position:absolute;top:50px;right:46px;width:min(270px,calc(100vw - 70px));z-index:7;background:#e6dcb8;color:#23241c;border:2px solid #4a4a32;border-radius:4px;padding:10px;
+        box-shadow:0 0 0 2px #22261a,0 8px 20px rgba(0,0,0,.45);animation:volIn .16s ease-out;transform-origin:top right}
+.vol.open .mu-pop{display:block}
+.mu-row{display:flex;gap:6px}
+.mu-row input{flex:1;min-width:0;font:13px var(--type);padding:7px 8px;border:1px solid #6f6a4a;background:#f3ecd4;color:#23241c;border-radius:4px}
+.mu-row button{padding:6px 10px;font-size:.8rem}
+.mu-player{position:relative;margin-top:8px;aspect-ratio:16/9;background:#14160e;border:1px solid #4a4a32;overflow:hidden}
+.mu-player iframe,#mu-player{position:absolute;inset:0;width:100%;height:100%;border:0}
+.mu-empty[hidden]{display:none}
+.mu-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:10px;font-size:.78rem;color:#a9a486;font-family:var(--type)}
+.mu-now{font-size:.78rem;margin:6px 0 4px;min-height:1.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--type)}
+.mu-ctl{display:flex;gap:6px;justify-content:center}
+.mu-ctl button{width:44px;height:36px;padding:0;font-size:1rem;text-transform:none}
+.mu-ctl button.on{outline:2px solid #6b7a2c}
+html[data-theme="dark"] .mu-pop{background:#1d2116;color:#e3dcc0;border-color:#5d5b42}
+html[data-theme="dark"] .mu-row input{background:#14160e;color:#e3dcc0;border-color:#5d5b42}
+@media (max-width:640px){ .mu-pop{top:46px;right:44px} }
+
+.vp-lbl{position:absolute;top:6px;left:0;right:0;text-align:center;font-family:var(--head);text-transform:uppercase;font-size:.62rem;letter-spacing:.04em;color:var(--ink)}
+html[data-theme="dark"] .vp-lbl{color:#e3dcc0}
+.mu-vol{display:flex;align-items:center;gap:8px;margin:2px 0 8px;font-family:var(--head);text-transform:uppercase;font-size:.72rem;letter-spacing:.04em}
+.mu-vol input{flex:1;accent-color:#5f6838}
+.mu-vol output{font-family:var(--type);font-size:.72rem;min-width:34px;text-align:right;text-transform:none}
 </style>
 <style>
   :root{
@@ -768,13 +794,14 @@ html[data-theme="dark"] .lb-off input{background:#1e2216;color:#e3dcc0;border-co
   .vol-btn .mx{display:none}
   .vol.muted .vol-btn .w1,.vol.muted .vol-btn .w2{display:none}
   .vol.muted .vol-btn .mx{display:inline}
-  .vol-pop{display:none;position:absolute;top:50px;left:50%;width:52px;height:210px;margin-left:-26px;
+  .vol-pop{display:none;position:absolute;top:50px;left:50%;width:52px;height:232px;margin-left:-26px;
            border:2px solid #4a4a32;border-radius:2px;background:#e6dcb8;box-shadow:0 0 0 2px #22261a,0 8px 20px rgba(0,0,0,.45);
            transform-origin:top center;animation:volIn .16s ease-out}
   .vol.open .vol-pop{display:block}
+  .vol.open{z-index:60}
   @keyframes volIn{from{transform:scaleY(.6);opacity:.4}to{transform:none;opacity:1}}
   .vol-pop::before{content:"";position:absolute;top:-8px;left:50%;margin-left:-7px;border:7px solid transparent;border-top:0;border-bottom-color:#4a4a32}
-  #vol-r{-webkit-appearance:none;appearance:none;position:absolute;width:150px;height:10px;left:-49px;top:84px;transform:rotate(-90deg);
+  #vol-r{-webkit-appearance:none;appearance:none;position:absolute;width:150px;height:10px;left:-49px;top:104px;transform:rotate(-90deg);
          border-radius:2px;border:1px solid #4a4a32;padding:0;margin:0;cursor:pointer;
          background:linear-gradient(90deg,#5f6838 0 var(--p,80%),#d6cba6 var(--p,80%) 100%)}
   #vol-r::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:2px;background:linear-gradient(#e2d7b3,#c7bb92);border:2px solid #22261a;box-shadow:0 1px 0 #121409}
@@ -928,7 +955,20 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
   <div class="vol" id="vol">
     <button class="sec vol-btn" id="vol-btn" type="button" aria-label="Lautstärke" title="Lautstärke"><svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M3 9h4l5-4v14l-5-4H3z" class="spk"/><path class="w1" d="M15 9.5a3.5 3.5 0 0 1 0 5"/><path class="w2" d="M17.5 7a7 7 0 0 1 0 10"/><path class="mx" d="M15.5 9.5l5 5M20.5 9.5l-5 5"/></svg></button>
-    <div class="vol-pop"><input type="range" id="vol-r" min="0" max="100" step="5" aria-label="Lautstärke"><output id="vol-o"></output></div>
+    <div class="vol-pop"><span class="vp-lbl">Töne</span><input type="range" id="vol-r" min="0" max="100" step="5" aria-label="Lautstärke der Töne"><output id="vol-o"></output></div>
+    <div class="mu-pop" id="mu-pop" aria-label="Musik">
+      <div class="np-head">♪ Musik</div>
+      <div class="mu-row"><input id="mu-url" type="url" placeholder="YouTube-Playlist-Link" autocomplete="off" spellcheck="false" enterkeyhint="go"><button class="sec" id="mu-load" type="button">Laden</button></div>
+      <div class="mu-player"><div id="mu-player"></div><div class="mu-empty" id="mu-empty">Link einer Playlist oder eines Videos einfügen</div></div>
+      <div class="mu-now" id="mu-now"></div>
+      <label class="mu-vol"><span>Musik</span><input type="range" id="mu-vol" min="0" max="100" step="5" aria-label="Lautstärke der Musik"><output id="mu-vol-o"></output></label>
+      <div class="mu-ctl">
+        <button class="sec" id="mu-prev" type="button" aria-label="Vorheriges">⏮</button>
+        <button class="sec" id="mu-play" type="button" aria-label="Abspielen/Pause">▶</button>
+        <button class="sec" id="mu-next" type="button" aria-label="Nächstes">⏭</button>
+        <button class="sec" id="mu-shuf" type="button" aria-label="Zufällige Reihenfolge" title="Zufällige Reihenfolge">⤮</button>
+      </div>
+    </div>
   </div>
   <button id="net-btn" class="sec" type="button" aria-pressed="false" aria-label="Online-Lobby an/aus" title="Online-Lobby: zwei Geräte live verbinden"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.2"/><path d="M8.2 8.2a5.4 5.4 0 0 0 0 7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.2 5.2a9.6 9.6 0 0 0 0 13.6M18.8 5.2a9.6 9.6 0 0 1 0 13.6"/></svg><i class="net-dot"></i></button>
   <div class="net-pop" id="net-pop" hidden role="dialog" aria-label="Online-Lobby">
@@ -2429,6 +2469,93 @@ btn.addEventListener('contextmenu',e=>e.preventDefault());
 // Nach dem langen Drücken keinen zusätzlichen normalen Klick auslösen
 window.addEventListener('click',e=>{ if(fired && e.target.closest&&e.target.closest('#gen')){ e.stopPropagation(); e.preventDefault(); fired=false; } },true);
 function showToast(txt){ const el=$('lb-toast'); if(!el) return; el.textContent=txt; el.classList.add('show'); clearTimeout(showToast.t); showToast.t=setTimeout(()=>el.classList.remove('show'),2200); }
+})();
+</script>
+<script>
+// ===================== Musik: YouTube-Playlist im Lautsprecher-Popup =====================
+(function(){
+const $m=id=>document.getElementById(id);
+let player=null, ready=false, apiP=null, cur=null, shuffle=false, pending=null;
+const store=(k,v)=>{ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } };
+function parse(u){
+  u=(u||'').trim(); if(!u) return null;
+  try{
+    const url=new URL(u.startsWith('http')?u:'https://'+u);
+    const list=url.searchParams.get('list');
+    let vid=url.searchParams.get('v'); if(!vid && /youtu\.be$/.test(url.hostname)) vid=url.pathname.slice(1);
+    if(!vid){ const m=url.pathname.match(/\/(?:embed|shorts|live)\/([\w-]{6,})/); if(m) vid=m[1]; }
+    if(list) return {list,vid}; if(vid) return {vid};
+  }catch(e){}
+  if(/^PL[\w-]{10,}$|^OL[\w-]{10,}$|^RD[\w-]{6,}$/.test(u)) return {list:u};
+  return null;
+}
+function loadApi(){
+  if(window.YT&&YT.Player) return Promise.resolve();
+  if(apiP) return apiP;
+  apiP=new Promise((ok,fail)=>{ const prev=window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady=()=>{ prev&&prev(); ok(); };
+    const sc=document.createElement('script'); sc.src='https://www.youtube.com/iframe_api'; sc.onerror=()=>{ apiP=null; fail(); }; document.head.appendChild(sc); });
+  return apiP;
+}
+let muVol=60; { const v=store('sitzkrieg-musik-vol'); if(v!==null&&v!==undefined&&v!=='') muVol=Math.max(0,Math.min(100,+v)); }
+const vol=()=>muVol;
+function showVol(){ $m('mu-vol').value=muVol; $m('mu-vol-o').textContent=muVol+' %'; }
+function now(t){ $m('mu-now').textContent=t||''; }
+function upd(){
+  const ok=player&&ready&&typeof player.getPlayerState==='function'; const st=ok?player.getPlayerState():-1;
+  $m('mu-play').textContent=st===1||st===3?'⏸':'▶';
+  if(ok){ const d=player.getVideoData&&player.getVideoData(); if(d&&d.title) now('♪ '+d.title); }
+}
+async function load(src,autoplay){
+  cur=src; $m('mu-empty').hidden=true; now('Lädt …');
+  try{ await loadApi(); }catch(e){ now('Kein Internet – YouTube nicht erreichbar'); return; }
+  const vars={playsinline:1,rel:0,modestbranding:1,autoplay:autoplay?1:0};
+  if(src.list){ vars.listType='playlist'; vars.list=src.list; }
+  if(player){
+    if(!ready){ pending={src,autoplay}; return; }     // Player startet noch: danach laden
+    if(src.list) player[autoplay?'loadPlaylist':'cuePlaylist']({list:src.list,listType:'playlist'});
+    else player[autoplay?'loadVideoById':'cueVideoById'](src.vid);
+    now(''); setTimeout(upd,800); return;
+  }
+  // eigenes iframe mit ausdrücklicher Herkunftsangabe (sonst meldet YouTube „Fehler 153“)
+  const q=new URLSearchParams({...vars,enablejsapi:1,origin:location.origin,widget_referrer:location.href});
+  const fr=document.createElement('iframe');
+  fr.id='mu-player'; fr.title='YouTube-Musik';
+  fr.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+  fr.setAttribute('allow','autoplay; encrypted-media; picture-in-picture');
+  fr.src='https://www.youtube.com/embed/'+(src.vid||'videoseries')+'?'+q.toString();
+  $m('mu-player').replaceWith(fr);
+  player=new YT.Player(fr,{
+    events:{
+      onReady:()=>{ ready=true; now(''); player.setVolume(vol()); if(shuffle&&src.list) player.setShuffle(true);
+        if(pending){ const p=pending; pending=null; load(p.src,p.autoplay); } upd(); },
+      onStateChange:()=>upd(),
+      onError:e=>{ now(e&&(e.data===101||e.data===150)?'Dieses Video darf nicht eingebettet werden – weiter …':'Video nicht abspielbar – weiter …'); setTimeout(()=>{ try{ player.nextVideo(); }catch(_){} },1500); }
+    }});
+}
+function go(){
+  const src=parse($m('mu-url').value);
+  if(!src){ now('Das ist kein YouTube-Link'); return; }
+  store('sitzkrieg-musik',$m('mu-url').value.trim()); load(src,true);
+}
+$m('mu-load').onclick=go;
+$m('mu-url').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+$m('mu-play').onclick=()=>{
+  if(!player||!ready){ const src=parse($m('mu-url').value); if(src) load(src,true); return; }
+  const st=player.getPlayerState(); if(st===1||st===3) player.pauseVideo(); else player.playVideo();
+};
+$m('mu-next').onclick=()=>{ try{ player&&player.nextVideo(); }catch(e){} };
+$m('mu-prev').onclick=()=>{ try{ player&&player.previousVideo(); }catch(e){} };
+$m('mu-shuf').onclick=()=>{ shuffle=!shuffle; $m('mu-shuf').classList.toggle('on',shuffle); try{ player&&player.setShuffle(shuffle); }catch(e){} store('sitzkrieg-musik-shuffle',shuffle?'1':'0'); };
+// eigener Regler für die Musik (der senkrechte Regler bleibt für die Töne der App)
+$m('mu-vol').addEventListener('input',()=>{ muVol=+$m('mu-vol').value; showVol(); store('sitzkrieg-musik-vol',String(muVol)); try{ player&&ready&&player.setVolume(muVol); }catch(e){} });
+showVol();
+$m('vol-btn').addEventListener('click',()=>{
+  // gespeicherte Playlist beim ersten Öffnen vorbereiten (ohne Autoplay)
+  if(!player&&cur===null){ const src=parse($m('mu-url').value); if(src) load(src,false); }
+});
+shuffle=store('sitzkrieg-musik-shuffle')==='1'; $m('mu-shuf').classList.toggle('on',shuffle);
+const saved=store('sitzkrieg-musik'); if(saved) $m('mu-url').value=saved;
+setInterval(()=>{ if(player&&ready) upd(); },3000);
 })();
 </script>
 <script>
