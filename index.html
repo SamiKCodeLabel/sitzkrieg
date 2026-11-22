@@ -810,10 +810,10 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
   </div>
   <button id="theme" class="sec" type="button" aria-label="Tag/Nacht umschalten" title="Tag/Nacht umschalten">☾</button>
   <h1>Sitzkrieg</h1>
-  <p class="sub" id="sub">Kartengenerator</p>
+  <p class="sub" id="sub">Karte</p>
   <nav class="tabs" role="tablist">
     <button role="tab" class="sec" data-tab="gen" id="t-gen">🗺️ Karte</button>
-    <button role="tab" class="sec" data-tab="mission" id="t-mission">⚔️ Mission</button>
+    <button role="tab" class="sec" data-tab="mission" id="t-mission">⚔️ Armee</button>
     <button role="tab" class="sec" data-tab="spiel" id="t-spiel">🎲 Spiel</button>
     <button role="tab" class="sec" data-tab="regeln" id="t-regeln">📜 Regelwerk</button>
   </nav>
@@ -1556,7 +1556,7 @@ function showTab(t){
   document.body.classList.toggle('on-mission', t==='mission');
   document.body.classList.toggle('on-spiel', t==='spiel');
   if(t==='spiel'&&window.renderSpiel) renderSpiel();
-  $('sub').textContent = {gen:'Kartengenerator',mission:'Mission',spiel:'Spiel',regeln:'Regelwerk'}[t];
+  $('sub').textContent = {gen:'Karte',mission:'Armee',spiel:'Spiel',regeln:'Regelwerk'}[t];
   try{ localStorage.setItem('sitzkrieg-tab', t); }catch(e){}
   if(t==='gen') render();
 }
