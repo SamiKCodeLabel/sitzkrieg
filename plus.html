@@ -526,7 +526,7 @@
              border:2px solid #4a4a32;border-right:0;border-radius:2px 0 0 2px;background:rgba(239,231,204,.6);color:var(--ink)}
   .flyer-lbl small{font-family:var(--type);text-transform:none;opacity:.75}
   .flyer button:first-of-type{border-radius:0}
-  @media (max-width:640px){ .flyer{grid-column:1 / -1;display:grid;grid-template-columns:auto 1fr 1fr} }
+  @media (max-width:640px){ .flyer{grid-column:1 / -1;display:grid;grid-template-columns:52% 1fr 1fr} .flyer-lbl{min-width:0} }   /* feste Label-Spalte: alle Ja/Nein-Buttons stehen genau untereinander */
   html[data-theme="dark"] .flyer-lbl{background:#161910;border-color:#5d5b42}
   .mtype{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;text-transform:none}
   .mtype-lbl{font-family:var(--head);text-transform:uppercase;font-size:.85rem}
