@@ -478,6 +478,8 @@
   .emblem{width:40px;height:40px;flex:none;display:flex;align-items:center;justify-content:center;font-size:1.5rem;
           background:#ece4c8;color:#23241c;border:2px solid #22261a;border-radius:50%}
   .army.al .emblem{color:var(--stamp)}
+  svg.emb{width:1.1em;height:1.1em;vertical-align:-.2em;display:inline-block;flex:none}
+  .emblem svg.emb{width:30px;height:30px;vertical-align:0}
   .army-head h3{margin:0;font-family:var(--head);text-transform:uppercase;letter-spacing:.1em;font-size:1.2rem;line-height:1.1}
   .army-head small{display:block;font-family:var(--type);letter-spacing:0;text-transform:none;font-size:.78rem;opacity:.85}
   .reroll{margin-left:auto;padding:6px 10px;font-size:.75rem}
@@ -1464,7 +1466,7 @@ function render(){
         const d=disp(x.e), n=x.part==='all'?((d==='left'||d==='right')?dR:dC):COLS/2;
         const bar=document.createElement('div'); bar.className=`edge ${d} ${side}${x.part==='all'?'':' half-'+x.part}`;
         const items=Array.from({length:n},()=>`<i>${arrow[d]}</i>`);
-        if(k===0) items.splice(Math.floor(n/2),0,`<b>${side==='de'?'♣ Deutsche':'♥ Alliierte'}</b>`);
+        if(k===0) items.splice(Math.floor(n/2),0,`<b>${EMB[side]} ${side==='de'?'Deutsche':'Alliierte'}</b>`);
         bar.innerHTML=items.join(''); map.appendChild(bar);
       });
       if(list.length===2){ const ds=list.map(x=>disp(x.e)); const h=ds.find(d=>d==='left'||d==='right'), v=ds.find(d=>d==='top'||d==='bottom');
@@ -1637,7 +1639,8 @@ const SPECIALS=[
 const SLOTS={'3x6':8,'3x8':10};   // Episch: 3 Fahrzeuge + 7 Trupps (35 Gewehrschützen)
 const RIFLEMEN=5; // Gewehrschützen pro Trupp
 const MAX_RIFLEMEN=35; // Gewehrschützen pro Spieler insgesamt
-const FACTIONS={de:{name:'Deutsche',emblem:'♣',card:'Kreuz'},al:{name:'Alliierte',emblem:'♥',card:'Herz'}};
+const EMB={de:"<svg class=\"emb\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><path d=\"M43 40 L30 6 Q50 13 70 6 L57 40 L60 43 L94 30 Q87 50 94 70 L60 57 L57 60 L70 94 Q50 87 30 94 L43 60 L40 57 L6 70 Q13 50 6 30 L40 43 Z\" fill=\"#111\" stroke=\"#111\" stroke-width=\"13\" stroke-linejoin=\"round\"/><path d=\"M43 40 L30 6 Q50 13 70 6 L57 40 L60 43 L94 30 Q87 50 94 70 L60 57 L57 60 L70 94 Q50 87 30 94 L43 60 L40 57 L6 70 Q13 50 6 30 L40 43 Z\" fill=\"#111\" stroke=\"#f4f0e0\" stroke-width=\"5\" stroke-linejoin=\"round\"/></svg>",al:"<svg class=\"emb\" viewBox=\"0 0 100 100\" aria-hidden=\"true\"><circle cx=\"50\" cy=\"50\" r=\"48\" fill=\"#3f4a24\"/><circle cx=\"50\" cy=\"50\" r=\"41\" fill=\"none\" stroke=\"#f4f0e0\" stroke-width=\"6\"/><polygon fill=\"#f4f0e0\" points=\"50.0,12.0 59.1,37.5 86.1,38.3 64.7,54.8 72.3,80.7 50.0,65.5 27.7,80.7 35.3,54.8 13.9,38.3 40.9,37.5\"/></svg>"};   // Wappen: Eisernes Kreuz / Alliierter Stern im Kreis
+const FACTIONS={de:{name:'Deutsche',emblem:EMB.de,card:'Kreuz'},al:{name:'Alliierte',emblem:EMB.al,card:'Herz'}};
 const flyerOn=false;   // Kampfflieger gibt es nicht mehr
 // Fahrzeuge einzeln erlauben (Ja/Nein). Im Armee-Seed als Bitmaske gespeichert: Bit gesetzt = Fahrzeug aus
 const VEH_TOGGLE=VEHICLES.filter(v=>!v.optional);
@@ -1886,7 +1889,7 @@ function renderMapMission(ms,port){
   const halfTxt=(x)=>{ if(x.part==='all') return ''; const d=disp(x.e); const vert=d==='left'||d==='right';
     return ' ½'; };
   const txt=list=>list.map(x=>W[disp(x.e)]+halfTxt(x)).join(' + ');
-    let t=`🎯 <b>${m.name}</b> · <span class="mm-de">♣ ${txt(s0.edges.de)}</span> · <span class="mm-al">♥ ${txt(s0.edges.al)}</span>`;
+    let t=`🎯 <b>${m.name}</b> · <span class="mm-de">${EMB.de} ${txt(s0.edges.de)}</span> · <span class="mm-al">${EMB.al} ${txt(s0.edges.al)}</span>`;
   $('mm-txt').innerHTML=t;
 }
 buildPool();
@@ -1993,7 +1996,7 @@ document.addEventListener('click',e=>{
 (function(){
 const LS=(k,v)=>{ try{ if(v===undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; } };
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const SIDE_NAME={de:'♣ Deutsche',al:'♥ Alliierte'};
+const SIDE_NAME={de:EMB.de+' Deutsche',al:EMB.al+' Alliierte'};
 const GOALS={Vernichtung:{'3x6':{sp:6},'3x8':{sp:9}}};
 const goal=()=>{ const m=window.CUR_MISSION; return m&&GOALS[m.name]&&GOALS[m.name][$('size').value]||null; };
 const RANKS=[{r:'K',u:'schwer',name:'Schwerer Panzer'},{r:'D',u:'leicht',name:'Leichter Panzer'},{r:'9',u:'krad',name:'Kraftrad'},
@@ -2029,7 +2032,7 @@ function renderSpiel(){
   for(const s of ['de','al']){ $('vp-'+s).textContent=G.vp[s]; $('vpbar-'+s).style.width=(g?Math.min(100,G.vp[s]/g.sp*100):0)+'%'; }
   $('vp-goal').innerHTML=g?`Ziel: <b>${g.sp} SP</b> · ${esc(m.name)}`:'';
   const win=g?['de','al'].filter(s=>G.vp[s]>=g.sp):[];
-  $('vp-win').hidden=!win.length; $('vp-win').textContent=win.length===2?'Beide haben das Ziel erreicht!':win.length?`${SIDE_NAME[win[0]]} gewinnt!`:'';
+  $('vp-win').hidden=!win.length; $('vp-win').innerHTML=win.length===2?'Beide haben das Ziel erreicht!':win.length?`${SIDE_NAME[win[0]]} gewinnt!`:'';
   $('round').textContent=G.round; $('deck-left').textContent=G.deck.length;
   const out=$('deck-out');
   if(G.roundMsg) out.innerHTML=`<div class="roundend"><b>Stapel gemischt – Runde ${G.round}</b><ul>${roundReminders().map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
