@@ -1810,6 +1810,12 @@ const FACTIONS={de:{name:'Deutsche',emblem:'♣',card:'Kreuz'},al:{name:'Alliier
 const FLYER_CHANCE=0.2; // bei "Ja": 20 % Chance, dass beide Spieler einen Kampfflieger bekommen
 let flyerAllowed=true; try{ flyerAllowed=localStorage.getItem('sitzkrieg-flieger')!=='0'; }catch(e){}
 let flyerOn=false;
+// Fahrzeuge einzeln erlauben (Ja/Nein). Im Armee-Seed als Bitmaske gespeichert: Bit gesetzt = Fahrzeug aus
+const VEH_TOGGLE=VEHICLES.filter(v=>!v.optional);
+let vehAllowed={}; try{ vehAllowed=JSON.parse(localStorage.getItem('sitzkrieg-fahrzeuge'))||{}; }catch(e){}
+let vehMask=0;
+const vehMaskNow=()=>VEH_TOGGLE.reduce((m,v,i)=>m|(vehAllowed[v.key]===false?1<<i:0),0);
+const vehOff=key=>{ const i=VEH_TOGGLE.findIndex(v=>v.key===key); return i>=0 && !!(vehMask&(1<<i)); };
 const armies={};
 let arnd=Math.random;   // Zufall für die Armeen (aus dem Armee-Seed)
 // Ein Slot ist entweder ein Fahrzeug oder ein Trupp aus 2 Spezialeinheiten + Gewehrschützen (höchstens 1 General pro Trupp)
@@ -1818,14 +1824,14 @@ function rollArmy(){
   for(let tries=0;tries<500;tries++){
     const pool=[];
     const small=$('size').value==='2x4'; // Klein: kein Flakgeschütz und kein Transporter
-    for(const v of VEHICLES) if(!v.optional && !(small && v.notSmall)) for(let i=0;i<v.n;i++) pool.push({...v,veh:true});
+    for(const v of VEHICLES) if(!v.optional && !(small && v.notSmall) && !vehOff(v.key)) for(let i=0;i<v.n;i++) pool.push({...v,veh:true});
     for(const p of SPECIALS) for(let i=0;i<p.n;i++) pool.push({...p,veh:false});
     for(let i=pool.length-1;i>0;i--){ const j=Math.floor(arnd()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
     const out=[]; let ok=true, squads=0;
     for(let k=0;k<n && ok;k++){
       // Sind die Gewehrschützen aufgebraucht, gibt es nur noch Fahrzeuge
       if((squads+1)*RIFLEMEN>MAX_RIFLEMEN) for(let i=pool.length-1;i>=0;i--) if(!pool[i].veh) pool.splice(i,1);
-      const u=pool.shift(); if(!u){ ok=false; break; }
+      const u=pool.shift(); if(!u){ if(vehMask && out.length) break; ok=false; break; }   // Fahrzeuge abgewählt: Armee hat dann weniger Slots
       if(u.veh){ out.push(u); continue; }
       const j=pool.findIndex(x=>!x.veh && !(u.key==='general' && x.key==='general'));
       if(j<0){ ok=false; break; }
@@ -1846,7 +1852,7 @@ function rollArmy(){
 const MISSIONS=[{name:'Vernichtung'},{name:'Aufmarsch',sec:'aufmarsch'},{name:'Missionsziele',sec:'missionsziele'}];
 let mission=null;
 let armyBase=0, armyFair=true;
-const encodeArmy=()=>armyBase*12+MISSIONS.indexOf(mission)*4+(flyerOn?2:0)+(armyFair?1:0);
+const encodeArmy=()=>(vehMask*1e6+armyBase)*12+MISSIONS.indexOf(mission)*4+(flyerOn?2:0)+(armyFair?1:0);
 function rollMission(idx){
   // Klein: immer Vernichtung
   if(idx==null) idx=Math.floor(Math.random()*MISSIONS.length);
@@ -1886,11 +1892,11 @@ const vehCount=a=>a.filter(x=>x.veh).length;
 function genArmies(code){
   if(typeof code!=='number' || !isFinite(code)) code=null;
   if(code==null){
-    armyBase=Math.floor(Math.random()*1e6); armyFair=fairOn;
+    armyBase=Math.floor(Math.random()*1e6); armyFair=fairOn; vehMask=vehMaskNow();
     flyerOn=flyerAllowed && Math.random()<FLYER_CHANCE;
     armyCode=null; rollMission();
   } else {
-    code=Math.floor(code); armyBase=Math.floor(code/12); armyFair=!!(code&1); flyerOn=!!(code&2);
+    code=Math.floor(code); const cb=Math.floor(code/12); armyBase=cb%1e6; vehMask=Math.floor(cb/1e6)&31; armyFair=!!(code&1); flyerOn=!!(code&2);
     armyCode=null; rollMission(Math.floor(code%12/4)%MISSIONS.length);
   }
   armyCode=encodeArmy(); updateSeed();
@@ -1915,7 +1921,7 @@ function setFair(on){
 document.querySelectorAll('.fair button').forEach(b=>b.onclick=()=>{ setFair(b.dataset.fair==='1'); genArmies(); });
 setFair(fairOn);
 function renderPoolInfo(){
-  $('pool-veh').innerHTML=VEHICLES.filter(v=>!v.optional).map(v=>`<li>${v.n}× ${v.name}${v.notSmall?' <small>(nicht auf Klein)</small>':''}</li>`).join('')+(flyerAllowed?`<li>Kampfflieger: ${Math.round(FLYER_CHANCE*100)} % Chance pro Wurf – dann bekommen ihn beide Spieler (zusätzlich, ohne Slot)</li>`:'<li><s>Kampfflieger</s> (aus)</li>');
+  $('pool-veh').innerHTML=VEHICLES.filter(v=>!v.optional).map(v=>vehAllowed[v.key]===false?`<li><s>${v.name}</s> (aus)</li>`:`<li>${v.n}× ${v.name}${v.notSmall?' <small>(nicht auf Klein)</small>':''}</li>`).join('')+(flyerAllowed?`<li>Kampfflieger: ${Math.round(FLYER_CHANCE*100)} % Chance pro Wurf – dann bekommen ihn beide Spieler (zusätzlich, ohne Slot)</li>`:'<li><s>Kampfflieger</s> (aus)</li>');
   $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Hat eine Seite einen Transporter, hat die andere auch einen</li><li>Beide Seiten haben gleich viele Generäle</li><li>Trupp = 2 Spezialeinheiten (max. 1 General) + ${RIFLEMEN} Gewehrschützen</li><li>Höchstens ${MAX_RIFLEMEN} Gewehrschützen pro Spieler</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
 }
 $('army-gen').onclick=()=>genArmies();
@@ -1926,6 +1932,13 @@ function setFlyerAllowed(on){
 }
 document.querySelectorAll('.flyer button[data-flyer]').forEach(b=>b.onclick=()=>{ setFlyerAllowed(b.dataset.flyer==='1'); genArmies(); });
 setFlyerAllowed(flyerAllowed);
+document.querySelector('.seg.flyer:not(.fair)').insertAdjacentHTML('afterend',VEH_TOGGLE.map(v=>`<div class="seg flyer veh-tg" role="group" aria-label="${v.name} möglich">
+  <span class="flyer-lbl">${v.name}</span><button class="sec" data-veh-on="${v.key}" data-v="1">Ja</button><button class="sec" data-veh-on="${v.key}" data-v="0">Nein</button></div>`).join(''));
+function syncVehButtons(){ document.querySelectorAll('[data-veh-on]').forEach(b=>b.classList.toggle('on',(b.dataset.v==='1')===(vehAllowed[b.dataset.vehOn]!==false))); }
+document.querySelectorAll('[data-veh-on]').forEach(b=>b.onclick=()=>{
+  vehAllowed[b.dataset.vehOn]=b.dataset.v==='1'; try{ localStorage.setItem('sitzkrieg-fahrzeuge',JSON.stringify(vehAllowed)); }catch(e){}
+  syncVehButtons(); renderPoolInfo(); genArmies(); });
+syncVehButtons(); renderPoolInfo();
 
 // ---------- Popup mit Erklärung der Generals-Fähigkeit ----------
 function openAbil(name){
@@ -2001,7 +2014,8 @@ function missionSetup(){
   const mirror=x=>({e:opp[x.e],part:flipPart[x.part]});
   let de;
   if(r()<.5){
-    if(r()<.5) de=[{e:r()<.5?'left':'right',part:'all'}];
+    // Große Karte: nie nur die kurze Kante – allein gibt es dort nur lange Kanten
+    if(!(ROWS===3&&COLS===8) && r()<.5) de=[{e:r()<.5?'left':'right',part:'all'}];
     else de=[{e:r()<.5?'top':'bottom',part:r()<.5?'all':(r()<.5?'start':'end')}];
   } else {
     const h=r()<.5?'left':'right', v=r()<.5?'top':'bottom';
