@@ -124,7 +124,7 @@ body.on-spiel main{margin-bottom:130px}
 .gc-body .vgrid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
 .gc-note{font-size:.9rem;margin:8px 0 0;line-height:1.45}
 .gc-note b{font-family:var(--head);letter-spacing:.04em}
-.gc-notes{padding:0 14px}
+.gc-notes{padding:0 14px 14px;margin-top:-8px}
 html[data-theme="dark"] .gcard{background:#2a2f20;color:#e3dcc0;border-color:#5d5b42}
 html[data-theme="dark"] .gc-sub{color:#a9a486}
 @media (max-width:640px){ .gc-art{height:120px} .gc-name{font-size:1.25rem} .gc-body .vgrid{grid-template-columns:1fr} .gp-next{width:84px;height:84px} }
@@ -152,9 +152,9 @@ html[data-theme="dark"] .gc-sub{color:#a9a486}
   .gc-art.five svg.fig:first-child{margin-left:0}
   .gc-name{grid-column:1;font-size:1.05rem;margin:4px 8px 0}
   .gc-sub{grid-column:1;font-size:.75rem;margin-bottom:4px}
-  .gc-notes{grid-column:2;grid-row:2;padding:6px 10px 0;border-left:1px dashed #6f6a4a}
+  .gc-notes{grid-column:2;grid-row:3 / span 4;padding:2px 10px 8px;margin:0;border-left:1px dashed #6f6a4a;overflow:auto;min-height:0}
   .gcard{grid-template-rows:auto auto auto auto 1fr}
-  .gc-notes+.gc-body{grid-row:3 / span 4;padding-top:0}
+  .gc-body:has(+.gc-notes){grid-row:2;overflow:visible;padding-bottom:2px}
   .gc-body{grid-column:2;grid-row:2 / span 5;overflow:auto;min-height:0;padding:6px 10px 8px;border-left:1px dashed #6f6a4a}
   .gc-body table.rt th,.gc-body table.rt td{padding:2px 5px!important;font-size:.68rem!important;line-height:1.25}
   .gc-body table.rt.kv th{width:auto}
@@ -162,7 +162,7 @@ html[data-theme="dark"] .gc-sub{color:#a9a486}
   .gc-body .vgrid{grid-template-columns:1fr auto;gap:6px}
   .gc-body .armor{zoom:.62;margin:0 0 4px}
   .gc-body .vgrid>*:last-child .note,.gc-body .vgrid small{display:none}
-  .gc-note{font-size:.7rem;margin:4px 0 0;line-height:1.3}
+  .gc-note{font-size:.64rem;margin:3px 0 0;line-height:1.26}
   .gc-body .tw{margin-top:5px}
 }
 @media (orientation:landscape) and (max-height:560px) and (max-width:760px){
@@ -2109,7 +2109,7 @@ function cardHTML(c){
     <div class="gc-top"><span class="gc-emb">${EMB[c.side]}</span>${F.name}</div>
     <div class="gc-art army ${c.side} ${artCls}">${art}</div>
     <h3 class="gc-name">${name}</h3>${sub?`<div class="gc-sub">${sub}</div>`:''}
-    ${notes?`<div class="gc-notes">${notes}</div>`:''}<div class="gc-body">${body}</div></div>`;
+    <div class="gc-body">${body}</div>${notes?`<div class="gc-notes">${notes}</div>`:''}</div>`;
 }
 function render(){
   const el=$('tab-spiel'); if(!el) return;
