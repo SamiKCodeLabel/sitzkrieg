@@ -826,7 +826,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <button class="sec" data-size="3x8">Episch <small>3×8</small></button>
     </div>
     <button class="sec" id="rot">↻ Drehen</button>
-    <span class="seed"><span class="lbl">Seed</span><input type="text" id="seed" enterkeyhint="go" autocomplete="off" spellcheck="false" aria-label="Seed (Karte-Armeen)"><button class="sec" id="load">Laden</button></span>
   </div>
   <div id="msg"></div>
   <div class="stats" id="stats"></div>
@@ -1460,7 +1459,7 @@ function render(){
     map.appendChild(el);
     x.p.biome==='g'?g+=x.cells.length:b+=x.cells.length;
   }
-  $('stats').textContent=`${ROWS}×${COLS} · ${current.pieces.length} Teile · ${g} grüne Felder · ${b} Stadtfelder · Seed ${seedStr()}`;
+  $('stats').textContent=`${ROWS}×${COLS} · ${current.pieces.length} Teile · ${g} grüne Felder · ${b} Stadtfelder`;
   if(mset){                                   // Spielkanten: Band im Kartenrahmen, Pfeile zeigen zur Mitte
     const disp=e=>port?({left:'top',right:'bottom',top:'right',bottom:'left'})[e]:e;
     const arrow={left:'▶',right:'◀',top:'▼',bottom:'▲'};
@@ -1495,11 +1494,7 @@ const newSeed = () => Math.floor(Math.random()*1e9);
 // Seed = „Karte-Armeen“: die zweite Zahl speichert Armeen, abgewählte Fahrzeuge und „Faire Armeen“
 let armyCode=null;
 const seedStr=()=>current? (current.seed+(armyCode!=null?'-'+armyCode:'')) : '';
-function updateSeed(){
-  if(!current) return;
-  $('seed').value=seedStr();
-  try{ history.replaceState(null,'',`#${SIZE_NAME[$('size').value]}-${seedStr()}`); }catch(e){}
-}
+function updateSeed(){}   // Seed-Anzeige und -Laden gibt es nicht mehr (Zufall läuft intern weiter mit Seeds)
 
 // ---------- Einstellungs-UI ----------
 
@@ -1544,14 +1539,8 @@ function buildPool(){
 $('reset').onclick=()=>{ settings=structuredClone(DEFAULTS); saveSettings(); buildPool(); run(newSeed()); };
 $('gen').onclick=()=>run(newSeed());
 $('fab').onclick=()=>{ if(document.body.classList.contains('on-mission')){ genArmies(); $('tab-mission').scrollIntoView({behavior:'smooth',block:'start'}); return; } run(newSeed()); $('map').scrollIntoView({behavior:'smooth',block:'start'}); };
-document.querySelectorAll('.seg button[data-size]').forEach(b=>b.onclick=()=>{ $('size').value=b.dataset.size; run(newSeed()); if(typeof genArmies==='function') genArmies(); });
-window.addEventListener('hashchange',()=>{ const h=location.hash.match(/^#(gross|mittel|klein)-(\d+)(?:-(\d+))?$/); if(!h) return;
-  const sizeCh=SIZE_OF[h[1]]!==$('size').value;
-  if(sizeCh || +h[2]!==current?.seed){ $('size').value=SIZE_OF[h[1]]; run(+h[2]); }
-  if(h[3]!=null && (sizeCh || +h[3]!==armyCode)) genArmies(+h[3]); });
+document.querySelectorAll('.seg button[data-size]').forEach(b=>b.onclick=()=>{ $('size').value=b.dataset.size; try{ localStorage.setItem('sitzkrieg-size',b.dataset.size); }catch(e){} run(newSeed()); if(typeof genArmies==='function') genArmies(); });
 $('size').onchange=()=>run(newSeed());
-$('load').onclick=()=>{ const n=($('seed').value.match(/\d+/g)||['0']).map(Number); run(n[0]); if(n.length>1) genArmies(n[1]); };
-$('seed').onkeydown=e=>{ if(e.key==='Enter') $('load').click(); };
 $('rot').onclick=()=>{ rotated=!isPortrait(); render(); };
 let rzT; window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(render,80); });
 
@@ -1924,11 +1913,14 @@ function renderMapMission(ms,port){
   $('mm-txt').innerHTML=t;
 }
 buildPool();
-const m=location.hash.match(/^#(gross|mittel|klein)-(\d+)(?:-(\d+))?$/);
+// Größe merken (früher stand sie mit dem Seed in der Adresse); alte Links mit #gross-… / #mittel-… geben noch die Größe vor
+const m=location.hash.match(/^#(gross|mittel|klein)-/);
+try{ const sz=localStorage.getItem('sitzkrieg-size'); if(!m && (sz==='3x6'||sz==='3x8')) $('size').value=sz; }catch(e){}
+if(m){ $('size').value=SIZE_OF[m[1]]; try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
 let startTab='gen'; try{ startTab=localStorage.getItem('sitzkrieg-tab')||'gen'; }catch(e){}
-if(m){ $('size').value = SIZE_OF[m[1]]; run(+m[2]); } else run(newSeed());
+run(newSeed());
 showTab(['regeln','mission','spiel'].includes(startTab)?startTab:'gen');
-genArmies(m&&m[3]!=null?+m[3]:undefined);
+genArmies();
 </script>
 <script>
 // Einheitliche Symbole auf allen Geräten (eigene WW2-Zeichnungen, eingebettet)
