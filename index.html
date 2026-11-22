@@ -2054,14 +2054,20 @@ const DECK_NORMAL={rif:5,spec:3};
 const S={round:1,deck:[],cur:null,newRound:false,sig:''};
 const sigNow=()=>JSON.stringify([$('size').value,armies.de,armies.al].map(x=>x&&typeof x==='object'?(Array.isArray(x)?x.map(y=>y.veh?y.key:(y.units||[]).map(u=>u.key+(u.abil?u.abil.name:'')).join('+')+'/'+(y.rif??'')):x):x));
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+// Abwechselnd Deutsche und Alliierte: jede Seite wird für sich gemischt, dann im Reißverschluss zusammengelegt.
+// Wer anfängt, wird je Runde ausgelost. Hat eine Seite mehr Karten, kommen deren letzte Karten am Ende hintereinander.
 function buildDeck(){
-  const d=[];
+  const per={};
   for(const side of ['de','al']){
+    const d=[];
     for(let i=0;i<DECK_NORMAL.rif;i++) d.push({side,kind:'rif'});
     for(let i=0;i<DECK_NORMAL.spec;i++) d.push({side,kind:'spec'});
     for(const v of (armies[side]||[]).filter(x=>x.veh)) d.push({side,kind:'veh',key:v.key});
+    per[side]=shuffle(d);
   }
-  return shuffle(d);
+  const order=Math.random()<.5?['de','al']:['al','de'], out=[];
+  while(per.de.length||per.al.length) for(const s of order) if(per[s].length) out.push(per[s].shift());
+  return out;
 }
 function reset(){ S.round=1; S.deck=buildDeck(); S.cur=null; S.newRound=false; S.sig=sigNow(); }
 window.spielReset=()=>{ reset(); render(); };
