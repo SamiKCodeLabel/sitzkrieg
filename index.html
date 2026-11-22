@@ -372,6 +372,10 @@
 
   /* ---------- Einstellungen ---------- */
   .settings{margin-top:20px}
+  .army-settings{margin:16px 0 0}
+  .veh-filter{display:flex;flex-wrap:wrap;gap:10px}
+  .veh-filter .flyer{display:grid;grid-template-columns:1fr auto auto;min-width:min(100%,300px)}
+  @media (max-width:640px){ .veh-filter{display:grid;grid-template-columns:1fr} .veh-filter .flyer{grid-template-columns:52% 1fr 1fr} }
   .settings summary{font-size:1rem;padding:2px 0}
   .shint{color:var(--muted);font-size:.9rem;margin:10px 0 14px}
   .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
@@ -872,6 +876,11 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <section class="army" id="army-de"></section>
       <section class="army" id="army-al"></section>
     </div>
+    <details class="noprint settings army-settings">
+      <summary>⚙️ Einstellungen</summary>
+      <p class="shint">Lege fest, welche Fahrzeuge in den Armeen vorkommen dürfen. Abgewählte Fahrzeuge fallen weg, die Armeen haben dann entsprechend weniger Slots.</p>
+      <div class="veh-filter" id="veh-filter"></div>
+    </details>
     <details class="pool-info">
       <summary>📋 Vorrat (für jeden Spieler gleich)</summary>
       <div class="pool-cols">
@@ -1734,7 +1743,7 @@ function renderPoolInfo(){
   $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Beide Seiten haben gleich viele Generäle</li><li>Trupp = 2 Spezialeinheiten (max. 1 General) + ${RIFLEMEN} Gewehrschützen</li><li>Höchstens ${MAX_RIFLEMEN} Gewehrschützen pro Spieler</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
 }
 $('army-gen').onclick=()=>genArmies();
-document.querySelector('.seg.flyer.fair').insertAdjacentHTML('beforebegin',VEH_TOGGLE.map(v=>`<div class="seg flyer veh-tg" role="group" aria-label="${v.name} möglich">
+$('veh-filter').insertAdjacentHTML('beforeend',VEH_TOGGLE.map(v=>`<div class="seg flyer veh-tg" role="group" aria-label="${v.name} möglich">
   <span class="flyer-lbl">${v.name}</span><button class="sec" data-veh-on="${v.key}" data-v="1">Ja</button><button class="sec" data-veh-on="${v.key}" data-v="0">Nein</button></div>`).join(''));
 function syncVehButtons(){ document.querySelectorAll('[data-veh-on]').forEach(b=>b.classList.toggle('on',(b.dataset.v==='1')===(vehAllowed[b.dataset.vehOn]!==false))); }
 document.querySelectorAll('[data-veh-on]').forEach(b=>b.onclick=()=>{
