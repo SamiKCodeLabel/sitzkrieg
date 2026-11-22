@@ -666,8 +666,6 @@
   /* Blendgranate */
   #flash{position:fixed;inset:0;z-index:9999;background:#fff;opacity:1;pointer-events:none}
   #flash.out{transition:opacity 1.6s ease-out;opacity:0}
-  #flash img{position:absolute;left:50%;top:50%;width:min(60vmin,480px);height:auto;transform:translate(-50%,-50%);image-rendering:pixelated;image-rendering:crisp-edges;animation:flashFig .35s ease-out}
-  @keyframes flashFig{from{transform:translate(-50%,-50%) scale(.6)}to{transform:translate(-50%,-50%) scale(1)}}
 
   /* ---------- Mission auf der Karte ---------- */
   .mapmission{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 auto 8px;max-width:1000px;
@@ -1606,12 +1604,11 @@ document.querySelectorAll('.armor').forEach(d=>{
 
 
 // ---------- Blendgranate beim Wechsel auf den Tag-Modus ----------
-const FLASH_FIG='data:image/webp;base64,UklGRqwFAABXRUJQVlA4TJ8FAAAvv8AvENfBNpJdJy+Q9C2eIiiB/mvxJvSgkCLYRrat5OJfDhJSAmXQf0Qh7hqwjWxbyQ0O/j9uJdB/VRo6vGD+E9Kt39VdC7tgF+yCWbDLrzUjArGOkQEBa0AGBCgGGVhgDQiQgQUErIEFVqWoklWpi51Js12HWw+V2XW49Zg0Qyv3/dDf6G/0N/qb+340zSTi5FUp4kScvCpFnLwqRZyIY6Ao27arqKKTHc05ZwXR++7FLP//ZWz2PRxay2N6c0b0X7YkSXLbVL01AHo4Mog98AXLvw/d2dCv8AF+YbADH+GLRj7CoOp8TXpY6gf4JcEOfNaFJkkPnaqRQfPg1wAHqTtwqoNGruhF7SG5dNArCpzqHI70wpo2OgdwDEdrugMTiDwa0ft6G3q4pZEJHK3pBY3X/fzzPSYX9ExPVc3jJ/pY8+CJPoSEOZh6QU/1GNqaJEme++ocduAa3NQH8FgfwhO9qdcgstT3ulzTGBzpCbQ1RxqTnGuwAx9gAp3egKvaaQ8f4JZ+hDVSj1Q91V8A3Ib4QU9Bfaz3NSnjnr7XEi7ozz8/mDh/3N/XR2uasNDW50gLUYFb+hDuwFVVgThovKcL/TWAGlFH+Qq3IdKvJHJ7JQmFSXOTB18h4a7GG+3aStSHcFdvwKDqQvOkKdnV/ZUcaeVglMeq5gsgd/UyjFIt2dPYjZ9/qiWbBq9gWuBMO024r+oduA2qeksv6qCdqjNVk5onsFE3DlU9WUm7sKuD5jvFsdQeutTn+rLYGLzXe3pV1csjclHzRM1rnsDodzyB2I34ZQeNxbQIuxprm6fGSiJJJS82NAbqJXgAt/Q6XFpJp6PJVPOak2C+Jru60Oca65nqHGLQHIzWBuSVdJq08VUVV5eWOdM8KSl4NFjooC8hVhKJH9kWJLXlXRqtZC2pa94uit0oGDSiTjU2JBKDtgCItfUwWUleSWyj1U1utPo1z7SH+KyPJK1QYz0tAtDpJDVWosYJwneEmj81JmvSQ15Pc5CMG2OSVzLbkp2+XclUZ9Udfdb3K8nHAM3BpuPGGM9UrfaZhdQsOH7f0SFrPgbooSFQNx03TkDNbqjN3SiuUDAQWeroX3B03tQWHOpU1XyVI1YSC8vP2WJcrVo16UbJvLXTU20O9vRUO1VZk3xbefScLcZ1Tsq7caj5DCgmLcKpTopdrulUz/+4sVO1Tjeag32IP5JqMt041Pg/PP/g809RN1I7jd1oERZaMkg707y8cw4wSj7dyP+mLUJMgJIJSM45/6BOc0qmG/miWVsw6Dy1ZAIyes65ZfSkku3CvJJO24L8pYXJSvIFq5yuoj0k6+3WMr+b8u3CWH9eSVswssmSWv47OTmvqqOoc8j3fdQ5AG3B6LM+2feJ9eQcVvRoRI/LPFmTU1XPVC35NRi0ByB/Aa8tGH3W57/hU81POoazc2+1cWMrkAedqnlt+bP4e/mgmuPGpbYFB1A4bz3T0e8y1R7qENu+RdSS1+1iJWfaIhzq6Lz1UEupZaT+S1Oj3egKPNRGIR/CqWeqFqLWXP2oT51utAFbcqpdXXuYVXdZy7amq2gTQ3VrfnBD8MM4p4el/vpBrclSW5bnClQmK7iiU21WnsFzneq7Wib3EXV9CW3KN4hfqv5LvF9h1fCKTnXQBuWTPtf6793N4bM+19cVnelCG5QP8BJm+q6iMV4oUL/brUnyi9rpf3WNQ8epVls9S97ebFDivdNvw6UmSZ1xQssC1Lx0dOqqvoRq6x7tS6e/cqj2EP8lQR6U/3u/SADKN/h+qTDoG5iPSAnJDVuHWeo7ncOgC32vbcT7NV2omnTmJdR70I/Iii2ZDC3eqfoW8h6qbUHeq9K7aauO9qRwDbackiC/ExuCjRoIzLftc61AYW1vChw0uaQN+E4saVSF2qqt3rcAAgA=';
 function flashbang(){
   if(typeof Sounds!=='undefined') Sounds.play('flash');
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;   // ohne Blitz, wenn das Gerät weniger Bewegung wünscht
   document.getElementById('flash')?.remove();
-  const f=document.createElement('div'); f.id='flash'; f.innerHTML='<img alt="" src="'+FLASH_FIG+'">'; document.body.appendChild(f);
+  const f=document.createElement('div'); f.id='flash'; document.body.appendChild(f);
   setTimeout(()=>{ f.classList.add('out'); setTimeout(()=>f.remove(),1700); }, 2000);
 }
 // ---------- Tag/Nacht ----------
