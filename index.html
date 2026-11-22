@@ -180,7 +180,7 @@ html[data-theme="dark"] .gc-sub{color:#a9a486}
 .net-pop{position:absolute;top:116px;right:64px;z-index:40;width:260px;background:#e6dcb8;color:#23241c;border:2px solid #4a4a32;border-radius:6px;padding:12px;box-shadow:0 0 0 3px #22261a,0 12px 30px rgba(0,0,0,.55)}
 .net-pop[hidden],.lb-off[hidden],.lb-on[hidden]{display:none!important}
 .np-head{font-family:var(--head);text-transform:uppercase;letter-spacing:.08em;color:var(--stamp);font-size:1.05rem;margin-bottom:8px}
-.np-sw{display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--head);text-transform:uppercase;letter-spacing:.04em;font-size:.9rem}
+.np-sw{margin-bottom:10px;display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--head);text-transform:uppercase;letter-spacing:.04em;font-size:.9rem}
 .np-sw input{width:20px;height:20px;accent-color:#5f6838;margin:0}
 .np-hint{font-size:.78rem;line-height:1.35;margin:6px 0 10px;color:#5e5b45}
 .lb-off{display:flex;gap:8px}
@@ -934,7 +934,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
   <div class="net-pop" id="net-pop" hidden role="dialog" aria-label="Online-Lobby">
     <div class="np-head">Online-Lobby</div>
     <label class="np-sw"><input type="checkbox" id="lb-enable"> <span>Lobby-Funktion an</span></label>
-    <p class="np-hint" id="np-hint">Ist sie an, erstellt „Neue Karte“ einmal eine Lobby. Den Code gibst du deinem Freund.</p>
     <div class="lb-off" id="lb-off">
       <input id="lb-in" maxlength="4" placeholder="CODE" autocomplete="off" spellcheck="false" aria-label="Lobby-Code" enterkeyhint="go">
       <button class="sec" id="lb-join">Beitreten</button>
