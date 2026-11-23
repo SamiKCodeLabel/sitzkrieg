@@ -2114,9 +2114,22 @@ const m=location.hash.match(/^#(gross|mittel|klein)-/);
 try{ const sz=localStorage.getItem('sitzkrieg-size'); if(!m && (sz==='3x6'||sz==='3x8')) $('size').value=sz; }catch(e){}
 if(m){ $('size').value=SIZE_OF[m[1]]; try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
 let startTab='gen'; try{ startTab=localStorage.getItem('sitzkrieg-tab')||'gen'; }catch(e){}
-run(newSeed());
+// Letzten Stand wiederherstellen (Karte, Armeen, je Größe), sonst neu würfeln
+let STAND=null; try{ STAND=JSON.parse(localStorage.getItem('sitzkrieg-stand')); }catch(e){}
+if(STAND&&!m&&STAND.size===$('size').value&&STAND.seed!=null){
+  if(STAND.keep) Object.assign(SIZE_KEEP,STAND.keep);
+  run(STAND.seed);
+} else { STAND=null; run(newSeed()); }
 showTab(['regeln','mission','spiel'].includes(startTab)?startTab:'gen');
-genArmies();
+if(STAND&&STAND.armies&&STAND.armies.de&&STAND.armies.al){ armies.de=STAND.armies.de; armies.al=STAND.armies.al; renderArmy('de'); renderArmy('al'); }
+else genArmies();
+// Stand speichern (wird bei jeder Änderung aufgerufen)
+let standT=null;
+window.saveStand=function(){ clearTimeout(standT); standT=setTimeout(()=>{ try{
+  const keep={...SIZE_KEEP}; if(current) keep[$('size').value]={seed:current.seed,de:armies.de,al:armies.al};
+  localStorage.setItem('sitzkrieg-stand',JSON.stringify({size:$('size').value,seed:current?current.seed:null,armies:{de:armies.de,al:armies.al},keep,
+    spiel:window.spielGet?spielGet():null}));
+}catch(e){} },200); };
 </script>
 <script>
 // Einheitliche Symbole auf allen Geräten (eigene WW2-Zeichnungen, eingebettet)
@@ -2225,6 +2238,7 @@ function render(){
 window.renderSpiel=render;
 window.spielGet=()=>({round:S.round,deck:S.deck,cur:S.cur,newRound:S.newRound});
 window.spielSet=o=>{ if(!o) return; S.round=o.round; S.deck=o.deck||[]; S.cur=o.cur||null; S.newRound=!!o.newRound; S.sig=sigNow(); render(); };
+if(typeof STAND!=='undefined'&&STAND&&STAND.spiel&&STAND.spiel.deck) spielSet(STAND.spiel);
 render();
 })();
 </script>
@@ -2258,6 +2272,7 @@ function snapshot(){
 }
 function send(m){ if(NET.conn&&NET.conn.open){ try{ NET.conn.send(m); }catch(e){} } }
 function netChanged(){
+  if(window.saveStand) saveStand();
   if(NET.applying||!NET.conn) return;
   clearTimeout(NET.timer);
   NET.timer=setTimeout(()=>{ NET.ts=Date.now(); send(snapshot()); },60);
@@ -2274,7 +2289,7 @@ function apply(m){
     if(m.armies){ armies.de=m.armies.de; armies.al=m.armies.al; renderArmy('de'); renderArmy('al'); }
     if(m.spiel&&window.spielSet) spielSet(m.spiel);
     try{ buildPool(); }catch(e){}
-  } finally { NET.applying=false; }
+  } finally { NET.applying=false; if(window.saveStand) saveStand(); }
 }
 function onData(m){
   if(!m||typeof m!=='object') return;
