@@ -2201,9 +2201,9 @@ function missionSetup(){
   const mirror=x=>({e:opp[x.e],part:flipPart[x.part]});
   let de;
   if(r()<.5){
-    // Große Karte: nie nur die kurze Kante – allein gibt es dort nur lange Kanten
-    if(!(ROWS===3&&COLS===8) && r()<.5) de=[{e:r()<.5?'left':'right',part:'all'}];
-    else de=[{e:r()<.5?'top':'bottom',part:r()<.5?'all':(r()<.5?'start':'end')}];
+    // Nie nur die kurzen Kanten: allein gibt es nur lange Kanten (ganz oder zur Hälfte)
+    if(!(ROWS===3&&COLS===8)) r();   // Zufallsfolge wie bisher, damit andere Karten gleich bleiben
+    de=[{e:r()<.5?'top':'bottom',part:r()<.5?'all':(r()<.5?'start':'end')}];
   } else {
     const h=r()<.5?'left':'right', v=r()<.5?'top':'bottom';
     de=[{e:h,part:'all'},{e:v,part:h==='left'?'start':'end'}];   // lange Kante nur zur Hälfte an der eigenen Ecke -> Ecken gehören eindeutig einem Spieler
