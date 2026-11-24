@@ -192,7 +192,7 @@ html[data-theme="dark"] .gc-sub{color:#a9a486}
 .np-sw{margin-bottom:10px;display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--head);text-transform:uppercase;letter-spacing:.04em;font-size:.9rem}
 .np-sw input{width:20px;height:20px;accent-color:#5f6838;margin:0}
 .np-hint{font-size:.78rem;line-height:1.35;margin:6px 0 10px;color:#5e5b45}
-.lb-off{display:flex;gap:8px}
+.lb-off{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(74,74,50,.5)}
 .lb-off input{flex:1;min-width:0;font:700 1.05rem var(--head);letter-spacing:.2em;text-align:center;text-transform:uppercase;padding:7px 6px;border:1px solid #6f6a4a;background:#f3ecd4;color:#23241c;border-radius:4px}
 .lb-off button,.np-btns button{padding:7px 12px;font-size:.85rem}
 .lb-on{text-align:center}
@@ -272,14 +272,11 @@ html[data-theme="dark"] .rw-search input{background:#1d2116;color:#e3dcc0;border
 .np-side{margin:8px 0 2px} .np-lbl{display:block;font-family:var(--head);text-transform:uppercase;letter-spacing:.05em;font-size:.72rem;margin-bottom:4px;opacity:.8}
 .np-seg{display:grid;grid-template-columns:1fr 1fr auto;gap:4px} .np-seg button{padding:6px 4px;font-size:.78rem}
 .np-seg button.on{background:#5f6838;color:#f2ecd6;border-color:#2b2f1c}
-.gp-turn{text-align:center;font-family:var(--head);text-transform:uppercase;letter-spacing:.1em;font-size:.85rem;color:var(--muted);margin:0 0 6px}
-.gp-turn.mine{color:#fff3e0;background:var(--stamp);padding:5px 10px;font-size:1rem;box-shadow:0 2px 0 rgba(0,0,0,.3)}
-.gcard.is-theirs{opacity:.72;filter:saturate(.6)}
-.gcard.is-mine{box-shadow:0 0 0 3px var(--stamp),0 0 22px rgba(155,45,32,.55)}
-.gcard.ping{animation:myturn .9s ease-out 2}
-@keyframes myturn{0%{transform:scale(1)}30%{transform:scale(1.025)}100%{transform:scale(1)}}
-.gc-turn{display:none}
-@media (orientation:landscape) and (max-height:560px){ .gp-turn{display:none} .gc-turn{display:inline-block;font-size:.62rem;letter-spacing:.06em;padding:2px 7px;border:1px solid currentColor;opacity:.8} .gc-turn.mine{background:var(--stamp);border-color:#fff3e0;color:#fff3e0;opacity:1} }
+.gp-next.t-de{background:linear-gradient(#6b7580,#3c434b);color:#eef1f4;border-color:#22261a}
+.gp-next.t-al{background:linear-gradient(#727c42,#3c4322);color:#f3efd9;border-color:#22261a}
+.gp-next.t-end{background:linear-gradient(#8a3020,#4e1a10);color:#fff3e0;border-color:#22261a}
+.gp-next.locked{opacity:.4;cursor:not-allowed;filter:grayscale(.35)}
+.np-seg button:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
 
 /* Rundenende-Bildschirm */
 .gcard.rend .gc-top{background:linear-gradient(#7a2a1c,#4e1a10)}
@@ -1060,15 +1057,15 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
   <div class="net-pop" id="net-pop" hidden role="dialog" aria-label="Online-Lobby">
     <div class="np-head">Online-Lobby</div>
     <label class="np-sw"><input type="checkbox" id="lb-enable"> <span>Lobby-Funktion an</span></label>
-    <div class="lb-off" id="lb-off">
-      <input id="lb-in" maxlength="4" placeholder="CODE" autocomplete="off" spellcheck="false" aria-label="Lobby-Code" enterkeyhint="go">
-      <button class="sec" id="lb-join">Beitreten</button>
-    </div>
     <div class="lb-on" id="lb-on" hidden>
       <div class="np-code"><span class="lb-dot"></span><b class="lb-code" id="lb-code">––––</b></div>
       <div class="lb-status" id="lb-status"></div>
       <div class="np-side"><span class="np-lbl">Meine Seite</span><div class="np-seg" role="group" aria-label="Meine Seite"><button class="sec" data-me="de">Deutsche</button><button class="sec" data-me="al">Alliierte</button><button class="sec" data-me="">Keine</button></div></div>
-      <div class="np-btns"><button class="sec" id="lb-share">Teilen</button><button class="sec" id="lb-leave">Verlassen</button></div>
+      <div class="np-btns"><button class="sec" id="lb-leave">Verlassen</button></div>
+    </div>
+    <div class="lb-off" id="lb-off">
+      <input id="lb-in" maxlength="4" placeholder="CODE" autocomplete="off" spellcheck="false" aria-label="Code vom Freund" enterkeyhint="go">
+      <button class="sec" id="lb-join">Beitreten</button>
     </div>
   </div>
   <button id="theme" class="sec" type="button" aria-label="Tag/Nacht umschalten" title="Tag/Nacht umschalten">☾</button>
@@ -2409,6 +2406,7 @@ window.spielReset=()=>{ reset(); render(); };
 window.spielArmies=()=>{ if(S.sig!==sigNow()) return render();
   if(S.end===null) syncVeh(); render(); };
 function draw(){
+  if($('sp-next')&&$('sp-next').disabled) return;
   if(S.sig!==sigNow()) reset();
   S.newRound=false;
   // Deck leer: erst das Rundenende (jedes Missionsziel einzeln), danach neue Runde
@@ -2535,18 +2533,15 @@ function render(){
   const gc=el.querySelector('.gcard');
   if(gc){
     if(window.linkRules) linkRules(gc);
-    const me=window.mySide?mySide():'', live=window.lobbyLive?lobbyLive():false;
-    if(me&&live&&S.end===null&&S.cur){
-      const mine=S.cur.side===me, id=S.round+'|'+S.deck.length;
-      gc.classList.add(mine?'is-mine':'is-theirs');
-      gc.insertAdjacentHTML('beforebegin',`<div class="gp-turn ${mine?'mine':''}">${mine?'★ Du bist dran ★':'Gegner ist dran'}</div>`);
-      const top=gc.querySelector('.gc-top'); if(top){ const t=document.createElement('span'); t.className='gc-turn'+(mine?' mine':''); t.textContent=mine?'★ Du bist dran':'Gegner ist dran'; top.insertBefore(t,top.querySelector('.gc-info')); }
-      if(mine&&lastTurn!==id) gc.classList.add('ping');
-      lastTurn=id;
-    }
   }
+  // Weiter-Knopf in der Farbe der Seite, die gerade dran ist. In der Lobby darf nur diese Seite weiterklicken.
+  const nb=$('sp-next'), turn=S.end===null&&S.cur?S.cur.side:'';
+  nb.classList.toggle('t-de',turn==='de'); nb.classList.toggle('t-al',turn==='al'); nb.classList.toggle('t-end',S.end!==null);
+  const me=window.mySide?mySide():'', live=window.lobbyLive?lobbyLive():false;
+  const locked=!!(live&&me&&turn&&turn!==me);
+  nb.disabled=locked; nb.classList.toggle('locked',locked);
+  nb.title=locked?'Dein Freund ist dran':'Nächste Karte aufdecken';
 }
-let lastTurn=null;
 window.renderSpiel=render;
 window.spielGet=()=>({round:S.round,deck:S.deck,cur:S.cur,newRound:S.newRound,end:S.end,played:S.played});
 window.spielSet=o=>{ if(!o) return; S.round=o.round; S.deck=o.deck||[]; S.cur=o.cur||null; S.newRound=!!o.newRound; S.end=(typeof o.end==='number'&&o.end>=-1)?o.end:null; S.played=Array.isArray(o.played)?o.played:(S.cur&&S.cur.kind==='veh'?[S.cur.side+':'+S.cur.key]:[]); S.sig=sigNow(); render(); };
@@ -2572,7 +2567,8 @@ function loadLib(){
 function ui(state,text){
   const on=!!NET.role, b=$('net-btn');
   b.classList.toggle('live',on&&state==='on'); b.classList.toggle('wait',on&&state!=='on');
-  $('lb-off').hidden=on; $('lb-on').hidden=!on;
+  const linked=!!(NET.conn&&NET.conn.open);
+  $('lb-off').hidden=NET.role==='guest'||linked; $('lb-on').hidden=!on;
   $('lb-on').classList.toggle('ok',state==='on');
   $('lb-code').textContent=NET.code||'––––';
   $('lb-status').textContent=text||'';
@@ -2608,13 +2604,14 @@ function onData(m){
   if(m.type==='full'){ toast('Diese Lobby ist schon voll'); leave(); return; }
   if(m.type==='hello'){ NET.ts=Date.now(); send(snapshot()); toast('Dein Freund ist in der Lobby'); }
   else if(m.type==='state') apply(m);
+  else if(m.type==='side'&&window.lobbyPeerSide) lobbyPeerSide(m.side||'');
 }
 function attach(conn){
   if(NET.conn && NET.conn!==conn){ const old=NET.conn; NET.conn=null; try{ old.close(); }catch(e){} }
   NET.conn=conn;
-  conn.on('open',()=>{ NET.retry=0; ui('on','Verbunden'); if(NET.role==='guest'){ send({type:'hello'}); toast('Mit Lobby '+NET.code+' verbunden'); } });
+  conn.on('open',()=>{ NET.retry=0; ui('on','Verbunden'); if(NET.role==='guest'){ send({type:'hello'}); toast('Mit Lobby '+NET.code+' verbunden'); } if(window.sendMySide) sendMySide(); });
   conn.on('data',onData);
-  conn.on('close',()=>{ if(NET.conn===conn) NET.conn=null; lost(); });
+  conn.on('close',()=>{ if(NET.conn===conn) NET.conn=null; if(window.lobbyPeerSide) lobbyPeerSide(''); lost(); });
   conn.on('error',()=>{});
 }
 function lost(){
@@ -2664,17 +2661,12 @@ function leave(silent){
   if(NET.peer){ try{ NET.peer.destroy(); }catch(e){} NET.peer=null; }
   NET.code=null; ui('off');
 }
-window.lobby={host,join,leave,get state(){ return {role:NET.role,code:NET.code,open:!!(NET.conn&&NET.conn.open)}; }};
+window.lobby={host,join,leave,send,get state(){ return {role:NET.role,code:NET.code,open:!!(NET.conn&&NET.conn.open)}; }};
 // Bedienung
 $('lb-join').onclick=()=>join($('lb-in').value);
 $('lb-in').addEventListener('keydown',e=>{ if(e.key==='Enter') $('lb-join').click(); });
 $('lb-in').addEventListener('input',e=>{ e.target.value=e.target.value.toUpperCase(); });
 $('lb-leave').onclick=()=>{ leave(); toast('Lobby verlassen'); };
-$('lb-share').onclick=async()=>{
-  const u=new URL(location.href); u.hash=''; u.search='?lobby='+NET.code; const url=u.toString(), text='Sitzkrieg-Lobby '+NET.code;
-  if(navigator.share){ try{ await navigator.share({title:text,text,url}); return; }catch(e){} }
-  try{ await navigator.clipboard.writeText(url); toast('Link kopiert'); }catch(e){ prompt('Link zum Beitreten:',url); }
-};
 // Neue Karte: ohne Lobby einmal eine Lobby erstellen, sonst einfach würfeln (und an den Freund schicken)
 const genBtn=$('gen'), prevGen=genBtn.onclick;
 genBtn.onclick=e=>{ prevGen&&prevGen.call(genBtn,e); if(enabled()&&!NET.role){ host(); toast('Lobby erstellt – Code an deinen Freund geben'); } };
@@ -2688,6 +2680,7 @@ function setEnabled(on){
   lbOn=on; $('lb-enable').checked=on; $('net-btn').classList.toggle('on',on); $('net-btn').setAttribute('aria-pressed',on);
   try{ localStorage.setItem('sitzkrieg-lobby-an',on?'1':'0'); }catch(e){}
   if(!on && NET.role) leave();
+  if(on && !NET.role) setTimeout(()=>{ if(lbOn&&!NET.role) host(); },0);   // Code gleich erzeugen, ohne erst eine neue Karte zu würfeln
 }
 $('lb-enable').onchange=()=>setEnabled($('lb-enable').checked);
 $('net-btn').onclick=e=>{ e.stopPropagation(); $('net-pop').hidden=!$('net-pop').hidden; };
@@ -2697,7 +2690,7 @@ let on0=false; try{ on0=localStorage.getItem('sitzkrieg-lobby-an')==='1'; }catch
 // Beitreten per Link schaltet die Lobby-Funktion ein; sonst nach dem Neuladen wieder verbinden
 const q=new URLSearchParams(location.search).get('lobby');
 if(q){ setEnabled(true); try{ history.replaceState(null,'',location.pathname); }catch(e){} join(q); }
-else { setEnabled(on0); const r=store(); if(on0&&r&&r.code&&Date.now()-r.t<3*3600e3){ if(r.role==='host') host(r.code); else join(r.code); } }
+else { const r=store(); if(on0&&r&&r.code&&Date.now()-r.t<3*3600e3){ setEnabled(true); if(r.role==='host') host(r.code); else join(r.code); } else setEnabled(on0); }
 ui(NET.role?'wait':'off', NET.role?$('lb-status').textContent:'');
 })();
 </script>
@@ -2985,13 +2978,22 @@ function search(){
 q.addEventListener('input',()=>{ clearTimeout(qt); qt=setTimeout(search,120); });
 q.addEventListener('keydown',e=>{ if(e.key==='Escape'){ q.value=''; search(); } });
 
-// ---------- Lobby: eigene Seite (nur dieses Gerät, wird nicht übertragen) ----------
-let me=''; try{ me=localStorage.getItem('sitzkrieg-meine-seite')||''; }catch(e){}
+// ---------- Lobby: eigene Seite (jede Seite nur 1 mal; der Freund sieht, was vergeben ist) ----------
+let me='', other=''; try{ me=localStorage.getItem('sitzkrieg-meine-seite')||''; }catch(e){}
 window.mySide=()=>me;
-window.lobbyLive=()=>{ const on=$('lb-on'); return !!on&&!on.hidden; };
+window.lobbyLive=()=>!!(window.lobby&&lobby.state.open);
 const btns=[...document.querySelectorAll('[data-me]')];
-const sync=()=>btns.forEach(b=>b.classList.toggle('on',b.dataset.me===me));
-btns.forEach(b=>b.onclick=()=>{ me=b.dataset.me; try{ localStorage.setItem('sitzkrieg-meine-seite',me); }catch(e){} sync(); if(window.renderSpiel) renderSpiel(); });
+const NAME={de:'Deutsche',al:'Alliierte'};
+const sync=()=>btns.forEach(b=>{ const v=b.dataset.me; b.classList.toggle('on',v===me); const taken=!!v&&v===other; b.disabled=taken; b.title=taken?'Diese Seite hat schon dein Freund':''; });
+const setMe=v=>{ me=v; try{ localStorage.setItem('sitzkrieg-meine-seite',me); }catch(e){} sync(); if(window.renderSpiel) renderSpiel(); };
+window.sendMySide=()=>{ if(window.lobby&&lobby.send) lobby.send({type:'side',side:me}); };
+window.lobbyPeerSide=s=>{
+  other=s;
+  // Beide gleich? Der Gast gibt nach.
+  if(s&&s===me&&lobby.state.role==='guest'){ setMe(''); const t=$('lb-toast'); t.textContent=NAME[s]+' hat schon dein Freund'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); sendMySide(); }
+  sync(); if(window.renderSpiel) renderSpiel();
+};
+btns.forEach(b=>b.onclick=()=>{ const v=b.dataset.me; if(v&&v===other) return; setMe(v); sendMySide(); });
 sync();
 // Lobby an/aus -> Spielansicht auffrischen
 new MutationObserver(()=>{ if(window.renderSpiel) renderSpiel(); }).observe($('lb-on'),{attributes:true,attributeFilter:['hidden']});
