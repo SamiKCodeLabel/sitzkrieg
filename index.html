@@ -2580,7 +2580,7 @@ function ui(state,text){
 }
 function remember(){ store(NET.role?{role:NET.role,code:NET.code,t:Date.now()}:null); }
 function snapshot(){
-  return {type:'state',ts:NET.ts,size:$('size').value,seed:current?current.seed:0,settings,
+  return {type:'state',ts:NET.ts,from:NET.role,size:$('size').value,seed:current?current.seed:0,settings,
           armies:{de:armies.de,al:armies.al},spiel:window.spielGet?spielGet():null};
 }
 function send(m){ if(NET.conn&&NET.conn.open){ try{ NET.conn.send(m); }catch(e){} } }
@@ -2588,14 +2588,15 @@ function netChanged(){
   if(window.saveStand) saveStand();
   if(NET.applying||!NET.conn) return;
   clearTimeout(NET.timer);
-  NET.timer=setTimeout(()=>{ NET.ts=Date.now(); send(snapshot()); },60);
+  NET.timer=setTimeout(()=>{ NET.ts++; send(snapshot()); },60);   // Zähler statt Uhrzeit: Handy-Uhren gehen unterschiedlich
 }
 window.netChanged=netChanged;
 function apply(m){
-  if(m.ts && m.ts<NET.ts) return;
+  // Ältere Stände verwerfen. Gleichstand (beide gleichzeitig): der Stand des Gastgebers gilt.
+  if(m.ts<NET.ts || (m.ts===NET.ts && NET.role==='host')) return;
   NET.applying=true;
   try{
-    NET.ts=m.ts||Date.now();
+    NET.ts=m.ts;
     if(m.settings) settings=m.settings;
     $('size').value=m.size;
     run(m.seed);
@@ -2607,14 +2608,14 @@ function apply(m){
 function onData(m){
   if(!m||typeof m!=='object') return;
   if(m.type==='full'){ toast('Diese Lobby ist schon voll'); leave(); return; }
-  if(m.type==='hello'){ NET.ts=Date.now(); send(snapshot()); toast('Dein Freund ist in der Lobby'); }
+  if(m.type==='hello'){ NET.ts=Math.max(NET.ts,m.ts|0)+1; send(snapshot()); toast('Dein Freund ist in der Lobby'); }
   else if(m.type==='state') apply(m);
   else if(m.type==='side'&&window.lobbyPeerSide) lobbyPeerSide(m.side||'',!!m.swap);
 }
 function attach(conn){
   if(NET.conn && NET.conn!==conn){ const old=NET.conn; NET.conn=null; try{ old.close(); }catch(e){} }
   NET.conn=conn;
-  conn.on('open',()=>{ NET.retry=0; ui('on','Verbunden'); if(NET.role==='guest'){ send({type:'hello'}); toast('Mit Lobby '+NET.code+' verbunden'); } if(window.sendMySide) sendMySide(); });
+  conn.on('open',()=>{ NET.retry=0; ui('on','Verbunden'); if(NET.role==='guest'){ send({type:'hello',ts:NET.ts}); toast('Mit Lobby '+NET.code+' verbunden'); } if(window.sendMySide) sendMySide(); });
   conn.on('data',onData);
   conn.on('close',()=>{ if(NET.conn===conn) NET.conn=null; if(window.lobbyPeerSide) lobbyPeerSide(''); lost(); });
   conn.on('error',()=>{});
@@ -2653,7 +2654,7 @@ async function start(){
     } else ui('wait','Fehler: '+(t||'unbekannt'));
   });
 }
-function host(code){ leave(true); NET.role='host'; NET.code=code||newCode(); NET.ts=Date.now(); ui('wait','Lobby wird erstellt …'); start(); }
+function host(code){ leave(true); NET.role='host'; NET.code=code||newCode(); NET.ts=0; ui('wait','Lobby wird erstellt …'); start(); }
 function join(code){
   if(!lbOn) setEnabled(true);
   code=(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
