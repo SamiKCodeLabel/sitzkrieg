@@ -566,7 +566,7 @@ html[data-theme="dark"] .re-ort{color:#a9a486}
   .veh-filter{display:flex;flex-wrap:wrap;gap:10px}
   .veh-filter .flyer{display:grid;grid-template-columns:1fr auto auto;min-width:min(100%,300px)}
   @media (max-width:640px){ .veh-filter{display:grid;grid-template-columns:1fr} .veh-filter .flyer{grid-template-columns:52% 1fr 1fr} }
-  .gen-filter{margin-top:10px} .veh-filter .gen-tg{grid-template-columns:1fr repeat(4,auto)}
+  .gen-filter{margin-top:10px} .veh-filter .gen-tg{grid-template-columns:1fr repeat(4,auto)} .veh-filter .gen-tg.fair-tg{grid-template-columns:40% 1fr 1fr}
   @media (max-width:640px){ .veh-filter .gen-tg{grid-template-columns:40% repeat(4,1fr)} }
   .settings summary{font-size:1rem;padding:2px 0}
   .shint{color:var(--muted);font-size:.9rem;margin:10px 0 14px}
@@ -1086,11 +1086,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
   <section id="tab-mission" class="tabpane" hidden>
     <div class="bar mbar">
       <button id="army-gen" class="big">🎲 Zufällige Armeen</button>
-      <div class="seg flyer fair" role="group" aria-label="Faire Armeen">
-        <span class="flyer-lbl">Faire Armeen</span>
-        <button class="sec" data-fair="1">Ja</button>
-        <button class="sec" data-fair="0">Nein</button>
-      </div>
     </div>
     <div class="armies">
       <section class="army" id="army-de"></section>
@@ -1100,6 +1095,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <summary>⚙️ Einstellungen</summary>
       <div class="veh-filter"><div class="seg flyer gen-tg" role="group" aria-label="Anzahl Fahrzeuge"><span class="flyer-lbl">Fahrzeuge</span><button class="sec" data-vn="0">0</button><button class="sec" data-vn="1">1</button><button class="sec" data-vn="2">2</button><button class="sec" data-vn="3">3</button></div></div>
       <div class="veh-filter gen-filter"><div class="seg flyer gen-tg" role="group" aria-label="Anzahl Generäle"><span class="flyer-lbl">★ Generäle</span><button class="sec" data-gen="0">0</button><button class="sec" data-gen="1">1</button><button class="sec" data-gen="2">2</button><button class="sec" data-gen="3">3</button></div></div>
+      <div class="veh-filter gen-filter"><div class="seg flyer fair gen-tg fair-tg" role="group" aria-label="Faire Armeen"><span class="flyer-lbl">Faire Armeen</span><button class="sec" data-fair="1">Ja</button><button class="sec" data-fair="0">Nein</button></div></div>
     </details>
     <details class="pool-info">
       <summary>📋 Vorrat (für jeden Spieler gleich)</summary>
