@@ -1832,10 +1832,10 @@ $('fab').onclick=()=>{ if(document.body.classList.contains('on-mission')){ genAr
 const SIZE_KEEP={};
 document.querySelectorAll('.seg button[data-size]').forEach(b=>b.onclick=()=>{
   const from=$('size').value, to=b.dataset.size; if(from===to) return;
-  if(current) SIZE_KEEP[from]={seed:current.seed, de:armies.de, al:armies.al};
+  if(current) SIZE_KEEP[from]={seed:current.seed, de:armies.de, al:armies.al, spiel:window.spielGet?spielGet():null};
   $('size').value=to; try{ localStorage.setItem('sitzkrieg-size',to); }catch(e){}
   const k=SIZE_KEEP[to];
-  if(k){ run(k.seed); armies.de=k.de; armies.al=k.al; renderArmy('de'); renderArmy('al'); if(window.spielReset) spielReset(); }
+  if(k){ run(k.seed); armies.de=k.de; armies.al=k.al; renderArmy('de'); renderArmy('al'); if(k.spiel&&window.spielSet) spielSet(k.spiel); else if(window.spielReset) spielReset(); }
   else { run(newSeed()); if(typeof genArmies==='function') genArmies(); }
 });
 $('size').onchange=()=>run(newSeed());
@@ -2057,7 +2057,7 @@ function genArmies(code){
     for(let i=0;i<400;i++){ armies.al=rollArmy(); if(matches(armies.de,armies.al)){ ok=true; break; } }
   }
   renderArmy('de'); renderArmy('al');
-  if(window.spielReset) spielReset();   // neue Armeen -> neues Befehlsdeck
+  if(window.spielArmies) spielArmies();   // Deck bleibt; startet nur beim Gedrückthalten von „Neue Karte“ neu
 }
 function setFair(on){
   fairOn=on; try{ localStorage.setItem('sitzkrieg-fair',on?'1':'0'); }catch(e){}
@@ -2322,7 +2322,7 @@ new MutationObserver(ms=>{ for(const m of ms) for(const n of m.addedNodes){
 // Aktivierungen pro Armee und Runde (siehe Regelwerk: Rundenaktivierungen)
 const DECKS={'3x6':{rif:4,spec:3},'3x8':{rif:6,spec:4}};
 const S={round:1,deck:[],cur:null,newRound:false,sig:'',end:null};   // end: Seite des Rundenende-Bildschirms (null = normale Karten)
-const sigNow=()=>JSON.stringify([$('size').value,armies.de,armies.al].map(x=>x&&typeof x==='object'?(Array.isArray(x)?x.map(y=>y.veh?y.key:(y.units||[]).map(u=>u.key+(u.abil?u.abil.name:'')).join('+')+'/'+(y.rif??'')):x):x));
+const sigNow=()=>$('size').value;   // Deck startet nur neu bei neuer Größe ohne eigenes Deck oder beim Gedrückthalten von „Neue Karte“
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 // Abwechselnd Deutsche und Alliierte: jede Seite wird für sich gemischt, dann im Reißverschluss zusammengelegt.
 // Wer anfängt, wird je Runde ausgelost. Hat eine Seite mehr Karten, kommen deren letzte Karten am Ende hintereinander.
@@ -2343,6 +2343,10 @@ function buildDeck(){
 function reset(){ S.round=1; S.deck=buildDeck(); S.cur=null; S.newRound=false; S.end=null; S.sig=sigNow(); }
 const objList=()=>{ const ms=typeof missionSetup==='function'?missionSetup():null; return ms&&ms.objInfo?ms.objInfo:[]; };
 window.spielReset=()=>{ reset(); render(); };
+// Armeen neu gewürfelt: Deck und Runde bleiben. Fahrzeugkarten von Fahrzeugen, die es nicht mehr gibt, fliegen raus;
+// neue Fahrzeuge kommen ab der nächsten Runde ins Deck.
+window.spielArmies=()=>{ if(S.sig!==sigNow()) return render();
+  S.deck=S.deck.filter(c=>c.kind!=='veh'||(armies[c.side]||[]).some(v=>v.veh&&v.key===c.key)); render(); };
 function draw(){
   if(S.sig!==sigNow()) reset();
   S.newRound=false;
