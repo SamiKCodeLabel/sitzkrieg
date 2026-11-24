@@ -507,6 +507,7 @@ html[data-theme="dark"] .vp-lbl{color:#e3dcc0}
   .armor{grid-template-columns:repeat(3,42px)!important;gap:4px}
   .armor .vtop{position:absolute;left:50%;top:67px;width:150px;height:225px;transform:translate(-50%,-50%);z-index:0;pointer-events:none}
   .armor .armor-cap{margin-top:46px;height:14px}
+  .armor.no-nums>span{visibility:hidden}   /* nur die Flugzeug-Zeichnung, keine Panzerungswerte */
   .armor .vtop g{fill:rgba(239,231,204,.35);stroke:#2f3a1e;stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round;opacity:.55}
   .armor > span{position:relative;z-index:1}
   .armor .v{background:rgba(239,231,204,.62);backdrop-filter:blur(1px)}
@@ -1430,6 +1431,17 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         <thead><tr><th>Maschinengewehr</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>MG</td><td>2</td><td>10</td><td>1</td></tr></tbody>
       </table></div>
+    </article>
+
+    <article class="rcard vehicle" id="kampfflieger-werte">
+      <h2>Kampfflieger</h2>
+      <div class="vgrid">
+        <div class="tw"><table class="rt wt">
+          <thead><tr><th>Bewaffnung</th><th>Reich&shy;weite</th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
+          <tbody><tr><td>Bombe</td><td>1</td><td>Gr. Scheibe</td><td>3</td></tr><tr><td>Luftschlag-MGs</td><td>1</td><td>4 Kl. Scheiben in einer Linie</td><td>1</td></tr></tbody>
+        </table></div>
+        <div class="armor no-nums" data-f="1" data-s="1" data-r="1" aria-hidden="true"></div>
+      </div>
     </article>
 
     <article class="rcard" id="treffertabelle">
