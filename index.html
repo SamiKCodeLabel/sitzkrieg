@@ -1062,8 +1062,8 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     </div>
     <details class="noprint settings army-settings">
       <summary>⚙️ Einstellungen</summary>
-      <p class="shint">Lege fest, welche Fahrzeuge in den Armeen vorkommen dürfen und wie viele Generäle jede Seite bekommt. Abgewählte Fahrzeuge fallen weg, die Armeen haben dann entsprechend weniger Slots. Generäle zählen zu den einzelnen Spezialeinheiten.</p>
-      <div class="veh-filter" id="veh-filter"></div>
+      <p class="shint">Lege fest, wie viele Fahrzeuge und wie viele Generäle jede Seite bekommt. Die Fahrzeuge werden zufällig gewählt, jeder Typ höchstens 1 mal. Generäle zählen zu den einzelnen Spezialeinheiten.</p>
+      <div class="veh-filter"><div class="seg flyer gen-tg" role="group" aria-label="Anzahl Fahrzeuge"><span class="flyer-lbl">Fahrzeuge</span><button class="sec" data-vn="0">0</button><button class="sec" data-vn="1">1</button><button class="sec" data-vn="2">2</button><button class="sec" data-vn="3">3</button></div></div>
       <div class="veh-filter gen-filter"><div class="seg flyer gen-tg" role="group" aria-label="Anzahl Generäle"><span class="flyer-lbl">★ Generäle</span><button class="sec" data-gen="0">0</button><button class="sec" data-gen="1">1</button><button class="sec" data-gen="2">2</button><button class="sec" data-gen="3">3</button></div></div>
     </details>
     <details class="pool-info">
@@ -1515,11 +1515,11 @@ const PIECES = [
   {key:'graben',  name:'Graben',        biome:'g', size:2, count:1, icon:'⛏️'},
   {key:'hafen',   name:'Hafen',         biome:'g', size:2, count:1, icon:'⚓', rule:'corner', city:true},
   {key:'see',     name:'See',           biome:'g', size:1, count:1, icon:'💧'},
-  {key:'strasse', name:'Leere Straße',  biome:'b', size:1, count:1, icon:'🛣️'},
-  {key:'ruine',   name:'Ruine',         biome:'b', size:1, count:5, icon:'🏚️'},
+  {key:'strasse', name:'Leere Straße',  biome:'b', size:1, count:2, icon:'🛣️'},
+  {key:'ruine',   name:'Ruine',         biome:'b', size:1, count:4, icon:'🏚️'},
   {key:'kirche',  name:'Kirche',        biome:'b', size:2, count:1, icon:'⛪'},
 ];
-const DEFAULTS = { counts: Object.fromEntries(PIECES.map(p=>[p.key,p.count])), bmin:0, bmax:8, v:2 };
+const DEFAULTS = { counts: Object.fromEntries(PIECES.map(p=>[p.key,p.count])), bmin:0, bmax:8, v:3 };
 let ROWS = 3;
 const ROWNAMES = 'ABC';
 
@@ -1528,6 +1528,7 @@ let settings = structuredClone(DEFAULTS);
 try { const s = JSON.parse(localStorage.getItem('kartengen-settings')); if (s && s.counts) settings = {...settings, ...s, counts:{...settings.counts, ...s.counts}}; } catch(e){}
 // Ältere Einstellungen: Flachland-Maximum ist von 8 auf 9 gestiegen
 if((settings.v|0)<2){ if(settings.counts.flach===8) settings.counts.flach=9; settings.v=2; }
+if((settings.v|0)<3){ if(settings.counts.strasse===1) settings.counts.strasse=2; settings.v=3; }   // Straßen-Maximum 1 -> 2
 // Deine Liste ist das Maximum: gespeicherte Werte darauf begrenzen
 const MAXB = PIECES.filter(p=>p.biome==='b').reduce((a,p)=>a+p.size*p.count,0);
 for(const p of PIECES) settings.counts[p.key]=Math.max(0,Math.min(p.count, settings.counts[p.key]|0));
@@ -1926,13 +1927,15 @@ function rollArmy(){
 // Aufbau je Kartengröße:
 //  Normal: je Fahrzeugtyp höchstens 1 Fahrzeug (mindestens 1 insgesamt), 4 einzelne Spezialeinheiten, 6 Trupps à 5 Gewehrschützen
 //  Episch: alle (erlaubten) Fahrzeuge, 6 einzelne Spezialeinheiten, 8 Trupps à 5 Gewehrschützen
+let vehN=3; try{ const v=localStorage.getItem('sitzkrieg-fahrzeug-anzahl'); if(v!=null) vehN=Math.max(0,Math.min(3,+v|0)); }catch(e){}   // Fahrzeuge pro Seite (0–3)
 let genCount=1; try{ const g=localStorage.getItem('sitzkrieg-generale'); if(g!=null) genCount=Math.max(0,Math.min(3,+g|0)); }catch(e){}   // Anzahl Generäle pro Seite (0–3)
 const ARMY_SETUP={'3x6':{solo:4,squads:6,allVeh:false},'3x8':{solo:6,squads:8,allVeh:true}};
 function rollArmyNormal(){
   const cfg=ARMY_SETUP[$('size').value]||ARMY_SETUP['3x6'], NORMAL_SOLO=cfg.solo, NORMAL_SQUADS=cfg.squads;
   const out=[];
-  const vOk=VEHICLES.filter(v=>!vehOff(v.key));
-  let vs=cfg.allVeh?vOk:vOk.filter(()=>arnd()<.5); if(!vs.length && vOk.length) vs=[vOk[Math.floor(arnd()*vOk.length)]];
+  // Fahrzeuge: genau so viele wie eingestellt (0–3), zufällige Typen, jeder höchstens 1 mal
+  const vPool=[...VEHICLES]; for(let i=vPool.length-1;i>0;i--){ const j=Math.floor(arnd()*(i+1)); [vPool[i],vPool[j]]=[vPool[j],vPool[i]]; }
+  const vs=vPool.slice(0,Math.min(vehN,vPool.length)).sort((a,b)=>VEHICLES.indexOf(a)-VEHICLES.indexOf(b));
   for(const v of vs) out.push({...v,veh:true});
   // Generäle: feste Anzahl aus den Einstellungen, der Rest der Spezialeinheiten zufällig aus dem Vorrat
   const genSpec=SPECIALS.find(p=>p.key==='general'), nGen=Math.min(genCount, genSpec.n, NORMAL_SOLO);
@@ -2018,15 +2021,13 @@ function setFair(on){
 document.querySelectorAll('.fair button').forEach(b=>b.onclick=()=>{ setFair(b.dataset.fair==='1'); genArmies(); });
 setFair(fairOn);
 function renderPoolInfo(){
-  $('pool-veh').innerHTML=VEHICLES.map(v=>vehAllowed[v.key]===false?`<li><s>${v.name}</s> (aus)</li>`:`<li>${v.n}× ${v.name}</li>`).join('');
-  $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Generäle pro Seite: ${genCount} (in den Einstellungen 0–3)</li><li>Normal: 1–3 Fahrzeuge (je Typ höchstens 1), 4 einzelne Spezialeinheiten, 6 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Episch: alle 3 Fahrzeuge, 6 einzelne Spezialeinheiten, 8 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
+  $('pool-veh').innerHTML=VEHICLES.map(v=>`<li>${v.n}× ${v.name}</li>`).join('')+`<li>Fahrzeuge pro Seite: ${vehN} (in den Einstellungen 0–3)</li>`;
+  $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Generäle pro Seite: ${genCount} (in den Einstellungen 0–3)</li><li>Normal: 4 einzelne Spezialeinheiten, 6 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Episch: 6 einzelne Spezialeinheiten, 8 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
 }
 $('army-gen').onclick=()=>genArmies();
-$('veh-filter').insertAdjacentHTML('beforeend',VEH_TOGGLE.map(v=>`<div class="seg flyer veh-tg" role="group" aria-label="${v.name} möglich">
-  <span class="flyer-lbl">${v.name}</span><button class="sec" data-veh-on="${v.key}" data-v="1">Ja</button><button class="sec" data-veh-on="${v.key}" data-v="0">Nein</button></div>`).join(''));
-function syncVehButtons(){ document.querySelectorAll('[data-veh-on]').forEach(b=>b.classList.toggle('on',(b.dataset.v==='1')===(vehAllowed[b.dataset.vehOn]!==false))); }
-document.querySelectorAll('[data-veh-on]').forEach(b=>b.onclick=()=>{
-  vehAllowed[b.dataset.vehOn]=b.dataset.v==='1'; try{ localStorage.setItem('sitzkrieg-fahrzeuge',JSON.stringify(vehAllowed)); }catch(e){}
+function syncVehButtons(){ document.querySelectorAll('[data-vn]').forEach(b=>b.classList.toggle('on',+b.dataset.vn===vehN)); }
+document.querySelectorAll('[data-vn]').forEach(b=>b.onclick=()=>{
+  vehN=+b.dataset.vn; try{ localStorage.setItem('sitzkrieg-fahrzeug-anzahl',String(vehN)); }catch(e){}
   syncVehButtons(); renderPoolInfo(); genArmies(); });
 syncVehButtons(); renderPoolInfo();
 function syncGenButtons(){ document.querySelectorAll('[data-gen]').forEach(b=>b.classList.toggle('on',+b.dataset.gen===genCount)); }
