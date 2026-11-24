@@ -200,7 +200,6 @@ html[data-theme="dark"] .gc-sub{color:#a9a486}
 .lb-dot{width:10px;height:10px;border-radius:50%;background:#d8b34a;flex:none}
 .lb-on.ok .lb-dot{background:#6fbf3a;box-shadow:0 0 6px #6fbf3a}
 .lb-code{font-family:var(--head);font-size:2rem;letter-spacing:.25em;color:var(--stamp)}
-.lb-status{font-family:var(--type);font-size:.82rem;margin:2px 0 8px}
 .np-btns{display:flex;gap:8px;justify-content:center}
 #net-btn{position:absolute}
 #net-btn .net-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#d8b34a;display:none}
@@ -270,7 +269,7 @@ th .rlink,.gc-top .rlink{border:0}
 html[data-theme="dark"] .rw-search input{background:#1d2116;color:#e3dcc0;border-color:#5d5b42}
 /* Lobby: eigene Seite */
 .np-side{margin:8px 0 2px} .np-lbl{display:block;font-family:var(--head);text-transform:uppercase;letter-spacing:.05em;font-size:.72rem;margin-bottom:4px;opacity:.8}
-.np-seg{display:grid;grid-template-columns:1fr 1fr auto;gap:4px} .np-seg button{padding:6px 4px;font-size:.78rem}
+.np-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px} .np-seg button{padding:7px 4px;font-size:.8rem}
 .np-seg button.on{background:#5f6838;color:#f2ecd6;border-color:#2b2f1c}
 .gp-next.t-de{background:linear-gradient(#6b7580,#3c434b);color:#eef1f4;border-color:#22261a}
 .gp-next.t-al{background:linear-gradient(#727c42,#3c4322);color:#f3efd9;border-color:#22261a}
@@ -1058,10 +1057,8 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <div class="np-head">Online-Lobby</div>
     <label class="np-sw"><input type="checkbox" id="lb-enable"> <span>Lobby-Funktion an</span></label>
     <div class="lb-on" id="lb-on" hidden>
-      <div class="np-code"><span class="lb-dot"></span><b class="lb-code" id="lb-code">––––</b></div>
-      <div class="lb-status" id="lb-status"></div>
-      <div class="np-side"><span class="np-lbl">Meine Seite</span><div class="np-seg" role="group" aria-label="Meine Seite"><button class="sec" data-me="de">Deutsche</button><button class="sec" data-me="al">Alliierte</button><button class="sec" data-me="">Keine</button></div></div>
-      <div class="np-btns"><button class="sec" id="lb-leave">Verlassen</button></div>
+      <div class="np-code"><span class="lb-dot" id="lb-status" title=""></span><b class="lb-code" id="lb-code">––––</b></div>
+      <div class="np-seg" role="group" aria-label="Meine Seite"><button class="sec" data-me="de">Deutsche</button><button class="sec" data-me="al">Alliierte</button></div>
     </div>
     <div class="lb-off" id="lb-off">
       <input id="lb-in" maxlength="4" placeholder="CODE" autocomplete="off" spellcheck="false" aria-label="Code vom Freund" enterkeyhint="go">
@@ -2571,7 +2568,7 @@ function ui(state,text){
   $('lb-off').hidden=NET.role==='guest'||linked; $('lb-on').hidden=!on;
   $('lb-on').classList.toggle('ok',state==='on');
   $('lb-code').textContent=NET.code||'––––';
-  $('lb-status').textContent=text||'';
+  $('lb-status').title=text||'';
 }
 function remember(){ store(NET.role?{role:NET.role,code:NET.code,t:Date.now()}:null); }
 function snapshot(){
@@ -2666,7 +2663,6 @@ window.lobby={host,join,leave,send,get state(){ return {role:NET.role,code:NET.c
 $('lb-join').onclick=()=>join($('lb-in').value);
 $('lb-in').addEventListener('keydown',e=>{ if(e.key==='Enter') $('lb-join').click(); });
 $('lb-in').addEventListener('input',e=>{ e.target.value=e.target.value.toUpperCase(); });
-$('lb-leave').onclick=()=>{ leave(); toast('Lobby verlassen'); };
 // Neue Karte: ohne Lobby einmal eine Lobby erstellen, sonst einfach würfeln (und an den Freund schicken)
 const genBtn=$('gen'), prevGen=genBtn.onclick;
 genBtn.onclick=e=>{ prevGen&&prevGen.call(genBtn,e); if(enabled()&&!NET.role){ host(); toast('Lobby erstellt – Code an deinen Freund geben'); } };
