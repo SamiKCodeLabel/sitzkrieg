@@ -102,6 +102,9 @@
 .gp{max-width:560px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:14px}
 .gp-info{font-family:var(--type);font-size:.9rem;color:var(--muted);text-align:center}
 .gp-info b{font-family:var(--head);color:var(--stamp);letter-spacing:.05em}
+.gc-top .gc-info{margin-left:auto;font-family:var(--type);text-transform:none;letter-spacing:0;font-size:.8rem;opacity:.9;text-align:right;white-space:nowrap}
+.gc-top .gc-info b{font-family:var(--head);letter-spacing:.05em;color:#f3d9a0}
+@media (max-width:640px){ .gc-top .gc-info{white-space:normal;font-size:.68rem;line-height:1.25;min-width:0;max-width:46%} .gc-top .gc-info b{display:block} .gc-top .gc-info .sep{display:none} }
 .gp-next{width:96px;height:96px;border-radius:50%;font-size:3rem;line-height:1;padding:0;display:grid;place-items:center;
   position:fixed;right:calc(18px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));z-index:30;
   box-shadow:0 0 0 3px #22261a,0 8px 22px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,220,160,.35)}
@@ -2474,10 +2477,12 @@ function cardHTML(c){
 function render(){
   const el=$('tab-spiel'); if(!el) return;
   if(S.sig!==sigNow()) reset();
+  const info=S.end!==null?(S.end<0?'':`Missionsziel ${S.end+1} von ${objList().length}`):`<b>Runde ${S.round}</b><span class="sep"> · </span>noch ${S.deck.length} Karte${S.deck.length===1?'':'n'} im Deck`;
+  let card=S.end!==null?endHTML():(S.cur?cardHTML(S.cur):'');
+  if(card&&info){ const k=card.indexOf('</div>',card.indexOf('class="gc-top"')); card=card.slice(0,k)+`<span class="gc-info">${info}</span>`+card.slice(k); }
   el.innerHTML=`<div class="gp">
-    <p class="gp-info">${S.end!==null?(S.end<0?`<b>Rundenende</b> · Rauch und Feuer`:`<b>Rundenende</b> · Missionsziel ${S.end+1} von ${objList().length}`):`<b>Runde ${S.round}</b> · noch ${S.deck.length} Karte${S.deck.length===1?'':'n'} im Deck`}</p>
+    ${card||`<p class="gp-info">${info}</p>`}
     <button class="big gp-next" id="sp-next" aria-label="Nächste Karte aufdecken" title="Nächste Karte aufdecken">${ARROW}</button>
-    ${S.end!==null?endHTML():(S.cur?cardHTML(S.cur):'')}
   </div>`;
   $('sp-next').onclick=draw;
 }
