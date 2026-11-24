@@ -1223,6 +1223,11 @@ html[data-theme="dark"] .dg-fxcard{background:#2a2f20;color:#e3dcc0;border-color
 }
 
 
+.dg-sim{display:inline-flex;gap:3px;margin-right:4px}
+.dg-sim button{padding:5px 8px!important;font-size:.8rem!important;min-width:0!important}
+.dg-sim button.on{background:linear-gradient(#5f6838,#3c4322);color:#ece4c8;border-color:var(--gold)}
+@media (max-width:640px){ .dg-top{flex-wrap:wrap} .dg-status{flex-basis:100%} }
+
 </style>
 </head>
 <body>
@@ -3697,8 +3702,8 @@ function attackDirect(a,o,t,ctx){
     const imp=nearGeneral(a,'Improvisator');
     if(imp&&hits<nd){ const v=rnd(6); fx.lines.push({lbl:'Improvisator: einen Fehlwurf neu',type:6,vals:[v],need}); if(v>=need) hits++; }
   }
-  if(!hits){ fx.res.push('Kein Treffer'); return fx; }
-  fx.res.push(`${hits} ${hits===1?'Treffer':'Treffer'}`);
+  if(!hits){ fx.res.push(`${nd} W6 auf ${need}+: kein Treffer`); return fx; }
+  fx.res.push(`${nd} W6 auf ${need}+: ${hits} Treffer`);
   resolvePen(t,hits,w.pen+(a.penB||0),a,w.top,a,fx,0);
   return fx;
 }
@@ -4344,7 +4349,7 @@ function renderStatus(){
   else if(G.phase==='over') s=`<b>Gefecht vorbei</b>`;
   else if(G.phase==='end') s=`<b>Rundenende ${G.round}</b> · ${esc(endStepLabel(G.end&&G.end.steps[G.end.i]))}`;
   else { const c=G.cur; s=`<b>Runde ${G.round}</b> · noch ${G.deck.length} Karten`+(c?` · ${sideChip(c.side)}`:''); }
-  $('dg-status').innerHTML=s;
+  $('dg-status').innerHTML=s; $('dg-simw').innerHTML=simBar();
   $('dg-undo').disabled=!hist.length;
 }
 function unitCard(u){
@@ -4472,7 +4477,7 @@ function onPanelClick(e){
   const b=e.target.closest('[data-a]'); if(!b||b.disabled) return;
   const a=b.dataset.a, c=G&&G.cur;
   if(a==='pl'){ startBots[b.dataset.s]=b.dataset.v==='1'; renderStart(); return; }
-  if(a==='start'||a==='botbot'){ if(a==='botbot') startBots={de:true,al:true}; if(newGame({...startBots})){ commit(); } return; }
+  if(a==='start'||a==='botbot'){ if(a==='botbot') startBots={de:true,al:true}; if(newGame({...startBots})){ DG.paused=false; if(startBots.de&&startBots.al){ ui.log=true; $('dg-log').hidden=false; } commit(); } return; }
   if(a==='new'){ if(G&&G.phase!=='over'&&!confirm('Laufendes Gefecht beenden und neu starten?')) return; G=null; hist=[]; save(); try{ localStorage.removeItem(LS); }catch(_){}; render(); if(window.netChanged) netChanged(); return; }
   if(!G) return;
   if(a==='ready') return setReady(b.dataset.s);
@@ -4502,7 +4507,24 @@ const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const D20SVG='<svg viewBox="0 0 48 48"><polygon class="f0" points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#3f4a2a" stroke="#1b1d14" stroke-width="2"/><polygon points="24,9 38,32 10,32" fill="rgba(255,255,255,.1)" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/></svg>';
 function dieHTML(t,v){ return t===20?D20SVG+`<b>${v}</b>`:Array.from({length:9},(_,i)=>`<i${PIPS[v].includes(i)?' class="p"':''}></i>`).join(''); }
 let fxQueue=Promise.resolve(), fxBusy=0;
-function speed(){ return G&&G.bots.de&&G.bots.al?(DG.fast?.35:.7):1; }
+// Tempo der Bot-Simulation (nur dieses Gerät): langsam / normal / schnell
+DG.spd=(()=>{ try{ return +localStorage.getItem('dg-tempo')||1; }catch(e){ return 1; } })();
+DG.paused=false;
+function speed(){ if(DG.fast===2) return .06; return G&&(G.bots.de||G.bots.al)?DG.spd:1; }
+function setTempo(v){ DG.spd=v; try{ localStorage.setItem('dg-tempo',String(v)); }catch(e){} render(); }
+function simBar(){
+  if(!G||!(G.bots.de||G.bots.al)||G.phase==='over') return '';
+  const t=(v,l,ti)=>`<button class="sec ${DG.spd===v?'on':''}" data-sim="t${v}" title="${ti}">${l}</button>`;
+  return `<div class="dg-sim"><button class="sec ${DG.paused?'on':''}" data-sim="pause" title="${DG.paused?'Weiter':'Anhalten'}">${DG.paused?'▶ Weiter':'⏸ Stopp'}</button>${t(2.2,'🐢','Langsam')}${t(1,'▶','Normal')}${t(.4,'⏩','Schnell')}<button class="sec" data-sim="save" title="Protokoll als Textdatei speichern">📄 Log</button></div>`;
+}
+function logText(){
+  const head=`Sitzkrieg Gefecht – Protokoll\n${new Date(G.start||Date.now()).toLocaleString('de-DE')} · ${G.map.size==='3x8'?'Episch':'Normal'} · DE: ${G.bots.de?'Bot':'Mensch'} · AL: ${G.bots.al?'Bot':'Mensch'}\n\n`;
+  return head+G.log.map(e=>e.s==='r'?`\n=== ${e.t} ===`:`${e.s?'['+sideTag(e.s)+'] ':''}${e.t}`).join('\n')+'\n';
+}
+function saveLog(){
+  const b=new Blob([logText()],{type:'text/plain;charset=utf-8'}), a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=`sitzkrieg-gefecht-runde${G.round}.txt`; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
+}
 function playFx(f){
   fxBusy++;
   fxQueue=fxQueue.then(()=>showFx(f)).catch(()=>{}).then(()=>{ fxBusy--; });
@@ -4555,7 +4577,7 @@ async function showFx(f){
 // ---------- Bots ----------
 let botBusy=false;
 function botTurnSide(){
-  if(!G||G.phase==='over') return null;
+  if(!G||G.phase==='over'||DG.paused) return null;
   if(live()&&lobby.state.role!=='host') return null;
   if(G.phase==='setup'){ for(const s of ['de','al']) if(G.bots[s]&&!G.ready[s]) return s; return null; }
   if(G.cur) return G.bots[G.cur.side]?G.cur.side:null;
@@ -4654,7 +4676,7 @@ function botMoveTarget(u){
   }
   return best?best.q:null;
 }
-setInterval(botTick,180);
+setInterval(botTick,70);
 
 // =====================================================================
 //  Teil 6: Oberfläche aufbauen, Menü, Start
@@ -4664,6 +4686,7 @@ function buildUI(){
   const tab=$('tab-spiel');
   tab.innerHTML=`<div id="dg">
     <div class="dg-top" id="dg-top"><div class="dg-status" id="dg-status"></div>
+      <span id="dg-simw"></span>
       <button class="sec" id="dg-undo" title="Zurück (letzte Aktion rückgängig)">↶</button>
       <button class="sec" id="dg-logb" title="Ereignisse">📜</button>
       <button class="sec" id="dg-menub" title="Menü">☰</button></div>
@@ -4678,6 +4701,9 @@ function buildUI(){
   const fx=document.createElement('div'); fx.id='dg-fx'; fx.hidden=true; document.body.appendChild(fx);
   $('dg-panel').addEventListener('click',onPanelClick);
   $('dg-menu').addEventListener('click',onMenuClick);
+  $('dg-top').addEventListener('click',e=>{ const b=e.target.closest('[data-sim]'); if(!b) return; const a=b.dataset.sim;
+    if(a==='pause'){ DG.paused=!DG.paused; toast(DG.paused?'Simulation angehalten':'Simulation läuft weiter'); render(); }
+    else if(a==='save') saveLog(); else setTempo(+a.slice(1)); });
   $('dg-next').addEventListener('click',e=>{ if(!$('dg-next').disabled) onPanelClick(e); });
   $('dg-undo').onclick=undo;
   $('dg-logb').onclick=()=>{ ui.log=!ui.log; $('dg-log').hidden=!ui.log; if(ui.log) renderLog(); };
@@ -4695,7 +4721,7 @@ function renderMenu(){
   const m=$('dg-menu');
   const b=(a,t,on)=>`<button class="sec ${on?'on':''}" data-m="${a}">${t}</button>`;
   m.innerHTML=`<h3>☰ Gefecht</h3>
-   ${G?`<div class="dg-row"><span class="dg-muted">Spieler:</span>${b('bot-de',(G.bots.de?'🤖':'👤')+' Deutsche',G.bots.de)}${b('bot-al',(G.bots.al?'🤖':'👤')+' Alliierte',G.bots.al)}${b('fast','⏩ Bots schnell',DG.fast)}</div>
+   ${G?`<div class="dg-row"><span class="dg-muted">Spieler:</span>${b('bot-de',(G.bots.de?'🤖':'👤')+' Deutsche',G.bots.de)}${b('bot-al',(G.bots.al?'🤖':'👤')+' Alliierte',G.bots.al)}</div>
    <div class="dg-row"><span class="dg-muted">Marker setzen:</span>${b('mk-fire','🔥 Feuer')}${b('mk-smoke','💨 Rauch')}${b('mk-pmine','Personenminen')}${b('mk-amine','Panzerminen')}</div>`:''}
    <div class="dg-row">${b('help','📖 So geht’s')}${b('terrain','🗺 Gelände & Auslegungen')}${G?b('newgame','⚔ Neues Gefecht'):''}</div>
    <div id="dg-help"></div>`;
@@ -4717,7 +4743,6 @@ function onMenuClick(e){
   if(a==='newgame'){ $('dg-menu').hidden=true; onPanelClick({target:Object.assign(document.createElement('button'),{dataset:{a:'new'}})}); return; }
   if(!G) return;
   if(a==='bot-de'||a==='bot-al'){ pushHist(); const s=a.slice(4); G.bots[s]=!G.bots[s]; log(s,`${SIDE_NAME[s]} werden jetzt von ${G.bots[s]?'einem Bot':'einem Menschen'} gespielt`); commit(); renderMenu(); return; }
-  if(a==='fast'){ DG.fast=!DG.fast; renderMenu(); return; }
   if(a.startsWith('mk-')){ ui.marker=a.slice(3); $('dg-menu').hidden=true; render(); toast('Tippe auf die Karte'); return; }
 }
 // Tab „Gefecht“ einhängen
