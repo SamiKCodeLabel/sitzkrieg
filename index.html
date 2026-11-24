@@ -275,7 +275,7 @@ html[data-theme="dark"] .rw-search input{background:#1d2116;color:#e3dcc0;border
 .gp-next.t-al{background:linear-gradient(#727c42,#3c4322);color:#f3efd9;border-color:#22261a}
 .gp-next.t-end{background:linear-gradient(#8a3020,#4e1a10);color:#fff3e0;border-color:#22261a}
 .gp-next.locked{opacity:.4;cursor:not-allowed;filter:grayscale(.35)}
-.np-seg button:disabled{opacity:.35;text-decoration:line-through;cursor:not-allowed}
+.np-seg button.taken{opacity:.55;border-style:dashed} .np-seg button.taken::after{content:' ⇄';opacity:.8}
 
 /* Rundenende-Bildschirm */
 .gcard.rend .gc-top{background:linear-gradient(#7a2a1c,#4e1a10)}
@@ -2385,7 +2385,7 @@ function buildDeck(){
   while(per.de.length||per.al.length) for(const s of order) if(per[s].length) out.push(per[s].shift());
   return out;
 }
-function reset(){ S.round=1; S.deck=buildDeck(); S.cur=null; S.newRound=false; S.end=null; S.played=[]; S.sig=sigNow(); }
+function reset(){ S.round=1; S.deck=buildDeck(); S.cur=null; S.newRound=false; S.end=null; S.played=[]; S.sig=sigNow(); takeCard(); }   // erste Karte liegt gleich offen: wer drückt, gibt ab
 // Jedes Fahrzeug jeder Armee kommt in jeder Runde genau 1 mal dran: fehlende Fahrzeugkarten werden in den Rest des Decks gemischt,
 // Karten von Fahrzeugen, die es nicht mehr gibt, fliegen raus.
 function syncVeh(){
@@ -2395,6 +2395,11 @@ function syncVeh(){
     const id=side+':'+v.key; if(have.has(id)||played.has(id)) continue;
     S.deck.splice(Math.floor(Math.random()*(S.deck.length+1)),0,{side,kind:'veh',key:v.key});
   }
+  // Wieder streng abwechselnd sortieren (Reihenfolge innerhalb jeder Seite bleibt), Start mit der Seite, die nicht gerade offen liegt
+  const per={de:S.deck.filter(c=>c.side==='de'),al:S.deck.filter(c=>c.side==='al')};
+  let nx=S.cur?(S.cur.side==='de'?'al':'de'):(S.deck[0]?S.deck[0].side:'de'); const out=[];
+  while(per.de.length||per.al.length){ if(per[nx].length) out.push(per[nx].shift()); nx=nx==='de'?'al':'de'; }
+  S.deck=out;
 }
 const objList=()=>{ const ms=typeof missionSetup==='function'?missionSetup():null; return ms&&ms.objInfo?ms.objInfo:[]; };
 window.spielReset=()=>{ reset(); render(); };
@@ -2413,12 +2418,15 @@ function draw(){
     if(S.end!==null && S.end<n-1){ S.end++; render(); if(window.netChanged) netChanged(); return; }
     S.end=null; S.round++; S.deck=buildDeck(); S.played=[]; S.newRound=true;
   }
-  const c=S.deck.shift(); if(c.kind==='veh') S.played.push(c.side+':'+c.key);
+  takeCard(); render(); if(window.netChanged) netChanged();
+}
+function takeCard(){
+  const c=S.deck.shift(); if(!c){ S.cur=null; return; } if(c.kind==='veh') S.played.push(c.side+':'+c.key);
   if(c.kind==='spec'){   // Spezial: zufällig eine der einzelnen Spezialeinheiten dieser Armee
     const sp=(armies[c.side]||[]).filter(x=>!x.veh&&x.units&&x.units.length&&!(x.rif));
     const sl=sp[Math.floor(Math.random()*sp.length)]; c.unit=sl?sl.units[0]:null;
   }
-  S.cur=c; render(); if(window.netChanged) netChanged();
+  S.cur=c;
 }
 const ARROW='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24 H38 M26 11 L39 24 L26 37"/></svg>';
 function objRow(name){
@@ -2601,7 +2609,7 @@ function onData(m){
   if(m.type==='full'){ toast('Diese Lobby ist schon voll'); leave(); return; }
   if(m.type==='hello'){ NET.ts=Date.now(); send(snapshot()); toast('Dein Freund ist in der Lobby'); }
   else if(m.type==='state') apply(m);
-  else if(m.type==='side'&&window.lobbyPeerSide) lobbyPeerSide(m.side||'');
+  else if(m.type==='side'&&window.lobbyPeerSide) lobbyPeerSide(m.side||'',!!m.swap);
 }
 function attach(conn){
   if(NET.conn && NET.conn!==conn){ const old=NET.conn; NET.conn=null; try{ old.close(); }catch(e){} }
@@ -2980,16 +2988,18 @@ window.mySide=()=>me;
 window.lobbyLive=()=>!!(window.lobby&&lobby.state.open);
 const btns=[...document.querySelectorAll('[data-me]')];
 const NAME={de:'Deutsche',al:'Alliierte'};
-const sync=()=>btns.forEach(b=>{ const v=b.dataset.me; b.classList.toggle('on',v===me); const taken=!!v&&v===other; b.disabled=taken; b.title=taken?'Diese Seite hat schon dein Freund':''; });
+const OPP={de:'al',al:'de'};
+const sync=()=>btns.forEach(b=>{ const v=b.dataset.me; b.classList.toggle('on',v===me); const taken=!!v&&v===other; b.disabled=false; b.classList.toggle('taken',taken); b.title=taken?'Seite deines Freundes – antippen zum Tauschen':''; });
+const note=t=>{ const el=$('lb-toast'); el.textContent=t; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2600); };
 const setMe=v=>{ me=v; try{ localStorage.setItem('sitzkrieg-meine-seite',me); }catch(e){} sync(); if(window.renderSpiel) renderSpiel(); };
-window.sendMySide=()=>{ if(window.lobby&&lobby.send) lobby.send({type:'side',side:me}); };
-window.lobbyPeerSide=s=>{
+window.sendMySide=(swap)=>{ if(window.lobby&&lobby.send) lobby.send({type:'side',side:me,swap:!!swap}); };
+window.lobbyPeerSide=(s,swap)=>{
   other=s;
-  // Beide gleich? Der Gast gibt nach.
-  if(s&&s===me&&lobby.state.role==='guest'){ setMe(''); const t=$('lb-toast'); t.textContent=NAME[s]+' hat schon dein Freund'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); sendMySide(); }
+  if(s&&s===me&&(swap||lobby.state.role==='guest')){ setMe(OPP[s]); note(swap?'Seiten getauscht – du spielst jetzt '+NAME[me]:'Du spielst '+NAME[me]); sendMySide(); }   // Tausch oder Doppelwahl: freie Seite nehmen
+  else if(s&&!me){ setMe(OPP[s]); sendMySide(); }   // noch keine Seite: automatisch die freie
   sync(); if(window.renderSpiel) renderSpiel();
 };
-btns.forEach(b=>b.onclick=()=>{ const v=b.dataset.me; if(v&&v===other) return; setMe(v); sendMySide(); });
+btns.forEach(b=>b.onclick=()=>{ const v=b.dataset.me; if(v===me) return; const swap=!!v&&v===other; if(swap) other=OPP[v]; setMe(v); sendMySide(swap); });
 sync();
 // Lobby an/aus -> Spielansicht auffrischen
 new MutationObserver(()=>{ if(window.renderSpiel) renderSpiel(); }).observe($('lb-on'),{attributes:true,attributeFilter:['hidden']});
