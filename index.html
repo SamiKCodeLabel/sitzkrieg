@@ -2340,7 +2340,7 @@ new MutationObserver(ms=>{ for(const m of ms) for(const n of m.addedNodes){
 // Deck je Armee: Gewehrschützen und Spezial laut DECKS, dazu je 1× jedes Fahrzeug, das die Armee wirklich hat
 // Aktivierungen pro Armee und Runde (siehe Regelwerk: Rundenaktivierungen)
 const DECKS={'3x6':{rif:4,spec:3},'3x8':{rif:6,spec:4}};
-const S={round:1,deck:[],cur:null,newRound:false,sig:'',end:null};   // end: Seite des Rundenende-Bildschirms (null = normale Karten)
+const S={round:1,deck:[],cur:null,newRound:false,sig:'',end:null,played:[]};   // played: diese Runde schon aufgedeckte Fahrzeuge   // end: Seite des Rundenende-Bildschirms (null = normale Karten)
 const sigNow=()=>$('size').value;   // Deck startet nur neu bei neuer Größe ohne eigenes Deck oder beim Gedrückthalten von „Neue Karte“
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 // Abwechselnd Deutsche und Alliierte: jede Seite wird für sich gemischt, dann im Reißverschluss zusammengelegt.
@@ -2359,13 +2359,23 @@ function buildDeck(){
   while(per.de.length||per.al.length) for(const s of order) if(per[s].length) out.push(per[s].shift());
   return out;
 }
-function reset(){ S.round=1; S.deck=buildDeck(); S.cur=null; S.newRound=false; S.end=null; S.sig=sigNow(); }
+function reset(){ S.round=1; S.deck=buildDeck(); S.cur=null; S.newRound=false; S.end=null; S.played=[]; S.sig=sigNow(); }
+// Jedes Fahrzeug jeder Armee kommt in jeder Runde genau 1 mal dran: fehlende Fahrzeugkarten werden in den Rest des Decks gemischt,
+// Karten von Fahrzeugen, die es nicht mehr gibt, fliegen raus.
+function syncVeh(){
+  const have=new Set(), played=new Set(S.played||[]);
+  S.deck=S.deck.filter(c=>{ if(c.kind!=='veh') return true; const ok=(armies[c.side]||[]).some(v=>v.veh&&v.key===c.key); if(ok) have.add(c.side+':'+c.key); return ok; });
+  for(const side of ['de','al']) for(const v of (armies[side]||[]).filter(x=>x.veh)){
+    const id=side+':'+v.key; if(have.has(id)||played.has(id)) continue;
+    S.deck.splice(Math.floor(Math.random()*(S.deck.length+1)),0,{side,kind:'veh',key:v.key});
+  }
+}
 const objList=()=>{ const ms=typeof missionSetup==='function'?missionSetup():null; return ms&&ms.objInfo?ms.objInfo:[]; };
 window.spielReset=()=>{ reset(); render(); };
 // Armeen neu gewürfelt: Deck und Runde bleiben. Fahrzeugkarten von Fahrzeugen, die es nicht mehr gibt, fliegen raus;
 // neue Fahrzeuge kommen ab der nächsten Runde ins Deck.
 window.spielArmies=()=>{ if(S.sig!==sigNow()) return render();
-  S.deck=S.deck.filter(c=>c.kind!=='veh'||(armies[c.side]||[]).some(v=>v.veh&&v.key===c.key)); render(); };
+  if(S.end===null) syncVeh(); render(); };
 function draw(){
   if(S.sig!==sigNow()) reset();
   S.newRound=false;
@@ -2374,9 +2384,9 @@ function draw(){
     const n=objList().length;
     if(S.end===null){ S.end=-1; S.cur=null; render(); if(window.netChanged) netChanged(); return; }   // -1 = Rauch & Feuer
     if(S.end!==null && S.end<n-1){ S.end++; render(); if(window.netChanged) netChanged(); return; }
-    S.end=null; S.round++; S.deck=buildDeck(); S.newRound=true;
+    S.end=null; S.round++; S.deck=buildDeck(); S.played=[]; S.newRound=true;
   }
-  const c=S.deck.shift();
+  const c=S.deck.shift(); if(c.kind==='veh') S.played.push(c.side+':'+c.key);
   if(c.kind==='spec'){   // Spezial: zufällig eine der einzelnen Spezialeinheiten dieser Armee
     const sp=(armies[c.side]||[]).filter(x=>!x.veh&&x.units&&x.units.length&&!(x.rif));
     const sl=sp[Math.floor(Math.random()*sp.length)]; c.unit=sl?sl.units[0]:null;
@@ -2492,8 +2502,8 @@ function render(){
   $('sp-next').onclick=draw;
 }
 window.renderSpiel=render;
-window.spielGet=()=>({round:S.round,deck:S.deck,cur:S.cur,newRound:S.newRound,end:S.end});
-window.spielSet=o=>{ if(!o) return; S.round=o.round; S.deck=o.deck||[]; S.cur=o.cur||null; S.newRound=!!o.newRound; S.end=(typeof o.end==='number'&&o.end>=-1)?o.end:null; S.sig=sigNow(); render(); };
+window.spielGet=()=>({round:S.round,deck:S.deck,cur:S.cur,newRound:S.newRound,end:S.end,played:S.played});
+window.spielSet=o=>{ if(!o) return; S.round=o.round; S.deck=o.deck||[]; S.cur=o.cur||null; S.newRound=!!o.newRound; S.end=(typeof o.end==='number'&&o.end>=-1)?o.end:null; S.played=Array.isArray(o.played)?o.played:(S.cur&&S.cur.kind==='veh'?[S.cur.side+':'+S.cur.key]:[]); S.sig=sigNow(); render(); };
 if(typeof STAND!=='undefined'&&STAND&&STAND.spiel&&STAND.spiel.deck) spielSet(STAND.spiel);
 render();
 })();
