@@ -287,6 +287,8 @@ body.on-spiel #dice-btn{display:block}
 #dice-pop{position:fixed;left:calc(10px + env(safe-area-inset-left));bottom:calc(54px + env(safe-area-inset-bottom));z-index:45;width:min(320px,calc(100vw - 20px));max-height:calc(100vh - 80px);overflow:auto;
   background:#e6dcb8;color:#23241c;border:2px solid #4a4a32;border-radius:8px;padding:10px;box-shadow:0 0 0 3px #22261a,0 14px 30px rgba(0,0,0,.55);transform-origin:0 100%;animation:dpIn .18s ease-out}
 #dice-pop[hidden]{display:none}
+#dice-pop.dp-de{border:3px solid #8fb0d0;box-shadow:0 0 0 3px #2f4a66,0 0 18px rgba(110,150,200,.45),0 14px 30px rgba(0,0,0,.55)}
+#dice-pop.dp-al{border:3px solid #b9c766;box-shadow:0 0 0 3px #4d5a1c,0 0 18px rgba(170,190,80,.45),0 14px 30px rgba(0,0,0,.55)}
 @keyframes dpIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
 html[data-theme="dark"] #dice-pop{background:#2a2f20;color:#e3dcc0;border-color:#5d5b42}
 .dp-row{display:flex;gap:8px;justify-content:space-between;align-items:center}
@@ -2605,6 +2607,7 @@ function render(){
   const me=window.mySide?mySide():'', live=window.lobbyLive?lobbyLive():false;
   const locked=!!(live&&me&&turn&&turn!==me);
   nb.disabled=locked; nb.classList.toggle('locked',locked);
+  if(window.diceTurn) diceTurn(turn);
   nb.title=locked?'Dein Freund ist dran':'Nächste Karte aufdecken';
 }
 window.renderSpiel=render;
@@ -2671,6 +2674,7 @@ function onData(m){
   if(m.type==='hello'){ NET.ts=Math.max(NET.ts,m.ts|0)+1; send(snapshot()); toast('Dein Freund ist in der Lobby'); }
   else if(m.type==='state') apply(m);
   else if(m.type==='side'&&window.lobbyPeerSide) lobbyPeerSide(m.side||'',!!m.swap);
+  else if(m.type==='dice'&&window.remoteDice) remoteDice(m);
 }
 function attach(conn){
   if(NET.conn && NET.conn!==conn){ const old=NET.conn; NET.conn=null; try{ old.close(); }catch(e){} }
@@ -3069,7 +3073,7 @@ if(window.renderSpiel) renderSpiel();
 </script>
 
 <script>
-// ---------- Würfel (nur auf diesem Gerät) ----------
+// ---------- Würfel (in der Lobby sieht der Freund jeden Wurf mit) ----------
 (function(){
 const btn=$('dice-btn'), pop=$('dice-pop'), tray=$('dp-tray');
 let type=6, n=1; try{ const o=JSON.parse(localStorage.getItem('sitzkrieg-wuerfel')); if(o){ type=o.t===20?20:6; n=Math.max(1,Math.min(10,o.n|0||1)); } }catch(e){}
@@ -3088,11 +3092,12 @@ function sync(){
 }
 const rnd=m=>1+Math.floor(Math.random()*m);
 let timers=[];
-function roll(){
+function roll(given){
   timers.forEach(clearInterval); timers=[];
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   tray.innerHTML=''; tray.classList.remove('shake'); void tray.offsetWidth; tray.classList.add('shake');
-  const cnt=type===20?1:n, vals=Array.from({length:cnt},()=>rnd(type)), dice=[];
+  const cnt=given?given.length:(type===20?1:n), vals=given||Array.from({length:cnt},()=>rnd(type)), dice=[];
+  if(!given&&window.lobby&&lobby.send) lobby.send({type:'dice',t:type,vals});
   vals.forEach((v,i)=>{
     const d=document.createElement('div'); d.className=`wf d${type}`;
     d.style.setProperty('--dx',(Math.random()*80-40)+'px'); d.style.setProperty('--rx',(Math.random()*720-360)+'deg');
@@ -3114,6 +3119,17 @@ pop.addEventListener('click',e=>{
 });
 document.addEventListener('click',()=>{ if(!pop.hidden){ pop.hidden=true; btn.classList.remove('open'); } });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ pop.hidden=true; btn.classList.remove('open'); } });
+// Wurf vom Freund: gleiche Würfel, gleiche Animation
+window.remoteDice=m=>{
+  if(!Array.isArray(m.vals)||!m.vals.length) return;
+  type=m.t===20?20:6; sync();
+  if(pop.hidden){ pop.hidden=false; btn.classList.add('open'); }
+  roll(m.vals.slice(0,10).map(v=>Math.max(1,Math.min(type,v|0))));
+  if(typeof Sounds!=='undefined') try{ Sounds.play('dice', nextDiceVariant()); }catch(e){}
+};
+// Rahmen in der Farbe der Seite, die gerade dran ist
+window.diceTurn=t=>{ pop.classList.toggle('dp-de',t==='de'); pop.classList.toggle('dp-al',t==='al'); };
+try{ const g=window.spielGet&&spielGet(); if(g&&g.end===null&&g.cur) diceTurn(g.cur.side); }catch(e){}
 sync();
 })();
 </script>
