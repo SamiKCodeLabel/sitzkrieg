@@ -127,6 +127,11 @@ body.on-spiel main{margin-bottom:130px}
 .gc-body .tw{margin-top:8px}
 .gc-body .vgrid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start}
 .gc-note{font-size:.9rem;margin:8px 0 0;line-height:1.45}
+.gc-abil{margin:4px 0 12px;border:2px solid var(--stamp);background:linear-gradient(rgba(155,45,32,.14),rgba(155,45,32,.06));box-shadow:3px 3px 0 rgba(30,20,10,.25);transform:rotate(-.4deg)}
+.gc-abil .ga-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;padding:5px 10px;background:var(--stamp);color:#fff3e0;font-family:var(--head);text-transform:uppercase;letter-spacing:.08em}
+.gc-abil .ga-star{font-size:1.1rem;color:#ffd36b} .gc-abil .ga-k{font-size:.7rem;opacity:.85} .gc-abil .ga-n{font-size:1.05rem;margin-left:auto}
+.gc-abil p{margin:0;padding:8px 10px;font-size:.98rem;line-height:1.45;font-weight:600}
+@media (orientation:landscape) and (max-height:560px){ .gc-abil{margin:0 0 6px} .gc-abil .ga-h{padding:2px 8px} .gc-abil .ga-n{font-size:.8rem} .gc-abil .ga-k{font-size:.58rem} .gc-abil p{font-size:.68rem;padding:4px 8px;line-height:1.3} }
 .gc-note b{font-family:var(--head);letter-spacing:.04em}
 .gc-notes{padding:0 14px 14px;margin-top:-8px}
 html[data-theme="dark"] .gcard{background:#2a2f20;color:#e3dcc0;border-color:#5d5b42}
@@ -2457,7 +2462,7 @@ function cardHTML(c){
       art=A[u.abil?'general:'+u.abil.name:u.key]||A[u.key]; name=u.name;
       const names=u.abil&&u.abil.name==='Veteran'?['Nahkampfwaffe','Maschinengewehr']:(WEAPONS_OF[u.key]||[]);
       const sec=EXTRA_SECTION[u.key]&&document.querySelector('#'+EXTRA_SECTION[u.key]+' p');
-      if(u.abil) notes+=`<p class="gc-note"><b>★ ${u.abil.name}:</b> ${u.abil.text}</p>`;
+      if(u.abil) body+=`<div class="gc-abil"><div class="ga-h"><span class="ga-star">★</span><span class="ga-k">Generalsfähigkeit</span><span class="ga-n">${u.abil.name}</span></div><p>${u.abil.text}</p></div>`;
       if(sec) notes+=`<p class="gc-note">${sec.textContent}</p>`;
       body+=weaponTable(names);
     }
