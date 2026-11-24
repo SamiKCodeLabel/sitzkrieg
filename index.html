@@ -1842,7 +1842,7 @@ $('ext-r').oninput=()=>{ const sz=$('size').value, v=+$('ext-r').value; settings
   if(current) current._ms=null; render(); if(window.netChanged) netChanged(); };
 $('reset').onclick=()=>{ settings=structuredClone(DEFAULTS); saveSettings(); buildPool(); run(newSeed()); };
 $('gen').onclick=()=>run(newSeed());
-$('fab').onclick=()=>{ if(document.body.classList.contains('on-mission')){ genArmies(); $('tab-mission').scrollIntoView({behavior:'smooth',block:'start'}); return; } run(newSeed()); $('map').scrollIntoView({behavior:'smooth',block:'start'}); };
+$('fab').onclick=()=>{ if(document.body.classList.contains('on-mission')){ genArmies(); if(Math.random()<0.01&&window.playReroll) playReroll(); $('tab-mission').scrollIntoView({behavior:'smooth',block:'start'}); return; } run(newSeed()); $('map').scrollIntoView({behavior:'smooth',block:'start'}); };
 // Größe wechseln ohne neu zu würfeln: jede Größe behält ihre Karte und Armeen, solange die Seite offen ist
 const SIZE_KEEP={};
 document.querySelectorAll('.seg button[data-size]').forEach(b=>b.onclick=()=>{
@@ -2084,7 +2084,8 @@ function renderPoolInfo(){
   $('pool-veh').innerHTML=VEHICLES.map(v=>`<li>${v.n}× ${v.name}</li>`).join('')+`<li>Fahrzeuge pro Seite: ${vehN} (in den Einstellungen 0–3)</li>`;
   $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Generäle pro Seite: ${genCount} (in den Einstellungen 0–3)</li><li>Normal: 4 einzelne Spezialeinheiten, 6 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Episch: 6 einzelne Spezialeinheiten, 8 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
 }
-$('army-gen').onclick=()=>genArmies();
+const catChance=()=>{ if(Math.random()<0.01&&window.playReroll) playReroll(); };   // 1 % Chance auf die Katze bei „Neue Armee“
+$('army-gen').onclick=()=>{ genArmies(); catChance(); };
 function syncVehButtons(){ document.querySelectorAll('[data-vn]').forEach(b=>b.classList.toggle('on',+b.dataset.vn===vehN)); }
 document.querySelectorAll('[data-vn]').forEach(b=>b.onclick=()=>{
   vehN=+b.dataset.vn; try{ localStorage.setItem('sitzkrieg-fahrzeug-anzahl',String(vehN)); }catch(e){}
@@ -2709,7 +2710,6 @@ if(!btn.querySelector('span.gen-l')){ const sp=document.createElement('span'); s
 let t=null, fired=false;
 function stop(){ clearTimeout(t); t=null; btn.classList.remove('charging'); }
 btn.addEventListener('pointerdown',e=>{
-  primeReroll();   // Video schon beim Drücken vorbereiten (Handys erlauben Ton nur nach einer Berührung)
   if(e.button>0) return; fired=false; stop();
   void btn.offsetWidth; btn.classList.add('charging');
   t=setTimeout(()=>{
@@ -2721,7 +2721,6 @@ btn.addEventListener('pointerdown',e=>{
     genArmies();                          // neue Armeen -> Deck startet neu
     if(window.spielReset) spielReset();
     if(window.netChanged) netChanged();
-    playReroll();
     showToast('Alles neu: Karte, Armeen und Deck');
   },HOLD);
 });
@@ -2747,6 +2746,7 @@ function keyFrame(){
   rctx.putImageData(img,0,0);
   rRAF=requestAnimationFrame(keyFrame);
 }
+window.playReroll=()=>playReroll();
 function stopReroll(){ cancelAnimationFrame(rRAF); if(rBox){ rBox.remove(); rBox=null; } if(rv){ try{ rv.pause(); }catch(e){} } }
 function playReroll(){
   primeReroll(); stopReroll();
