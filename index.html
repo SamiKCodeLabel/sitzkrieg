@@ -583,9 +583,7 @@ html[data-theme="dark"] .re-ort{color:#a9a486}
   .step output{display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:1.05rem;
                border-left:1px solid #6f6a4a;border-right:1px solid #6f6a4a}
   .sfoot{display:flex;justify-content:center;margin:14px 0 4px}
-  .ext-set{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 0;padding:10px 12px;border:1px dashed var(--line,#a89a63);font-weight:600}
-  .ext-set label{display:flex;align-items:center;gap:6px} .ext-set small{color:var(--muted);font-weight:400}
-  .ext-set input{flex:1;min-width:140px;accent-color:#6b5a2e} .ext-set output{min-width:1.4em;text-align:right;font-family:var(--head);font-size:1.15rem}
+  .ext-g{margin-top:14px;border-left-color:#6b5a2e} .ext-g .srow{grid-template-columns:28px minmax(0,1fr) auto;border-bottom:0} .ext-g .snm{overflow-wrap:anywhere;hyphens:auto}
   .rules ul{margin:6px 0 0;padding-left:1.3em}
   .rules li{margin:2px 0}
   @media (max-width:640px){
@@ -1075,7 +1073,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         <div class="slist" id="bsize"></div>
       </section>
     </div>
-    <div class="ext-set"><label for="ext-r"><span class="sic">🧱</span> Felderweiterungen <small id="ext-max"></small></label><input type="range" id="ext-r" min="0" max="3" step="1" aria-label="Anzahl Felderweiterungen"><output id="ext-o"></output></div>
+    <section class="sgroup ext-g"><div class="slist" id="ext-set"></div></section>
     <div class="sfoot"><button class="sec" id="reset">↺ Standard wiederherstellen</button></div>
     <div class="rules">
       <b>Regeln</b>
@@ -1783,7 +1781,7 @@ function run(seed){
   current = {...generate(seed), seed};
   updateSeed();
   document.querySelectorAll('.seg button[data-size]').forEach(b=>b.classList.toggle('on', b.dataset.size===$('size').value));
-  if(typeof syncExt==='function'&&$('ext-r')) syncExt();
+  if(typeof syncExt==='function'&&$('ext-set')) syncExt();
   render();
   const map=$('map'); map.classList.remove('pop'); void map.offsetWidth; map.classList.add('pop');
 }
@@ -1835,11 +1833,10 @@ function buildPool(){
   syncExt();
 }
 function syncExt(){
-  const sz=$('size').value, mx=EXT_MAX[sz]??3, v=Math.min(mx,settings.ext?.[sz]??mx);
-  $('ext-r').max=mx; $('ext-r').value=v; $('ext-o').textContent=v; $('ext-max').textContent=`(${sz==='3x8'?'Episch':'Normal'}: 0–${mx})`;
+  const sz=$('size').value, mx=EXT_MAX[sz]??3, box=$('ext-set'); box.innerHTML='';
+  box.appendChild(srow('🧱','Felderweiterungen',`${sz==='3x8'?'Episch':'Normal'} · max. ${mx}`,stepper(()=>Math.min(mx,settings.ext?.[sz]??mx),v=>{
+    settings.ext={...settings.ext,[sz]:v}; if(current) current._ms=null; render(); if(window.netChanged) netChanged(); },0,mx)));
 }
-$('ext-r').oninput=()=>{ const sz=$('size').value, v=+$('ext-r').value; settings.ext={...settings.ext,[sz]:v}; $('ext-o').textContent=v; saveSettings();
-  if(current) current._ms=null; render(); if(window.netChanged) netChanged(); };
 $('reset').onclick=()=>{ settings=structuredClone(DEFAULTS); saveSettings(); buildPool(); run(newSeed()); };
 $('gen').onclick=()=>run(newSeed());
 $('fab').onclick=()=>{ if(document.body.classList.contains('on-mission')){ genArmies(); if(Math.random()<0.01&&window.playReroll) playReroll(); $('tab-mission').scrollIntoView({behavior:'smooth',block:'start'}); return; } run(newSeed()); $('map').scrollIntoView({behavior:'smooth',block:'start'}); };
