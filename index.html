@@ -1087,138 +1087,253 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <article class="rcard" id="zugabfolge">
       <h2>Zugabfolge</h2>
       <ol class="steps">
-        <li><b>Karte aufdecken:</b>
-          <ul><li>Befehlskarte aufdecken und Befehl ausgeben</li><li>Ist der Stapel erschöpft: neu mischen, Rauch und Feuer abklingen lassen</li></ul></li>
-        <li><b>Trupp in Marsch setzen:</b> Der befohlene Trupp führt folgende Handlungen in freier Reihenfolge aus:
-          <ul><li>Stellungswechsel (Bewegen)</li><li>Feuer frei (Schießen)</li><li>Sonderauftrag (Spezialfähigkeit)</li></ul></li>
-        <li><b>Erfolg melden:</b> Für jeden vernichteten Feindtrupp und jedes vernichtete Feindfahrzeug wird 1 Siegpunkt gutgeschrieben</li>
+        <li><b>Aktivieren:</b> Drücke in der App auf den Weiter-Pfeil und aktiviere den angezeigten Trupp.</li>
+        <li><b>Aktionen:</b> Der aktivierte Trupp darf in beliebiger Reihenfolge:
+          <ul><li>sich bewegen</li><li>schießen</li></ul></li>
       </ol>
+      <p>Die Reihenfolge ist frei, aber eine begonnene Bewegung oder ein begonnener Angriff muss vollständig ausgeführt werden. Eine Bewegung kann also nicht „aufgespart“ oder „unterbrochen“ werden. In unwegsamem Gelände bewegen sich Trupps und Fahrzeuge nur halb so weit. Wer sich auf oder durch ein passendes Minenfeld oder Feuer bewegt hat, macht direkt nach der Bewegung einen entsprechenden Durchschlagswurf.</p>
+      <p><b>Rundenende:</b> Rauch und Feuer klingen ab (siehe <a href="#rauch">Rauch</a> und <a href="#feuer">Feuer</a>) und die <a href="#missionsziele">Sondereffekte der Missionsziele</a> werden abgehandelt.</p>
     </article>
 
-    <article class="rcard" id="befehlsstapel">
-      <h2>Befehlsstapel</h2>
-      <p>Die oberste Karte des Befehlsstapels wird aufgedeckt. Sie bestimmt, welcher Trupp welcher Armee den Marschbefehl erhält. Ist der Stapel erschöpft, werden <b>SÄMTLICHE!</b> Karten wieder zusammengeführt, gemischt und als neuer Befehlsstapel ausgegeben. Bei jedem Mischen erhält jede Seite, die mit Truppen unmittelbar an einer Missionsflagge steht, je gehaltener Flagge einen Siegpunkt.</p>
+    <article class="rcard" id="rundenaktivierungen">
+      <h2>Rundenaktivierungen</h2>
+      <p>Das Aktivierungsdeck in der App wird jede Runde neu gemischt. Es besteht pro Armee aus:</p>
+      <div class="tw"><table class="rt">
+        <thead><tr><th>Kartengröße</th><th>Spezialtrupps</th><th>Gewehrschützen</th><th>Fahrzeuge</th></tr></thead>
+        <tbody><tr><td>Normal</td><td>3</td><td>4</td><td>jedes vorhandene</td></tr><tr><td>Episch</td><td>4</td><td>6</td><td>jedes vorhandene</td></tr></tbody>
+      </table></div>
+      <p>Die App deckt abwechselnd eine deutsche und eine alliierte Aktivierung auf. Sind alle durch, beginnt eine neue Runde.</p>
     </article>
 
-    <article class="rcard" id="bewegung">
-      <h2>Bewegung</h2>
-      <p>Ein befohlener Trupp hat zwei Handlungen zur Verfügung: <b>Stellungswechsel</b> und/oder <b>Feuer</b>.</p>
-      <p>Die Reihenfolge ist freigestellt, doch jede begonnene Bewegung und jeder begonnene Feuerkampf ist restlos durchzuführen. Ein „Aufsparen“ oder „Unterbrechen“ der Bewegung ist untersagt. In unwegsamem Gelände kommen Truppen und Fahrzeuge nur genau halb so weit voran. Wer sich auf oder durch ein passendes Minenfeld oder Feuer bewegt hat, legt unmittelbar nach der Bewegung einen Durchschlagswurf ab. Jeder Trupp erhält pro Runde nur 1 Marschbefehl.</p>
+    <article class="rcard" id="truppenzusammensetzung">
+      <h2>Truppenzusammensetzung</h2>
+      <div class="tw"><table class="rt">
+        <thead><tr><th>Kartengröße</th><th>Spezialtrupps</th><th>Gewehrschützen-Trupps</th><th>Fahrzeuge</th></tr></thead>
+        <tbody><tr><td>Normal</td><td>4</td><td>6</td><td>bis zu 1 pro Typ</td></tr><tr><td>Episch</td><td>6</td><td>8</td><td>bis zu 1 pro Typ</td></tr></tbody>
+      </table></div>
+      <p>Ein Gewehrschützen-Trupp besteht aus 5 Gewehrschützen. Ein Spezialtrupp ist eine einzelne <a href="#spezialeinheiten">Spezialeinheit</a>.</p>
     </article>
 
     <article class="rcard" id="angreifen">
       <h2>Angreifen</h2>
-      <p>Der Feuerkampf ist nach folgendem Schema zu führen:</p>
+      <p>Ein Angriff läuft in diesen Schritten ab:</p>
       <ol class="steps">
-        <li><b>Waffe bestimmen</b><br>Waffenart mit den zugehörigen Kampfwerten festlegen.</li>
-        <li><b>Ziel aufklären</b><br>Feindtrupp, Gebäude, Stellung oder sonstiges Ziel in Reichweite der Waffe benennen.</li>
-        <li><b>Trefferwurf / Abweichwurf</b><br>Gemäß Waffe die befohlene Anzahl W6 werfen (Erleichterung und Erschwernis laut <a href="#treffertabelle">Treffertabelle</a>). Kommen eine oder mehrere Scheiben zum Einsatz, tritt an die Stelle des Trefferwurfs der Abweichwurf (siehe <a href="#scheiben">Kl. / Gr. Scheibe</a>).</li>
-        <li><b>Durchschlagswurf</b><br>Jeder W6, der getroffen hat, wird erneut geworfen. Ob die Panzerung durchschlagen ist, meldet die <a href="#durchschlagstabelle">Durchschlagstabelle</a>.</li>
-        <li><b>Verluste melden</b><br>Jeder Durchschlag setzt einen Infanteristen außer Gefecht (der Führer des Trupps bestimmt, wen es trifft) oder fügt einem Fahrzeug einen Schaden zu (siehe <a href="#fahrzeugschaden">Fahrzeugschaden</a>).</li>
+        <li><b>Waffe wählen</b><br>Waffe des Trupps mit ihren Kampfwerten festlegen.</li>
+        <li><b>Ziel wählen</b><br>Feindlichen Trupp, Gebäude, Stellung oder ein anderes Ziel in Reichweite der Waffe wählen.</li>
+        <li><b>Trefferwurf / Abweichwurf</b><br>So viele W6 werfen, wie die Waffe angibt (Erleichterung und Erschwernis laut <a href="#treffertabelle">Treffertabelle</a>). Werden eine oder mehrere Scheiben benutzt, ersetzt der Abweichwurf den Trefferwurf (siehe <a href="#scheiben">Kl. / Gr. Scheibe</a>).</li>
+        <li><b>Durchschlagswurf</b><br>Jeder W6, der getroffen hat, wird noch einmal geworfen. Ob die Panzerung durchschlagen wird, steht in der <a href="#durchschlagstabelle">Durchschlagstabelle</a>.</li>
+        <li><b>Verluste abhandeln</b><br>Jeder Durchschlag schaltet einen Gewehrschützen aus oder fügt einer Spezialeinheit bzw. einem Fahrzeug einen Schaden zu (siehe <a href="#lebenspunkte">Lebenspunkte</a> und <a href="#fahrzeugschaden">Fahrzeugschaden</a>).</li>
       </ol>
     </article>
 
     <article class="rcard" id="infanterie">
       <h2>Infanterie</h2>
-      <p>Der Infanterist führt Panzerung <b>0</b> und marschiert mit Reichweite <b>1</b>.</p>
+      <p>Jeder Infanterietrupp hat eine Bewegungsreichweite von <b>1</b> und eine Panzerung von <b>0</b>.</p>
     </article>
 
-    <article class="rcard" id="gelaende">
-      <h2>Unwegsames Gelände</h2>
-      <p>In unwegsamem Gelände kommen Truppen und Fahrzeuge nur genau halb so weit voran.</p>
-    </article>
-
-    <article class="rcard" id="trupp">
-      <h2>Trupp-Zusammensetzung</h2>
-      <p>Ein Trupp gliedert sich stets in <b>5 Gewehrschützen</b> und <b>2 Spezialeinheiten</b>. Jede Spezialeinheit wird mit einer der folgenden Waffen ausgerüstet:</p>
+    <article class="rcard" id="spezialeinheiten">
+      <h2>Spezialeinheiten</h2>
+      <p>Jede Spezialeinheit erhält eine der folgenden Ausrüstungen:</p>
       <ul class="cols">
         <li>Scharfschützengewehr</li><li>Maschinengewehr</li><li>Flammenwerfer</li><li>Schrotflinte</li><li>Mörser</li><li>Panzerfaust</li>
         <li>Granaten (und 2 Rauchgranaten und 1 Pistole)</li>
-        <li>Minen (je 2 Panzerminen, 2 Personenminen und 1 Nahkampfwaffe)</li>
-        <li>Medikit (und 1 Pistole)</li><li>Nahkampfwaffe (und 1 Pistole)</li><li>Mechaniker (und 1 Pistole)</li>
-        <li>General (1 Generalsfähigkeit und 1 Pistole)</li><li>Helden (Sonderregeln)</li>
+        <li>Minen (1 Panzermine, 2 Personenminen und 1 Nahkampfwaffe)</li>
+        <li>Medikit (und 1 Pistole)</li><li>Mechaniker (und 1 Pistole)</li>
+        <li>General (1 Generalsfähigkeit und 1 Pistole)</li>
       </ul>
-      <p class="note">Pro Trupp ist höchstens 1 General zugelassen – zwei Generäle in einem Trupp sind verboten.</p>
     </article>
 
-    <article class="rcard" id="scheiben">
-      <h2>Kl. Scheibe und Gr. Scheibe</h2>
-      <p>Verlangt der Angriff eine Scheibe, so wird sie über das Ziel gelegt und ein W20 geworfen. Dieser Abweichwurf tritt an die Stelle des Trefferwurfs (ausgenommen Flammenwerfer und Minenlegen).</p>
-      <div class="dice"><div><b>W20: 1–8</b><span>Fehlschuss: von Norden aus im 45°-Winkel um 1 Scheibenlänge versetzen (an Kante anlegen)</span></div><div><b>W20: 9–20</b><span>Volltreffer</span></div></div>
-      <p>Flammenwerfer, Schrotflinte und Minenleger weichen niemals ab.</p>
-      <p>Bringt ein Angriff mehrere Scheiben ins Ziel, so wird für jede Scheibe einzeln ein W20 auf Abweichung geworfen. Jede Einheit kann höchstens 1 mal getroffen werden, auch wenn sich Scheiben überschneiden.</p>
+    <article class="rcard" id="lebenspunkte">
+      <h2>Lebenspunkte der Spezialeinheiten</h2>
+      <p>Jede Spezialeinheit hat <b>5 Lebenspunkte</b>. Ein Spezialtrupp besteht nur aus dieser einen Einheit. Sie kann sich bewegen und angreifen wie jeder andere Trupp, hält aber mehr aus als ein Gewehrschütze: Jeder Schaden kostet einen Lebenspunkt, erst beim letzten fällt sie.</p>
     </article>
 
     <article class="rcard" id="general">
       <h2>General</h2>
-      <p>Jeder Trupp führt höchstens einen General. Er kostet wie jede Spezialeinheit 3 Gewehrschützen und ist mit einer Pistole ausgerüstet. Vor Gefechtsbeginn wird ihm eine der folgenden Generals-Fähigkeiten zugeteilt:</p>
+      <p>Jeder General hat eine Pistole und eine Generalsfähigkeit. Zu Spielbeginn bekommt er eine der folgenden Fähigkeiten:</p>
       <dl class="abil">
-        <dt>Taktiker</dt><dd>Eine eigene Befehlskarte darf beim Aufdecken zurückgehalten und zu einem beliebigen Zeitpunkt der Runde ausgegeben werden, bevor die nächste Karte aufgedeckt wird. Fällt der General oder wird der Stapel gemischt, ist der Befehl sofort am Rundenende auszuführen. Halten beide Seiten Befehle zurück, entscheidet das Los über die Reihenfolge.</dd>
-        <dt>Hellseher</dt><dd>Darf jederzeit die oberste Karte des Befehlsstapels einsehen.</dd>
-        <dt>Blitzer</dt><dd>Der Trupp darf in derselben Runde mit einer 2. passenden Befehlskarte erneut in Marsch gesetzt werden.</dd>
-        <dt>Kartograf</dt><dd>Der gesamte Trupp des Generals durchquert unwegsames Gelände ohne Abzug.</dd>
-        <dt>Feldherr</dt><dd>Der gesamte Trupp des Generals erhält beim Trefferwurf eine Erleichterung von 1. Kl. und Gr. Scheiben dieses Trupps weichen niemals ab.</dd>
-        <dt>Improvisator</dt><dd>Bei jedem Einsatz seines Trupps darf ein einzelner beliebiger Würfel neu geworfen werden.</dd>
-        <dt>Infiltrator</dt><dd>Rückt der Trupp des Generals am Rundenende als Verstärkung ein, darf er an beliebiger Ecke oder Kante des Gefechtsfelds eintreffen und ist nicht an die festgelegten Seiten gebunden.</dd>
-        <dt>Veteran</dt><dd>Statt der Pistole führt der General Nahkampfwaffe und Maschinengewehr und greift im selben Zug mit beiden an.</dd>
-        <dt>Unsterblicher</dt><dd>Der General fällt nur, wenn ihm ein einzelner Trupp oder ein Fahrzeug 2 Schaden auf einmal zufügt oder ihn ein Durchschlag von 3 trifft.</dd>
+        <dt>Verschanzer</dt><dd>Der General zählt am Rundenende wie zwei Trupps, wenn die Trupps an einem Missionsziel gezählt werden.</dd>
+        <dt>Hellseher</dt><dd>Der Spieler darf sich jederzeit die nächste Aktivierung ansehen.</dd>
+        <dt>Blitzer</dt><dd>Der Trupp des Generals darf in derselben Runde mit einer zweiten passenden Aktivierung noch einmal aktiviert werden.</dd>
+        <dt>Kartograf</dt><dd>Infanterietrupps, die ihre Bewegung in Nahkampfreichweite des Generals beginnen, durchqueren unwegsames Gelände ohne Abzug und haben beim Angriff keinen Nachteil durch Rauch.</dd>
+        <dt>Feldherr</dt><dd>Infanterietrupps, die in Nahkampfreichweite des Generals angreifen, erhalten beim Trefferwurf eine Erleichterung von 1. Ihre Kl. und Gr. Scheiben weichen nie ab.</dd>
+        <dt>Taktiker</dt><dd>Infanterietrupps, die in Nahkampfreichweite des Generals angreifen, dürfen den Trefferwurf einmal pro Runde komplett wiederholen, wenn kein einziger Treffer dabei war.</dd>
+        <dt>Improvisator</dt><dd>Infanterietrupps, die in Nahkampfreichweite des Generals angreifen, dürfen einen beliebigen Würfel neu werfen (beim Treffer- oder beim Durchschlagswurf).</dd>
+        <dt>Infiltrator</dt><dd>Nach dem kompletten Spielaufbau und dem Aufstellen aller Trupps dürfen der General und 1 weiterer Infanterietrupp zusammen an eine beliebige Kante oder Ecke des Spielfelds gestellt werden. Sie sind nicht an die festgelegten Seiten gebunden.</dd>
+        <dt>Veteran</dt><dd>Statt der Pistole hat der General eine Nahkampfwaffe und ein Maschinengewehr und darf im selben Zug mit beiden angreifen.</dd>
+        <dt>Unsterblicher</dt><dd>Hat der General nur noch einen Lebenspunkt, fällt er nur, wenn ihm ein einzelner Trupp oder ein Fahrzeug 2 Schaden auf einmal zufügt oder ihn ein Durchschlag von 3 trifft.</dd>
       </dl>
-    </article>
-
-    <article class="rcard" id="panzer">
-      <h2>Panzer</h2>
-      <p>Ein befohlener Panzer feuert mit dem Turmgeschütz (Munitionsart nach Wahl) und zusätzlich mit dem Bug-MG nach vorne.</p>
-      <p>Dazu darf er 1 mal vorrücken – etwa erst die Kanone abfeuern, dann vorstoßen und anschließend mit dem MG nachsetzen (oder umgekehrt). Unwegsames Gelände bremst Panzer nicht.</p>
-    </article>
-
-    <article class="rcard" id="plaetten">
-      <h2>Plätten</h2>
-      <p>Leichte und schwere Panzer walzen mit der Fähigkeit Plätten nahezu alles nieder, was ihnen in den Weg kommt. Nur andere Panzer und unzerstörbares Gelände halten sie auf. Beim Durchbrechen nimmt der Panzer keinen Schaden (ausgenommen Panzerminen). Jeder Infanterist, der überrollt würde, hat eine einzige Gelegenheit, sich in Deckung zu werfen: Je Mann ein Würfel – bei gerader Zahl überlebt er und wird knapp neben den Panzer gesetzt. Eigene Leute werden verschont.</p>
     </article>
 
     <article class="rcard" id="minenleger">
       <h2>Minenleger</h2>
-      <p>Der Minenleger führt eine Pistole sowie je zwei Sätze Personen- und Panzerminen. Zum Verlegen wird die Kl. Scheibe in Nahkampfweite an die Figur gelegt; alles darunter gilt als vermint, und der Bestand dieser Minenart sinkt um 1. Betritt oder durchquert eine passende Feindeinheit (Mann bei Personenminen, Fahrzeug bei Panzerminen) das Minenfeld, würfelt sie unmittelbar nach ihrer Bewegung einmal Schaden gemäß Waffentabelle aus.</p>
+      <p>Der Minenleger hat eine Pistole, 2 Personenminen und 1 Panzermine. Zum Verlegen wird der Marker der jeweiligen Minenart in beliebiger Ausrichtung in Nahkampfweite an die Figur gelegt; der ganze Marker gilt als vermint. Betritt oder durchquert eine passende feindliche Einheit (Infanterie bei Personenminen, Fahrzeug bei Panzerminen) das Minenfeld, würfelt sie direkt nach ihrer Bewegung einmal Schaden laut Waffentabelle aus.</p>
     </article>
 
     <article class="rcard" id="flammenwerfer">
       <h2>Flammenwerfer</h2>
-      <p>Zum Angriff wird die Kl. oder Gr. Scheibe in Nahkampfweite an die Figur gelegt. Alles darunter ist sofort getroffen und steht in Flammen (siehe <a href="#feuer">Feuer</a>). Der Durchschlagswurf folgt gemäß Waffentabelle.</p>
+      <p>Zum Angriff wird der Feuermarker in beliebiger Ausrichtung in Nahkampfweite an die Figur gelegt. Alles darunter ist sofort getroffen und steht in Flammen (siehe <a href="#feuer">Feuer</a>). Der Durchschlagswurf folgt laut Waffentabelle.</p>
     </article>
 
     <article class="rcard" id="medikit">
       <h2>Medikit</h2>
-      <p>Der Sanitäter mit Medikit versucht, Verluste im eigenen Trupp abzuwenden. Für jeden drohenden Verlust wird ein W6 geworfen – bei gerader Zahl ist der Mann gerettet.</p>
+      <p>Erleidet ein Infanterietrupp in Nahkampfreichweite der Figur mit Medikit Verluste, wirft der Spieler pro Verlust einen W6. Ist mindestens eine gerade Zahl dabei, wird einer der Verluste verhindert (höchstens 1 pro Angriff).</p>
     </article>
 
     <article class="rcard" id="mechaniker">
       <h2>Mechaniker</h2>
-      <p>Der Mechaniker versucht, Schäden an Fahrzeugen in Reichweite 1 abzuwenden. Für jeden drohenden Schaden wird ein W6 geworfen – bei gerader Zahl ist der Schaden behoben.</p>
+      <p>Erhält ein Fahrzeug in Nahkampfreichweite des Mechanikers Schaden, wird das genauso abgehandelt wie beim Medikit: pro Schaden ein W6, bei mindestens einer geraden Zahl wird ein Schaden verhindert (höchstens 1 pro Angriff).</p>
+    </article>
+
+    <article class="rcard" id="scheiben">
+      <h2>Kl. Scheibe und Gr. Scheibe</h2>
+      <p>Braucht ein Angriff eine Scheibe, wird sie über das Ziel gelegt und ein W20 geworfen. Dieser Abweichwurf ersetzt den Trefferwurf.</p>
+      <div class="dice"><div><b>W20: 1–8</b><span>Daneben: von Norden aus im 45°-Winkel um 1 Scheibenlänge verschieben (an der Kante anlegen)</span></div><div><b>W20: 9–20</b><span>Genauer Treffer</span></div></div>
+      <p>Flammenwerfer, Schrotflinte und Minen weichen nie ab.</p>
+      <p>Bringt ein Angriff mehrere Scheiben ins Ziel, wird für jede Scheibe einzeln ein W20 auf Abweichung geworfen. Jede Einheit kann höchstens 1 mal getroffen werden, auch wenn sich Scheiben überschneiden.</p>
+    </article>
+
+    <article class="rcard" id="gelaende">
+      <h2>Unwegsames Gelände</h2>
+      <p>In unwegsamem Gelände bewegen sich Trupps und Fahrzeuge nur halb so weit.</p>
     </article>
 
     <article class="rcard" id="deckung">
       <h2>Deckung</h2>
-      <p>Deckung gilt nur, wenn die Einheit unmittelbar daneben, dazwischen oder darin in Stellung liegt.</p>
+      <p>Um eine Deckung zu nutzen, muss eine Einheit direkt daneben, dazwischen oder drin stehen.</p>
     </article>
 
     <article class="rcard" id="konzentration">
       <h2>Konzentration</h2>
-      <p>Wer mit nur einem einzigen Würfel angreift, zielt in Ruhe und erhält stets den Konzentrationsbonus beim Trefferwurf. Dies betrifft: Panzerfaust, Scharfschütze und Fahrzeuge, die AP-Munition verschießen.</p>
+      <p>Eine Einheit, die lediglich einen einzigen Würfel als Angriffswurf nutzt, erhält immer einen Konzentrationsbonus beim Trefferwurf. Einheiten mit Waffen, die diesen Bonus erhalten, sind: Panzerfaust, Scharfschütze, Fahrzeuge, die mit AP-Munition feuern.</p>
     </article>
 
-    <article class="rcard" id="mehrere-scheiben">
-      <h2>Mehrere Scheiben mit einem Angriff</h2>
-      <p>Bringt ein Angriff mehrere Scheiben ins Ziel, wird für jede Scheibe einzeln ein W20 auf Abweichung geworfen. Jede Einheit kann höchstens 1 mal getroffen werden, auch wenn sich Scheiben überschneiden.</p>
+    <article class="rcard" id="nahkampf">
+      <h2>Nahkampfreichweite</h2>
+      <p>Nahkampfreichweite heißt: Die Einheit muss ihr Ziel unmittelbar berühren können.</p>
+    </article>
+
+    <article class="rcard" id="hochexplosiv">
+      <h2>Hochexplosive Munition</h2>
+      <p>Mit Sprengmunition oder Flammenwerfern, die beim Trefferwurf eine Kl. oder Gr. Scheibe bzw. einen Marker nutzen (außer Minen, Schrotflinten und Rauchgranaten), können Deckungen, Mauern und ganze Gebäude zerstört werden.</p>
+    </article>
+
+    <article class="rcard" id="einsturz">
+      <h2>Einsturz</h2>
+      <p>Stürzt ein Gebäude oder eine Stellung komplett ein, sind alle Einheiten und Fahrzeuge darin automatisch getroffen. Der Durchschlagswurf erfolgt mit Durchschlag 3.</p>
+    </article>
+
+    <article class="rcard" id="feuer">
+      <h2>Feuer</h2>
+      <p>Am Ende jeder Runde ist jede Einheit und jedes Fahrzeug im Feuer automatisch getroffen. Der Durchschlagswurf erfolgt mit Durchschlag 3. Ein Feuer geht erst nach dem Ende der nächsten Runde aus (nicht der laufenden). Wer einen brennenden Bereich betritt, macht sofort einen Durchschlagswurf (wie bei Minen).</p>
+    </article>
+
+    <article class="rcard" id="rauch">
+      <h2>Rauch</h2>
+      <p>Wer in, durch oder auf einen Bereich mit Rauch angreift, bekommt beim Trefferwurf eine Erschwernis von 1. Der Rauch verzieht sich erst nach dem Ende der nächsten Runde (nicht der laufenden).</p>
+    </article>
+
+    <article class="rcard" id="tod-von-oben">
+      <h2>Tod von oben</h2>
+      <p>Mörser- und Grenadierangriffe machen ihren Schaden von oben.</p>
+    </article>
+
+    <article class="rcard" id="panzer">
+      <h2>Panzer</h2>
+      <p>Panzer können, wenn sie aktiviert werden, mit ihrem Turmgeschütz (mit einem Munitionstyp ihrer Wahl) schießen, sowie zusätzlich auch das MG nach vorne benutzen.</p>
+      <p>Zudem können sie sich 1 mal bewegen. Daher könnten sie beispielsweise mit dem Turmgeschütz schießen, sich dann bewegen und im Anschluss noch das MG benutzen (oder andersrum). Panzer ignorieren den Nachteil von unwegsamem Gelände.</p>
+    </article>
+
+    <article class="rcard" id="plaetten">
+      <h2>Plätten</h2>
+      <p>Die leichten und schweren Panzer können mit ihrer Fähigkeit Plätten praktisch alles über den Haufen fahren, was ihnen in den Weg kommt. Lediglich andere Panzer und unzerstörbares Gelände können nicht durchfahren werden. Wenn ein Panzer etwas durchfährt, so nimmt er dadurch keinerlei Schaden (außer bei Panzerminen). Jede Einheit, die von einem Panzer überfahren werden würde, hat ein einziges Mal die Chance, noch aus dem Weg zu hechten. Dazu wird je Einheit ein Würfel geworfen, bei einer geraden Zahl überlebt diese Einheit und wird so weit zur Seite des Panzers bewegt, dass sie gerade so nicht überfahren wird. Eigene Einheiten werden verschont.</p>
+    </article>
+
+    <article class="rcard" id="fahrzeuge">
+      <h2>Fahrzeuge</h2>
+      <p>Fahrer und Besatzung bleiben immer im Fahrzeug.</p>
+    </article>
+
+    <article class="rcard" id="missionsziele">
+      <h2>Sondereffekte der Missionsziele</h2>
+      <p>Am Ende jeder Runde wird für jedes gehaltene Missionsziel ein Sondereffekt ermittelt:</p>
+      <ol class="steps">
+        <li>Zähle die Trupps jeder Seite, die das Missionsziel halten (pro Seite höchstens 3), und bilde die Differenz.</li>
+        <li>Die Seite mit mehr Trupps wirft so viele W6, wie die Differenz beträgt.</li>
+        <li>Nur das höchste Ergebnis zählt: <b>1–3</b> nichts passiert, <b>4–5</b> Zieleffekt, <b>6</b> Übereffekt (siehe <a href="#missionsziel-tabelle">Missionsziel-Tabelle</a>).</li>
+      </ol>
+    </article>
+
+    <article class="rcard" id="missionsziel-tabelle">
+      <h2>Missionsziel-Tabelle</h2>
+      <div class="tw"><table class="rt">
+        <thead><tr><th>Ort</th><th>Zieleffekt (4–5)</th><th>Übereffekt (6)</th></tr></thead>
+        <tbody>
+          <tr><td>Hafen</td><td>1 Gewehrschützen-Trupp dauerhaft +1 Trefferbonus</td><td>1 Gewehrschützen-Trupp dauerhaft +1 Durchschlagsbonus</td></tr>
+          <tr><td>Kirche</td><td>2 Gewehrschützen zurückbekommen</td><td>2 Lebenspunkte einer Spezialeinheit heilen</td></tr>
+          <tr><td>Transporter</td><td>1 Gewehrschützen zurückbekommen</td><td>1 neuer Gewehrschützen-Trupp erscheint am Transporter</td></tr>
+          <tr><td>Zug</td><td>1 Lebenspunkt einer Spezialeinheit heilen</td><td>1 neue Spezialeinheit erscheint am Zug</td></tr>
+          <tr><td>Farm</td><td>1 Fahrzeug bewegen</td><td>1 Fahrzeug aktivieren</td></tr>
+          <tr><td>Wohnhaus</td><td>1 Infanterietrupp bewegen</td><td>1 Infanterietrupp aktivieren</td></tr>
+          <tr><td>Bunker</td><td>2 MG-Angriffe auf einen Trupp bis zu 2 Felder vor dem Bunker</td><td>4 MG-Angriffe auf Trupps bis zu 2 Felder vor dem Bunker</td></tr>
+          <tr><td>Graben</td><td>1 Granaten-Angriff auf ein Ziel bis zu 1 Feld entfernt</td><td>2 Granaten-Angriffe auf Ziele bis zu 1 Feld entfernt</td></tr>
+          <tr><td>Wachturm</td><td>1 Scharfschützen-Angriff auf einen Trupp bis zu 2 Felder entfernt</td><td>3 Scharfschützen-Angriffe auf Trupps bis zu 2 Felder entfernt</td></tr>
+          <tr><td>Artilleriegeschütz</td><td>1 Panzerfaust-Angriff auf einen Trupp bis zu 2 Felder entfernt</td><td>2 Panzerfaust-Angriffe auf einen Trupp bis zu 2 Felder entfernt</td></tr>
+          <tr><td>Flakgeschütz</td><td>1 Mörser-Angriff auf ein Ziel bis zu 3 Felder entfernt</td><td>1 Mörser-Angriff mit Gr. Scheibe auf ein Ziel bis zu 3 Felder entfernt</td></tr>
+          <tr><td>Kampfflieger</td><td>1 MG-Angriff des Kampffliegers irgendwo auf dem Spielfeld</td><td>1 Bomben-Angriff des Kampffliegers irgendwo auf dem Spielfeld</td></tr>
+        </tbody>
+      </table></div>
+    </article>
+
+    <article class="rcard" id="flexible-missionsziele">
+      <h2>Flexible Missionsziele</h2>
+      <p>Auf manchen Feldern können zusätzlich flexible Missionsziele erscheinen. Das Feld wird dadurch zum Missionsziel.</p>
+      <div class="vgrid">
+        <div><b>Mögliche Felder</b><ul><li>Flachland</li><li>Strand</li><li>Leere Straße</li><li>Ruine</li></ul></div>
+        <div><b>Mögliche Missionsziele</b><ul><li>Transporter</li><li>Kampfflieger</li><li>Artilleriegeschütz</li><li>Flakgeschütz</li></ul></div>
+      </div>
+    </article>
+
+    <article class="rcard" id="felderweiterung">
+      <h2>Felderweiterungen</h2>
+      <p>Ein Feld, auf dem ein flexibles Missionsziel hätte erscheinen können, aber keines erschienen ist, kann zu Spielbeginn eine der folgenden Erweiterungen bekommen (jede höchstens 1 mal pro Spielplan):</p>
+      <ul>
+        <li><b>Auto</b> – Deckung</li>
+        <li><b>Kutsche</b> – Deckung</li>
+        <li><b><a href="#stacheldraht">Stacheldraht</a></b> – Personenminen und unwegsames Gelände</li>
+        <li><b><a href="#flugzeugwrack">Flugzeugwrack</a></b> – Deckung und dauerhafter Rauch</li>
+        <li><b><a href="#abtruennige">Abtrünnige</a></b> – 2 neutrale Trupps mit je 7 Gewehrschützen</li>
+      </ul>
+    </article>
+
+    <article class="rcard" id="stacheldraht">
+      <h2>Stacheldraht</h2>
+      <p>Ein Feld mit Stacheldraht zu betreten oder zu durchqueren zählt wie das Betreten eines Minenfeldes mit Personenminen. Außerdem gilt das ganze Feld als unwegsames Gelände.</p>
+    </article>
+
+    <article class="rcard" id="flugzeugwrack">
+      <h2>Flugzeugwrack</h2>
+      <p>Das Flugzeugwrack gibt Deckung. Außerdem liegt auf dem ganzen Feld dauerhaft Rauch.</p>
+    </article>
+
+    <article class="rcard" id="abtruennige">
+      <h2>Abtrünnige</h2>
+      <p>Die Abtrünnigen sind zwei Trupps mit je 7 Gewehrschützen, die keinem Spieler gehören. Der 1. Abtrünnigen-Trupp hat immer die meisten Einheiten.</p>
+      <ol class="steps">
+        <li>Der 1. Trupp greift einen Trupp des Spielers an, der die meisten Trupps auf oder angrenzend an ihrem Feld hat. Der Gegner dieses Spielers wählt das genaue Ziel und würfelt Treffer- und Durchschlagswurf.</li>
+        <li>Danach greift der 2. Trupp einen angrenzenden Trupp des anderen Spielers an; diesmal wählt und würfelt der andere Spieler.</li>
+      </ol>
+      <p>Gibt es nur noch einen Abtrünnigen-Trupp, entfällt der 2. Angriff.</p>
     </article>
 
     <article class="rcard" id="spielaufbau">
       <h2>Spielaufbau und Topografie festlegen</h2>
-      <p>Vor Gefechtsbeginn ist das Gelände gemeinsam zu erkunden und festzulegen: was Deckung bietet, was zerstörbar und was unzerstörbar ist, wie die Sichtlinie verläuft, was als unwegsames Gelände gilt und welche Höhen und Senken zählen. Ferner wird Norden bestimmt (eine Ecke oder Kante des Gefechtsfelds). Danach werden Aufmarschräume und die zulässige Stärke je Truppengattung festgelegt. Zuletzt stellt jede Seite ihre Armee auf und teilt jedem General seine Fähigkeit zu.</p>
+      <p>Zu Spielbeginn sollten beide Spieler genau festlegen, was auf dem Spielfeld genau Deckung gibt, zerstörbar und unzerstörbar ist, wie genau eine Sichtlinie definiert wird, was unwegsames Gelände ist, und was als erhöhte oder niedrige Position zählt. Zudem wird festgelegt, wo auf der Karte Norden ist (eine Ecke oder Kante des Spielfelds). Dann wird noch bestimmt, wo jeder Spieler startet und wie viele Einheiten jedes Typs im Spiel sein dürfen. Dann legt noch jeder Spieler seine Armee und Einheiten fest. Zudem müssen die genaue Fähigkeit jedes Generals bestimmt werden.</p>
     </article>
 
     <article class="rcard" id="ausmasse">
       <h2>Ausmaße</h2>
-      <p>Für Feuer und Marsch sind folgende Schablonen vorgeschrieben:</p>
+      <p>Für Angriff und Bewegung gibt es diese Schablonen:</p>
       <div class="tw"><table class="rt">
         <thead><tr><th>Schablone</th><th>Länge / Durchmesser</th></tr></thead>
         <tbody>
@@ -1231,49 +1346,14 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       </table></div>
     </article>
 
-    <article class="rcard" id="nahkampf">
-      <h2>Nahkampf</h2>
-      <p>Nahkampfweite heißt: Mann am Mann – die Einheit muss ihr Ziel unmittelbar berühren können.</p>
-    </article>
-
-    <article class="rcard" id="befehlskarte-geht-nicht">
-      <h2>Befehlskarte geht nicht</h2>
-      <p>Kann ein aufgedeckter Befehl nicht ausgeführt werden, weil der Seite keine passende Einheit oder kein Fahrzeug dieser Art mehr zur Verfügung steht, verfällt er. Die nächste Karte wird aufgedeckt.</p>
-    </article>
-
-    <article class="rcard" id="stellung-angreifen">
-      <h2>Stellung angreifen</h2>
-      <p>Mit Sprengmunition oder Flammenwerfern, die beim Trefferwurf eine Kl. oder Gr. Scheibe verwenden (ausgenommen Minen, Schrotflinten und Rauchgranaten), lassen sich Deckungen, Mauern und ganze Gebäude niederlegen.</p>
-    </article>
-
-    <article class="rcard" id="einsturz">
-      <h2>Einsturz</h2>
-      <p>Stürzt ein Gebäude oder eine Stellung vollständig ein, ist jede Einheit und jedes Fahrzeug darin verschüttet: Sie gelten ohne Wurf als getroffen. Der Durchschlagswurf erfolgt mit Durchschlag 3.</p>
-    </article>
-
-    <article class="rcard" id="feuer">
-      <h2>Feuer</h2>
-      <p>Am Ende jeder Runde (also bei jedem Mischen des Befehlsstapels) gilt jede Einheit und jedes Fahrzeug im Feuer ohne Wurf als getroffen. Der Durchschlagswurf erfolgt mit Durchschlag 3. Ein Brand erlischt erst nach Abschluss der nächsten Runde (nicht der laufenden). Wer einen brennenden Bereich betritt, legt sofort einen Durchschlagswurf ab (wie bei Minen).</p>
-    </article>
-
-    <article class="rcard" id="rauch">
-      <h2>Rauch</h2>
-      <p>Wer in, durch oder auf eingenebelten Bereich feuert, erhält beim Trefferwurf eine Erschwernis von 1. Der Nebel verzieht sich erst nach Abschluss der nächsten Runde (nicht der laufenden).</p>
-    </article>
-
-    <article class="rcard" id="tod-von-oben">
-      <h2>Tod von oben</h2>
-      <p>Mörser und Granatwerfer schlagen von oben ein.</p>
-    </article>
-
-    <article class="rcard" id="fahrzeuge">
-      <h2>Fahrzeuge</h2>
-      <p>Fahrer und Besatzung verlassen ihr Fahrzeug niemals.</p>
+    <article class="rcard" id="aktivierung-geht-nicht">
+      <h2>Aktivierung geht nicht</h2>
+      <p>Kann eine aufgedeckte Aktivierung nicht ausgeführt werden, weil die Seite keine passende Einheit oder kein Fahrzeug dieser Art mehr hat, verfällt sie. Einfach weiter zur nächsten.</p>
     </article>
 
     <article class="rcard" id="spielende">
       <h2>Spielende</h2>
-      <p>Das Gefecht ist sofort beendet, sobald eine Seite die vereinbarte Zahl an Siegpunkten erreicht oder die feindliche Armee restlos aufgerieben ist.</p>
+      <p>Das Spiel endet sofort, sobald eine Seite nur noch <b>3 Trupps</b> hat.</p>
     </article>
 
     <article class="rcard" id="waffen">
@@ -1291,7 +1371,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
           <tr><td>Rauchgranate</td><td>1</td><td>0 + Rauch<br>Gr. Scheibe</td><td>0</td></tr>
           <tr><td>Nahkampfwaffe</td><td>Nahkampf</td><td>3</td><td>2</td></tr>
           <tr><td>Schrotflinte</td><td>Nahkampf</td><td>2 Kl. Scheiben</td><td>0</td></tr>
-          <tr><td>Flammenwerfer</td><td>Nahkampf</td><td>Kl. oder Gr. Scheibe<br>+ Feuer</td><td>2</td></tr>
+          <tr><td>Flammenwerfer</td><td>Nahkampf</td><td>Feuermarker<br>+ Feuer</td><td>2</td></tr>
           <tr><td>Personenminen</td><td>Betreten</td><td>2 je Einheit</td><td>1</td></tr>
           <tr><td>Panzerminen</td><td>Betreten</td><td>2 je Fahrzeug</td><td>3</td></tr>
         </tbody>
@@ -1375,23 +1455,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       </table></div>
     </article>
 
-    <article class="rcard" id="befehlskarten">
-      <h2>Befehlskarten</h2>
-      <div class="vgrid">
-        <div class="tw"><table class="rt kv">
-          <tr><th>♠ König</th><td>Schwerer Panzer</td></tr>
-          <tr><th>♠ Dame</th><td>Leichter Panzer</td></tr>
-          <tr><th>Zahl 9</th><td>Kraftrad</td></tr>
-          <tr><th>Zahlen 2–8</th><td>Infanterie</td></tr>
-        </table></div>
-        <div class="tw"><table class="rt kv">
-          <tr><th>♣ Kreuz</th><td>Deutsche</td></tr>
-          <tr><th><span style="color:var(--stamp)">♥</span> Herz</th><td>Alliierte</td></tr>
-        </table></div>
-      </div>
-      <p>Die ausgeführte Befehlskarte wird neben die Einheit gelegt – zum Zeichen, dass sie in dieser Runde bereits im Einsatz war.</p>
-    </article>
-
     <article class="rcard" id="fahrzeugschaden">
       <h2>Fahrzeugschaden</h2>
       <div class="tw"><table class="rt kv">
@@ -1402,27 +1465,15 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         <tr><th>2</th><td>Panzerung reduziert</td></tr>
         <tr><th>1</th><td>Rauch</td></tr>
       </table></div>
-      <p>Bei einer Explosion ist das Fahrzeug sofort ein Totalverlust. Die Gr. Scheibe wird mittig aufgelegt; der Schaden ergibt sich wie folgt:</p>
+      <p>Bei einer Explosion ist das Fahrzeug sofort komplett zerstört und die Gr. Scheibe wird mittig auf das Fahrzeug gelegt. Der Schaden ermittelt sich wie folgt:</p>
       <div class="tw"><table class="rt wt">
         <thead><tr><th></th><th>Treffer&shy;wurf</th><th><span class="lg">Panzer&shy;durchschlag</span><span class="sm">Durch&shy;schlag</span></th></tr></thead>
         <tbody><tr><td>Explosion</td><td>Gr. Scheibe</td><td>1</td></tr></tbody>
       </table></div>
-      <p>Bei einer gewürfelten 1 bis 5 bleibt das Fahrzeug einsatzfähig. Trifft es ein weiterer Schaden, wird erneut gewürfelt, was ihm widerfährt (es kann noch explodieren); danach ist es ausgefallen und dient nur noch als Deckung.</p>
+      <p>Ein Fahrzeug hält einem Schaden bei einer gewürfelten 1, 2, 3, 4 oder 5 stand. Erhält das Fahrzeug noch einen weiteren Schaden, so wird noch einmal gewürfelt, was dem Fahrzeug genau widerfährt (könnte noch explodieren), und dann ist es aus dem Spiel (dient noch als Deckung).</p>
     </article>
 
-    <article class="rcard variant" id="vernichtung">
-      <h2><small>Mission</small>Vernichtung</h2>
-      <p>Vor Gefechtsbeginn werden die Aufmarschräume gemeinsam festgelegt. Jede Seite steht mit ihrer gesamten Armee sofort im Feld. Für jeden vernichteten Feindtrupp und jedes vernichtete Feindfahrzeug wird sofort ein Siegpunkt gutgeschrieben.</p>
-      <div class="tw"><table class="rt">
-        <thead><tr><th>Kartengröße</th><th>Siegpunkte zum Sieg</th></tr></thead>
-        <tbody>
-          <tr><td>Normal</td><td>6</td></tr>
-          <tr><td>Episch</td><td>9</td></tr>
-        </tbody>
-      </table></div>
-    </article>
-
-    <p class="fin">★ Ende der Dienstvorschrift ★</p>
+    <p class="fin">★ Ende des Regelwerks ★</p>
     <p class="credits">Schriften: Stardos Stencil, Special Elite, Courier Prime (SIL OFL)</p>
     <a href="#top" class="totop" id="totop" aria-label="Nach oben">▲</a>
   </div>
@@ -2159,8 +2210,9 @@ new MutationObserver(ms=>{ for(const m of ms) for(const n of m.addedNodes){
 <script>
 // ===================== Spiel-Tab: Befehlsdeck (Normal) =====================
 (function(){
-// Deck je Armee (Normal): 5× Gewehrschützen, 3× Spezial, je 1× Fahrzeug, das die Armee wirklich hat
-const DECK_NORMAL={rif:5,spec:3};
+// Deck je Armee: Gewehrschützen und Spezial laut DECKS, dazu je 1× jedes Fahrzeug, das die Armee wirklich hat
+// Aktivierungen pro Armee und Runde (siehe Regelwerk: Rundenaktivierungen)
+const DECKS={'3x6':{rif:4,spec:3},'3x8':{rif:6,spec:4}};
 const S={round:1,deck:[],cur:null,newRound:false,sig:''};
 const sigNow=()=>JSON.stringify([$('size').value,armies.de,armies.al].map(x=>x&&typeof x==='object'?(Array.isArray(x)?x.map(y=>y.veh?y.key:(y.units||[]).map(u=>u.key+(u.abil?u.abil.name:'')).join('+')+'/'+(y.rif??'')):x):x));
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
@@ -2170,8 +2222,9 @@ function buildDeck(){
   const per={};
   for(const side of ['de','al']){
     const d=[];
-    for(let i=0;i<DECK_NORMAL.rif;i++) d.push({side,kind:'rif'});
-    for(let i=0;i<DECK_NORMAL.spec;i++) d.push({side,kind:'spec'});
+    const D=DECKS[$('size').value]||DECKS['3x6'];
+    for(let i=0;i<D.rif;i++) d.push({side,kind:'rif'});
+    for(let i=0;i<D.spec;i++) d.push({side,kind:'spec'});
     for(const v of (armies[side]||[]).filter(x=>x.veh)) d.push({side,kind:'veh',key:v.key});
     per[side]=shuffle(d);
   }
@@ -2225,7 +2278,6 @@ function cardHTML(c){
 }
 function render(){
   const el=$('tab-spiel'); if(!el) return;
-  if($('size').value!=='3x6'){ el.innerHTML='<div class="gp"><p class="gp-info">Das Befehlsdeck für <b>Episch</b> folgt noch. Stell die Größe auf <b>Normal</b>, um es zu benutzen.</p></div>'; return; }
   if(S.sig!==sigNow()) reset();
   el.innerHTML=`<div class="gp">
     <p class="gp-info"><b>Runde ${S.round}</b> · noch ${S.deck.length} Karte${S.deck.length===1?'':'n'} im Deck</p>
