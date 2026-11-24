@@ -3155,8 +3155,6 @@ pop.addEventListener('click',e=>{
   const k=e.target.closest('[data-dn]'); if(k){ n=Math.max(1,Math.min(10,n+(+k.dataset.dn))); save(); sync(); return; }
   if(e.target.closest('#dp-roll')&&!$('dp-roll').disabled) roll();
 });
-document.addEventListener('click',e=>{ if(e.target.closest&&e.target.closest('#sp-next')) return; closePop(); });   // Weiter lässt das Fenster offen
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePop(); });
 // Wurf vom Freund: gleiche Würfel, gleiche Animation
 window.remoteDice=m=>{
   if(!Array.isArray(m.vals)||!m.vals.length) return;
