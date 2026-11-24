@@ -312,7 +312,9 @@ html[data-theme="dark"] #dice-pop{background:#2a2f20;color:#e3dcc0;border-color:
 .wf.d20 b{position:relative;font-family:var(--head);font-size:1.05rem;color:#f4ecd2;text-shadow:0 1px 1px rgba(0,0,0,.6)}
 /* Ergebnis-Highlights */
 body:not(.on-spiel) #dice-pop{display:none}
-.wf.d20.max svg .f0{fill:#c9a23a} .wf.d20.one svg .f0{fill:#8a2a1c}
+.wf.d20 b{transition:color .25s}
+.wf.d20.hit b{color:#ffd45a;text-shadow:0 0 6px rgba(255,200,60,.9),0 1px 1px rgba(0,0,0,.7)}
+.wf.d20.miss b{color:#ff5a45;text-shadow:0 0 6px rgba(255,70,50,.75),0 1px 1px rgba(0,0,0,.7)}
 .wf.d6.max{box-shadow:inset -2px -3px 0 rgba(0,0,0,.18),0 0 0 2px #c9a23a,0 3px 10px rgba(201,162,58,.7)}
 /* Wurf-Animation: fliegt herein, dreht sich, prallt auf */
 .wf.rolling{animation:wfRoll .75s cubic-bezier(.2,.7,.3,1.15) both}
@@ -3131,7 +3133,7 @@ function sortDice(reduce){
     ],{duration:520,delay:i*45,easing:'cubic-bezier(.3,.7,.25,1)',fill:'backwards'});
   });
 }
-function mark(d,v){ if(v===type) d.classList.add('max'); if(v===1) d.classList.add('one'); }
+function mark(d,v){ if(type===20){ d.classList.add(v>=9?'hit':'miss'); return; } if(v===type) d.classList.add('max'); if(v===1) d.classList.add('one'); }   // W20: ab 9 gold, sonst rot
 btn.onclick=e=>{ e.stopPropagation(); pop.hidden=!pop.hidden; btn.classList.toggle('open',!pop.hidden); if(!pop.hidden) sync(); };
 pop.addEventListener('click',e=>{
   e.stopPropagation();
