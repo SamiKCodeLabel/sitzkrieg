@@ -3086,7 +3086,7 @@ function face(el,v){
 }
 function sync(){
   pop.querySelectorAll('[data-dt]').forEach(b=>b.classList.toggle('on',+b.dataset.dt===type));
-  $('dp-n').textContent=n;
+  $('dp-n').textContent=n; pop.querySelector('.dp-n').style.visibility=type===20?'hidden':'';   // W20: immer nur einer
   pop.querySelector('[data-dn="-1"]').disabled=n<=1; pop.querySelector('[data-dn="1"]').disabled=n>=20;
 }
 const rnd=m=>1+Math.floor(Math.random()*m);
@@ -3095,7 +3095,7 @@ function roll(){
   timers.forEach(clearInterval); timers=[];
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   tray.innerHTML=''; sum.textContent=''; tray.classList.remove('shake'); void tray.offsetWidth; tray.classList.add('shake');
-  const vals=Array.from({length:n},()=>rnd(type)), dice=[];
+  const cnt=type===20?1:n, vals=Array.from({length:cnt},()=>rnd(type)), dice=[];
   vals.forEach((v,i)=>{
     const d=document.createElement('div'); d.className=`wf d${type}`;
     d.style.setProperty('--dx',(Math.random()*80-40)+'px'); d.style.setProperty('--rx',(Math.random()*720-360)+'deg');
@@ -3107,8 +3107,8 @@ function roll(){
     } else { face(d,v); mark(d,v); }
   });
   const done=()=>{ const s=vals.reduce((a,b)=>a+b,0), hi=Math.max(...vals);
-    sum.innerHTML=n>1?`Summe <b>${s}</b> · Höchster <b>${hi}</b>`:(type===20&&vals[0]===20?'<b>Volltreffer!</b>':type===20&&vals[0]===1?'<b>Patzer!</b>':''); };
-  setTimeout(done,reduce?0:680+n*55);
+    sum.innerHTML=cnt>1?`Summe <b>${s}</b> · Höchster <b>${hi}</b>`:(type===20&&vals[0]===20?'<b>Volltreffer!</b>':type===20&&vals[0]===1?'<b>Patzer!</b>':''); };
+  setTimeout(done,reduce?0:680+cnt*55);
 }
 function mark(d,v){ if(v===type) d.classList.add('max'); if(v===1) d.classList.add('one'); }
 btn.onclick=e=>{ e.stopPropagation(); pop.hidden=!pop.hidden; btn.classList.toggle('open',!pop.hidden); if(!pop.hidden) sync(); };
