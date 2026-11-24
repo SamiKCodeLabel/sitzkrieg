@@ -279,17 +279,19 @@ html[data-theme="dark"] .rw-search input{background:#1d2116;color:#e3dcc0;border
 
 
 /* Würfel (Spiel-Tab, unten links) */
-#dice-btn{display:none;position:fixed;left:calc(10px + env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));z-index:31;width:34px;height:34px;padding:5px;border-radius:8px;
-  background:rgba(30,33,22,.35);border:1px solid rgba(169,164,134,.35);color:#cfc7a6;opacity:.55;box-shadow:none;transition:opacity .2s,transform .2s}
+#dice-btn{display:none;position:fixed;left:-20px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:31;width:44px;height:40px;padding:6px 6px 6px 22px;border-radius:0 10px 10px 0;
+  background:rgba(30,33,22,.55);border:1px solid rgba(169,164,134,.4);border-left:0;color:#cfc7a6;opacity:.7;box-shadow:2px 2px 6px rgba(0,0,0,.35);touch-action:none;transition:opacity .2s,transform .2s,left .2s}
 #dice-btn svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.6} #dice-btn svg circle{fill:currentColor;stroke:none}
-#dice-btn:hover,#dice-btn:focus-visible,#dice-btn.open{opacity:1;transform:rotate(-12deg)}
+#dice-btn:hover,#dice-btn:focus-visible{opacity:1;left:-14px}
+#dice-btn.open{display:none!important}
 body.on-spiel #dice-btn{display:block}
-#dice-pop{position:fixed;left:calc(10px + env(safe-area-inset-left));bottom:calc(54px + env(safe-area-inset-bottom));z-index:45;width:min(244px,calc(100vw - 20px));overflow:visible;
-  background:#e6dcb8;color:#23241c;border:2px solid #4a4a32;border-radius:8px;padding:10px;box-shadow:0 0 0 3px #22261a,0 14px 30px rgba(0,0,0,.55);transform-origin:0 100%;animation:dpIn .18s ease-out}
+#dice-pop{position:fixed;left:calc(8px + env(safe-area-inset-left));bottom:calc(8px + env(safe-area-inset-bottom));z-index:45;width:min(244px,calc(100vw - 20px));overflow:visible;
+  background:#e6dcb8;color:#23241c;border:2px solid #4a4a32;border-radius:8px;padding:10px;box-shadow:0 0 0 3px #22261a,0 14px 30px rgba(0,0,0,.55);transform-origin:0 100%;animation:dpIn .22s cubic-bezier(.2,.8,.3,1);touch-action:pan-y}
 #dice-pop[hidden]{display:none}
 #dice-pop.dp-de{border:3px solid #8fb0d0;box-shadow:0 0 0 3px #2f4a66,0 0 18px rgba(110,150,200,.45),0 14px 30px rgba(0,0,0,.55)}
 #dice-pop.dp-al{border:3px solid #b9c766;box-shadow:0 0 0 3px #4d5a1c,0 0 18px rgba(170,190,80,.45),0 14px 30px rgba(0,0,0,.55)}
-@keyframes dpIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes dpIn{from{transform:translateX(-110%);opacity:.4}to{transform:none;opacity:1}}
+#dice-pop.out{transform:translateX(-115%);opacity:.3;transition:transform .2s ease-in,opacity .2s}
 html[data-theme="dark"] #dice-pop{background:#2a2f20;color:#e3dcc0;border-color:#5d5b42}
 .dp-row{display:flex;gap:8px;justify-content:space-between;align-items:center}
 .dp-type{display:grid;grid-template-columns:1fr 1fr;gap:4px} .dp-type button{padding:5px 8px;font-size:.8rem}
@@ -330,8 +332,8 @@ body:not(.on-spiel) #dice-pop{display:none}
 @keyframes trayShake{0%,100%{transform:none}25%{transform:translateX(-3px) rotate(-.6deg)}75%{transform:translateX(3px) rotate(.6deg)}}
 @media (prefers-reduced-motion:reduce){ .wf,.dp-tray,#dice-pop{animation:none!important} }
 @media (orientation:landscape) and (max-height:560px){
-  #dice-btn{left:8px;bottom:8px;width:30px;height:30px;padding:4px}
-  #dice-pop{bottom:46px;width:min(244px,calc(100vw - 120px))} .dp-tray{min-height:50px;margin:6px 0 2px} .wf{width:34px;height:34px} .wf.d6{padding:5px} .wf.d6 i{width:6px;height:6px} .wf.d20{width:40px;height:40px} }
+  #dice-btn{bottom:8px;width:40px;height:34px;padding:5px 5px 5px 21px}
+  #dice-pop{bottom:6px;width:min(244px,calc(100vw - 120px))} .dp-tray{min-height:50px;margin:6px 0 2px} .wf{width:34px;height:34px} .wf.d6{padding:5px} .wf.d6 i{width:6px;height:6px} .wf.d20{width:40px;height:40px} }
 
 /* Rundenende-Bildschirm */
 .gcard.rend .gc-top{background:linear-gradient(#7a2a1c,#4e1a10)}
@@ -3134,20 +3136,32 @@ function sortDice(reduce){
   });
 }
 function mark(d,v){ if(type===20){ d.classList.add(v>=9?'hit':'miss'); return; } if(v===type) d.classList.add('max'); if(v===1) d.classList.add('one'); }   // W20: ab 9 gold, sonst rot
-btn.onclick=e=>{ e.stopPropagation(); pop.hidden=!pop.hidden; btn.classList.toggle('open',!pop.hidden); if(!pop.hidden) sync(); };
+function openPop(){ pop.classList.remove('out'); pop.hidden=false; btn.classList.add('open'); sync(); }
+function closePop(){ if(pop.hidden) return; pop.classList.add('out'); setTimeout(()=>{ pop.hidden=true; pop.classList.remove('out'); btn.classList.remove('open'); },190); }
+btn.onclick=e=>{ e.stopPropagation(); openPop(); };
+// Griff nach rechts wischen = öffnen
+let sx=null;
+btn.addEventListener('pointerdown',e=>{ sx=e.clientX; try{ btn.setPointerCapture(e.pointerId); }catch(_){} });
+btn.addEventListener('pointermove',e=>{ if(sx!==null&&e.clientX-sx>18){ sx=null; openPop(); } });
+btn.addEventListener('pointerup',()=>{ sx=null; }); btn.addEventListener('pointercancel',()=>{ sx=null; });
+// Fenster nach links wischen = schließen
+let px=null,py=null;
+pop.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; px=e.clientX; py=e.clientY; });
+pop.addEventListener('pointermove',e=>{ if(px!==null&&px-e.clientX>45&&Math.abs(e.clientY-py)<40){ px=null; closePop(); } });
+pop.addEventListener('pointerup',()=>{ px=null; }); pop.addEventListener('pointercancel',()=>{ px=null; });
 pop.addEventListener('click',e=>{
   e.stopPropagation();
   const t=e.target.closest('[data-dt]'); if(t){ type=+t.dataset.dt; tray.innerHTML=''; save(); sync(); return; }
   const k=e.target.closest('[data-dn]'); if(k){ n=Math.max(1,Math.min(10,n+(+k.dataset.dn))); save(); sync(); return; }
   if(e.target.closest('#dp-roll')&&!$('dp-roll').disabled) roll();
 });
-document.addEventListener('click',e=>{ if(e.target.closest&&e.target.closest('#sp-next')) return; if(!pop.hidden){ pop.hidden=true; btn.classList.remove('open'); } });   // Weiter lässt das Fenster offen
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ pop.hidden=true; btn.classList.remove('open'); } });
+document.addEventListener('click',e=>{ if(e.target.closest&&e.target.closest('#sp-next')) return; closePop(); });   // Weiter lässt das Fenster offen
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePop(); });
 // Wurf vom Freund: gleiche Würfel, gleiche Animation
 window.remoteDice=m=>{
   if(!Array.isArray(m.vals)||!m.vals.length) return;
   type=m.t===20?20:6; sync();
-  if(pop.hidden){ pop.hidden=false; btn.classList.add('open'); }
+  if(pop.hidden) openPop();
   roll(m.vals.slice(0,10).map(v=>Math.max(1,Math.min(type,v|0))));
   if(typeof Sounds!=='undefined') try{ Sounds.play('dice', nextDiceVariant()); }catch(e){}
 };
