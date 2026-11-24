@@ -568,6 +568,9 @@ html[data-theme="dark"] .re-ort{color:#a9a486}
   .step output{display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:1.05rem;
                border-left:1px solid #6f6a4a;border-right:1px solid #6f6a4a}
   .sfoot{display:flex;justify-content:center;margin:14px 0 4px}
+  .ext-set{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 0;padding:10px 12px;border:1px dashed var(--line,#a89a63);font-weight:600}
+  .ext-set label{display:flex;align-items:center;gap:6px} .ext-set small{color:var(--muted);font-weight:400}
+  .ext-set input{flex:1;min-width:140px;accent-color:#6b5a2e} .ext-set output{min-width:1.4em;text-align:right;font-family:var(--head);font-size:1.15rem}
   .rules ul{margin:6px 0 0;padding-left:1.3em}
   .rules li{margin:2px 0}
   @media (max-width:640px){
@@ -869,6 +872,8 @@ html[data-theme="dark"] .re-ort{color:#a9a486}
     .edge.left,.edge.right{top:20px;bottom:20px} .edge.top,.edge.bottom{left:20px;right:20px} .edge b{font-size:8px} }
   .cell .obj{position:absolute;top:4px;left:4px;z-index:3;padding:1px 6px;font-family:var(--head);font-size:.75rem;color:#fff3e0;
              background:var(--stamp);border:1px solid #3a1008;box-shadow:0 2px 3px rgba(0,0,0,.4);transform:rotate(-4deg)}
+  .cell .ext{position:absolute;left:50%;top:5px;z-index:3;width:max-content;max-width:94%;padding:1px 5px;font-family:var(--head);text-transform:uppercase;letter-spacing:.03em;font-size:clamp(.48rem,calc(var(--side,90px)*.1),.72rem);line-height:1.1;text-align:center;color:#2a2414;background:#e8d9a8;border:1px dashed #6b5a2e;box-shadow:0 2px 3px rgba(0,0,0,.35);transform:translateX(-50%) rotate(2deg);white-space:normal;hyphens:manual}
+  .cell.is-ext{box-shadow:inset 0 0 0 2px #6b5a2e}
   .cell.is-obj{box-shadow:inset 0 0 0 3px var(--stamp),inset 0 0 18px rgba(20,22,0,.45)}
   .cell .obj-flex{position:absolute;left:50%;bottom:22%;transform:translateX(-50%) rotate(-3deg);z-index:3;width:max-content;max-width:94%;padding:2px 5px;white-space:normal;hyphens:manual;text-align:center;line-height:1.1;
              font-family:var(--head);text-transform:uppercase;letter-spacing:.04em;font-size:clamp(.5rem,calc(var(--side,90px)*.11),.78rem);color:#fff3e0;background:#3c4322;border:1px solid #a89a63;box-shadow:0 2px 3px rgba(0,0,0,.4)}
@@ -1055,6 +1060,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
         <div class="slist" id="bsize"></div>
       </section>
     </div>
+    <div class="ext-set"><label for="ext-r"><span class="sic">🧱</span> Felderweiterungen <small id="ext-max"></small></label><input type="range" id="ext-r" min="0" max="3" step="1" aria-label="Anzahl Felderweiterungen"><output id="ext-o"></output></div>
     <div class="sfoot"><button class="sec" id="reset">↺ Standard wiederherstellen</button></div>
     <div class="rules">
       <b>Regeln</b>
@@ -1322,7 +1328,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
     <article class="rcard" id="felderweiterung">
       <h2>Felderweiterungen</h2>
-      <p>Ein Feld, auf dem ein flexibles Missionsziel hätte erscheinen können, aber keines erschienen ist, kann zu Spielbeginn eine der folgenden Erweiterungen bekommen (jede höchstens 1 mal pro Spielplan):</p>
+      <p>Ein Feld, auf dem ein flexibles Missionsziel hätte erscheinen können, aber keines erschienen ist, kann zu Spielbeginn eine der folgenden Erweiterungen bekommen (jede höchstens 1 mal pro Spielplan). Auf einer normalen Karte gibt es 0–3, auf einer epischen Karte 0–5 Felderweiterungen – die Anzahl stellst du bei <b>Karte → Einstellungen</b> ein:</p>
       <ul>
         <li><b>Auto</b> – Deckung</li>
         <li><b>Kutsche</b> – Deckung</li>
@@ -1544,7 +1550,8 @@ const PIECES = [
   {key:'ruine',   name:'Ruine',         biome:'b', size:1, count:4, icon:'🏚️'},
   {key:'kirche',  name:'Kirche',        biome:'b', size:2, count:1, icon:'⛪'},
 ];
-const DEFAULTS = { counts: Object.fromEntries(PIECES.map(p=>[p.key,p.count])), bmin:0, bmax:8, v:3 };
+const DEFAULTS = { counts: Object.fromEntries(PIECES.map(p=>[p.key,p.count])), bmin:0, bmax:8, ext:{'3x6':3,'3x8':5}, v:3 };
+const EXT_MAX={'3x6':3,'3x8':5};   // Felderweiterungen: Normal 0–3, Episch 0–5
 let ROWS = 3;
 const ROWNAMES = 'ABC';
 
@@ -1558,6 +1565,7 @@ if((settings.v|0)<3){ if(settings.counts.strasse===1) settings.counts.strasse=2;
 const MAXB = PIECES.filter(p=>p.biome==='b').reduce((a,p)=>a+p.size*p.count,0);
 for(const p of PIECES) settings.counts[p.key]=Math.max(0,Math.min(p.count, settings.counts[p.key]|0));
 settings.bmax=Math.max(0,Math.min(MAXB, settings.bmax|0)); settings.bmin=Math.max(0,Math.min(settings.bmax, settings.bmin|0));
+settings.ext={...DEFAULTS.ext,...(settings.ext||{})}; for(const k in EXT_MAX) settings.ext[k]=Math.max(0,Math.min(EXT_MAX[k],settings.ext[k]|0));
 function saveSettings(){ try{ localStorage.setItem('kartengen-settings', JSON.stringify(settings)); }catch(e){} }
 
 // ---------- Zufall (mit Seed, damit Karten reproduzierbar sind) ----------
@@ -1727,6 +1735,8 @@ function render(){
     if(oi>=0){ const o=mset.objInfo[oi]; el.classList.add('is-obj'); if(o.flex) el.classList.add('is-flex');
       el.insertAdjacentHTML('beforeend',`<span class="obj" title="Missionsziel ${oi+1}: ${o.name}">⚑ ${oi+1}</span>${o.flex?`<span class="obj-flex">${OBJ_SHY[o.name]||o.name}</span>`:''}`);
       el.title+=` · Missionsziel ${oi+1}${o.flex?': '+o.name:''}`; }
+    const ex=mset&&mset.exts?mset.exts.find(e=>e.p===x):null;
+    if(ex){ el.classList.add('is-ext'); el.insertAdjacentHTML('beforeend',`<span class="ext" title="Felderweiterung: ${ex.name}">${ex.icon} ${EXT_SHY[ex.name]||ex.name}</span>`); el.title+=` · Felderweiterung: ${ex.name}`; }
     map.appendChild(el);
     x.p.biome==='g'?g+=x.cells.length:b+=x.cells.length;
   }
@@ -1758,6 +1768,7 @@ function run(seed){
   current = {...generate(seed), seed};
   updateSeed();
   document.querySelectorAll('.seg button[data-size]').forEach(b=>b.classList.toggle('on', b.dataset.size===$('size').value));
+  if(typeof syncExt==='function'&&$('ext-r')) syncExt();
   render();
   const map=$('map'); map.classList.remove('pop'); void map.offsetWidth; map.classList.add('pop');
 }
@@ -1806,7 +1817,14 @@ function buildPool(){
   }
   buildBsize();
   updSums();
+  syncExt();
 }
+function syncExt(){
+  const sz=$('size').value, mx=EXT_MAX[sz]??3, v=Math.min(mx,settings.ext?.[sz]??mx);
+  $('ext-r').max=mx; $('ext-r').value=v; $('ext-o').textContent=v; $('ext-max').textContent=`(${sz==='3x8'?'Episch':'Normal'}: 0–${mx})`;
+}
+$('ext-r').oninput=()=>{ const sz=$('size').value, v=+$('ext-r').value; settings.ext={...settings.ext,[sz]:v}; $('ext-o').textContent=v; saveSettings();
+  if(current) current._ms=null; render(); if(window.netChanged) netChanged(); };
 $('reset').onclick=()=>{ settings=structuredClone(DEFAULTS); saveSettings(); buildPool(); run(newSeed()); };
 $('gen').onclick=()=>run(newSeed());
 $('fab').onclick=()=>{ if(document.body.classList.contains('on-mission')){ genArmies(); $('tab-mission').scrollIntoView({behavior:'smooth',block:'start'}); return; } run(newSeed()); $('map').scrollIntoView({behavior:'smooth',block:'start'}); };
@@ -2163,10 +2181,13 @@ const OBJ_N={'3x6':3,'3x8':5};
 const OBJ_FIXED={hafen:'Hafen',kirche:'Kirche',zug:'Zug',farm:'Farm',wohn:'Wohnhaus',bunker:'Bunker',graben:'Graben',turm:'Wachturm'};
 const OBJ_HOSTS=['flach','strand','strasse','ruine'];
 const OBJ_FLEX=['Transporter','Kampfflieger','Artilleriegeschütz','Flakgeschütz'];
+const EXT_TYPES=[{name:'Auto',icon:'🚗'},{name:'Kutsche',icon:'🐴'},{name:'Stacheldraht',icon:'➰'},{name:'Flugzeugwrack',icon:'✈️'},{name:'Abtrünnige',icon:'🏴'}];
+const EXT_SHY={Stacheldraht:'Stachel&shy;draht',Flugzeugwrack:'Flugzeug&shy;wrack','Abtrünnige':'Abtrün&shy;nige'};
 const OBJ_SHY={Transporter:'Trans&shy;porter',Kampfflieger:'Kampf&shy;flieger','Artilleriegeschütz':'Artillerie&shy;geschütz','Flakgeschütz':'Flak&shy;geschütz'};
 function missionSetup(){
   const m=window.CUR_MISSION; if(!current||current.error||!m) return null;
-  const key=current.seed+'|'+ROWS+'x'+COLS+'|'+m.name;
+  const nExt=Math.min(EXT_MAX[ROWS+'x'+COLS]??3, settings.ext?.[ROWS+'x'+COLS]??3);
+  const key=current.seed+'|'+ROWS+'x'+COLS+'|'+m.name+'|'+nExt;
   if(current._ms && current._ms.key===key) return current._ms;
   let h=0; for(const ch of m.name) h=(h*31+ch.charCodeAt(0))|0;
   const r=mulberry32((current.seed^h)>>>0);             // gleiche Karte + Mission = gleiche Markierungen
@@ -2214,7 +2235,24 @@ function missionSetup(){
     info.push({p:best.p,cx:best.cx,cy:best.cy,name,flex:!best.fixed});
   }
   for(const o of info) objectives.push(o.p);
-  return current._ms={key,edges,objectives,objInfo:info.map(o=>({name:o.name,flex:o.flex,ort:o.p.p.name,cells:o.p.cells}))};
+  // Felderweiterungen: auf Feldern, wo ein flexibles Ziel hätte liegen können, aber keins liegt; jede höchstens 1 mal.
+  // Eigener Zufall: mehr Erweiterungen behalten die bisherigen an ihrem Platz.
+  const r2=mulberry32((current.seed^0x5eed1)>>>0), exts=[];
+  const types=[...EXT_TYPES]; for(let i=types.length-1;i>0;i--){ const j=Math.floor(r2()*(i+1)); [types[i],types[j]]=[types[j],types[i]]; }
+  const free=cand.filter(c=>c.host&&!objectives.includes(c.p));
+  while(exts.length<nExt&&types.length){
+    let best=null, bs=-1e9;
+    for(const c of free){
+      if(exts.some(e=>e.p===c.p)) continue;
+      const others=[...info,...exts], dmin=others.length?Math.min(...others.map(o=>Math.hypot(o.cx-c.cx,o.cy-c.cy))):3;
+      const sc=Math.min(dmin,2.5)*10 + r2()*8;
+      if(sc>bs){ bs=sc; best=c; }
+    }
+    if(!best) break;
+    exts.push({p:best.p,cx:best.cx,cy:best.cy,t:types.shift()});
+  }
+  return current._ms={key,edges,objectives,objInfo:info.map(o=>({name:o.name,flex:o.flex,ort:o.p.p.name,cells:o.p.cells})),
+    exts:exts.map(e=>({p:e.p,name:e.t.name,icon:e.t.icon,ort:e.p.p.name}))};
 }
 function renderMapMission(ms,port){
   const box=$('mapmission'), m=window.CUR_MISSION;
