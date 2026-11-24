@@ -2541,7 +2541,7 @@ function render(){
       gc.classList.add(mine?'is-mine':'is-theirs');
       gc.insertAdjacentHTML('beforebegin',`<div class="gp-turn ${mine?'mine':''}">${mine?'★ Du bist dran ★':'Gegner ist dran'}</div>`);
       const top=gc.querySelector('.gc-top'); if(top){ const t=document.createElement('span'); t.className='gc-turn'+(mine?' mine':''); t.textContent=mine?'★ Du bist dran':'Gegner ist dran'; top.insertBefore(t,top.querySelector('.gc-info')); }
-      if(mine&&lastTurn!==id){ gc.classList.add('ping'); if(navigator.vibrate) try{ navigator.vibrate([90,60,90]); }catch(e){} }
+      if(mine&&lastTurn!==id) gc.classList.add('ping');
       lastTurn=id;
     }
   }
