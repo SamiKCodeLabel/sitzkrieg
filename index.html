@@ -1743,8 +1743,8 @@ function render(){
     el.title=x.p.name;
     const oi=mset?mset.objectives.indexOf(x):-1;
     if(oi>=0){ const o=mset.objInfo[oi]; el.classList.add('is-obj'); if(o.flex) el.classList.add('is-flex');
-      el.insertAdjacentHTML('beforeend',`<span class="obj" title="Missionsziel ${oi+1}: ${o.name}">⚑ ${oi+1}</span>${o.flex?`<span class="obj-flex">${OBJ_SHY[o.name]||o.name}</span>`:''}`);
-      el.title+=` · Missionsziel ${oi+1}${o.flex?': '+o.name:''}`; }
+      el.insertAdjacentHTML('beforeend',`<span class="obj" title="Missionsziel: ${o.name}">⚑</span>${o.flex?`<span class="obj-flex">${OBJ_SHY[o.name]||o.name}</span>`:''}`);
+      el.title+=` · Missionsziel${o.flex?': '+o.name:''}`; }
     const ex=mset&&mset.exts?mset.exts.find(e=>e.p===x):null;
     if(ex){ el.classList.add('is-ext'); el.insertAdjacentHTML('beforeend',`<span class="ext" title="Felderweiterung: ${ex.name}">${ex.icon} ${EXT_SHY[ex.name]||ex.name}</span>`); el.title+=` · Felderweiterung: ${ex.name}`; }
     map.appendChild(el);
