@@ -277,6 +277,59 @@ html[data-theme="dark"] .rw-search input{background:#1d2116;color:#e3dcc0;border
 .gp-next.locked{opacity:.4;cursor:not-allowed;filter:grayscale(.35)}
 .np-seg button.taken{opacity:.55;border-style:dashed} .np-seg button.taken::after{content:' ⇄';opacity:.8}
 
+
+/* Würfel (Spiel-Tab, unten links) */
+#dice-btn{display:none;position:fixed;left:calc(10px + env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));z-index:31;width:34px;height:34px;padding:5px;border-radius:8px;
+  background:rgba(30,33,22,.35);border:1px solid rgba(169,164,134,.35);color:#cfc7a6;opacity:.55;box-shadow:none;transition:opacity .2s,transform .2s}
+#dice-btn svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.6} #dice-btn svg circle{fill:currentColor;stroke:none}
+#dice-btn:hover,#dice-btn:focus-visible,#dice-btn.open{opacity:1;transform:rotate(-12deg)}
+body.on-spiel #dice-btn{display:block}
+#dice-pop{position:fixed;left:calc(10px + env(safe-area-inset-left));bottom:calc(54px + env(safe-area-inset-bottom));z-index:45;width:min(320px,calc(100vw - 20px));max-height:calc(100vh - 80px);overflow:auto;
+  background:#e6dcb8;color:#23241c;border:2px solid #4a4a32;border-radius:8px;padding:10px;box-shadow:0 0 0 3px #22261a,0 14px 30px rgba(0,0,0,.55);transform-origin:0 100%;animation:dpIn .18s ease-out}
+#dice-pop[hidden]{display:none}
+@keyframes dpIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+html[data-theme="dark"] #dice-pop{background:#2a2f20;color:#e3dcc0;border-color:#5d5b42}
+.dp-row{display:flex;gap:8px;justify-content:space-between;align-items:center}
+.dp-type{display:grid;grid-template-columns:1fr 1fr;gap:4px} .dp-type button{padding:6px 10px;font-size:.85rem}
+#dice-pop .dp-type button.on{background:#5f6838;color:#f2ecd6;border-color:#2b2f1c}
+.dp-n{display:grid;grid-template-columns:32px 34px 32px;align-items:stretch;border:2px solid #4a4a32}
+.dp-n button{padding:0;font-size:1.1rem;border:0;border-radius:0} .dp-n output{display:grid;place-items:center;font-family:var(--head);font-size:1.15rem;background:#efe7cc;color:#23241c}
+.dp-tray{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;min-height:62px;margin:10px 0 4px;padding:8px 4px;border-radius:6px;
+  background:radial-gradient(ellipse at 50% 40%,#4d5a35,#2c331f);box-shadow:inset 0 2px 10px rgba(0,0,0,.55);perspective:500px}
+.dp-sum{text-align:center;font-family:var(--type);font-size:.85rem;min-height:1.2em;margin-bottom:8px}
+.dp-sum b{font-family:var(--head);font-size:1.05rem;color:var(--stamp)}
+.dp-roll{width:100%;padding:9px!important;font-size:1rem!important}
+/* W6 */
+.wf{position:relative;width:42px;height:42px;flex:none;transform-style:preserve-3d}
+.wf.d6{background:linear-gradient(145deg,#fbf6e6,#ddd3b4);border-radius:8px;box-shadow:inset -2px -3px 0 rgba(0,0,0,.18),0 3px 6px rgba(0,0,0,.5);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:6px}
+.wf.d6 i{width:8px;height:8px;border-radius:50%;background:#1f2116;place-self:center;opacity:0;box-shadow:inset 0 1px 1px rgba(255,255,255,.25)}
+.wf.d6 i.p{opacity:1}
+.wf.d6.one i{background:#9b2d20}
+/* W20 */
+.wf.d20{width:48px;height:48px;display:grid;place-items:center}
+.wf.d20 svg{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 3px 3px rgba(0,0,0,.5))}
+.wf.d20 b{position:relative;font-family:var(--head);font-size:1.05rem;color:#f4ecd2;text-shadow:0 1px 1px rgba(0,0,0,.6)}
+/* Ergebnis-Highlights */
+body:not(.on-spiel) #dice-pop{display:none}
+.wf.d20.max svg .f0{fill:#c9a23a} .wf.d20.one svg .f0{fill:#8a2a1c}
+.wf.d6.max{box-shadow:inset -2px -3px 0 rgba(0,0,0,.18),0 0 0 2px #c9a23a,0 3px 10px rgba(201,162,58,.7)}
+/* Wurf-Animation: fliegt herein, dreht sich, prallt auf */
+.wf.rolling{animation:wfRoll .75s cubic-bezier(.2,.7,.3,1.15) both}
+@keyframes wfRoll{
+  0%{transform:translate3d(var(--dx),-70px,0) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(var(--rz)) scale(.5);opacity:0}
+  35%{opacity:1}
+  60%{transform:translate3d(0,4px,0) rotateX(20deg) rotateY(-15deg) rotateZ(8deg) scale(1.08)}
+  78%{transform:translate3d(0,-7px,0) rotateZ(-4deg) scale(.98)}
+  100%{transform:none}}
+.wf.land{animation:wfPop .35s ease-out}
+@keyframes wfPop{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.dp-tray.shake{animation:trayShake .3s ease-in-out}
+@keyframes trayShake{0%,100%{transform:none}25%{transform:translateX(-3px) rotate(-.6deg)}75%{transform:translateX(3px) rotate(.6deg)}}
+@media (prefers-reduced-motion:reduce){ .wf,.dp-tray,#dice-pop{animation:none!important} }
+@media (orientation:landscape) and (max-height:560px){
+  #dice-btn{left:8px;bottom:8px;width:30px;height:30px;padding:4px}
+  #dice-pop{bottom:46px;width:min(360px,calc(100vw - 120px))} .dp-tray{min-height:50px;margin:6px 0 2px} .wf{width:34px;height:34px} .wf.d6{padding:5px} .wf.d6 i{width:6px;height:6px} .wf.d20{width:40px;height:40px} }
+
 /* Rundenende-Bildschirm */
 .gcard.rend .gc-top{background:linear-gradient(#7a2a1c,#4e1a10)}
 .re-body{padding:12px 16px 16px}
@@ -1575,6 +1628,16 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <div id="pop-body"></div>
   </div>
 </div>
+<button id="dice-btn" type="button" aria-label="Würfeln" title="Würfeln"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1.4"/><circle cx="15.5" cy="15.5" r="1.4"/><circle cx="12" cy="12" r="1.4"/></svg></button>
+<div id="dice-pop" hidden role="dialog" aria-label="Würfeln">
+  <div class="dp-row">
+    <div class="dp-type" role="group" aria-label="Würfelart"><button type="button" class="sec" data-dt="6">W6</button><button type="button" class="sec" data-dt="20">W20</button></div>
+    <div class="dp-n" role="group" aria-label="Anzahl"><button type="button" class="sec" data-dn="-1" aria-label="weniger">−</button><output id="dp-n">1</output><button type="button" class="sec" data-dn="1" aria-label="mehr">+</button></div>
+  </div>
+  <div class="dp-tray" id="dp-tray" aria-live="polite"></div>
+  <div class="dp-sum" id="dp-sum"></div>
+  <button type="button" class="big dp-roll" id="dp-roll">🎲 Würfeln</button>
+</div>
 <button id="fab"><span class="lbl-map">🎲 Neue Karte</span><span class="lbl-army">🎲 Zufällige Armeen</span></button>
 
 <script>
@@ -2759,7 +2822,7 @@ document.addEventListener('click',e=>{
   if(el.id==='pop' ) return;
   let n='button';
   if(el.closest('.tabs')) n='menu';
-  if(el.id==='gen'||el.id==='fab'||el.id==='army-gen'){ Sounds.play('dice', nextDiceVariant()); return; }
+  if(el.id==='gen'||el.id==='fab'||el.id==='army-gen'||el.id==='dp-roll'){ Sounds.play('dice', nextDiceVariant()); return; }
   if(el.id==='rot'){ Sounds.play('chair', nextVariant('chair')); return; }
      // Kampfflieger Ja: Flugzeug fliegt vorbei   // Karte drehen: Stuhlrücken   // dice1.mp3 in einer zufälligen Tonhöhen-Variante
   if(el.id==='theme' && document.documentElement.getAttribute('data-theme')==='dark') return;   // Blendgranate übernimmt
@@ -3005,6 +3068,59 @@ sync();
 // Lobby an/aus -> Spielansicht auffrischen
 new MutationObserver(()=>{ if(window.renderSpiel) renderSpiel(); }).observe($('lb-on'),{attributes:true,attributeFilter:['hidden']});
 if(window.renderSpiel) renderSpiel();
+})();
+</script>
+
+<script>
+// ---------- Würfel (nur auf diesem Gerät) ----------
+(function(){
+const btn=$('dice-btn'), pop=$('dice-pop'), tray=$('dp-tray'), sum=$('dp-sum');
+let type=6, n=1; try{ const o=JSON.parse(localStorage.getItem('sitzkrieg-wuerfel')); if(o){ type=o.t===20?20:6; n=Math.max(1,Math.min(20,o.n|0||1)); } }catch(e){}
+const save=()=>{ try{ localStorage.setItem('sitzkrieg-wuerfel',JSON.stringify({t:type,n})); }catch(e){} };
+const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+const D20='<svg viewBox="0 0 48 48"><polygon class="f0" points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#3f4a2a" stroke="#1b1d14" stroke-width="2"/><polygon points="24,9 38,32 10,32" fill="rgba(255,255,255,.1)" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/><path d="M24 2 24 9 M44 13 38 32 M4 13 10 32 M24 46 10 32 M24 46 38 32 M4 35 10 32 M44 35 38 32" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/></svg>';
+function face(el,v){
+  if(type===6){ el.innerHTML=Array.from({length:9},(_,i)=>`<i${PIPS[v].includes(i)?' class="p"':''}></i>`).join(''); }
+  else el.innerHTML=D20+`<b>${v}</b>`;
+  el.setAttribute('aria-label',`W${type}: ${v}`);
+}
+function sync(){
+  pop.querySelectorAll('[data-dt]').forEach(b=>b.classList.toggle('on',+b.dataset.dt===type));
+  $('dp-n').textContent=n;
+  pop.querySelector('[data-dn="-1"]').disabled=n<=1; pop.querySelector('[data-dn="1"]').disabled=n>=20;
+}
+const rnd=m=>1+Math.floor(Math.random()*m);
+let timers=[];
+function roll(){
+  timers.forEach(clearInterval); timers=[];
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  tray.innerHTML=''; sum.textContent=''; tray.classList.remove('shake'); void tray.offsetWidth; tray.classList.add('shake');
+  const vals=Array.from({length:n},()=>rnd(type)), dice=[];
+  vals.forEach((v,i)=>{
+    const d=document.createElement('div'); d.className=`wf d${type}`;
+    d.style.setProperty('--dx',(Math.random()*80-40)+'px'); d.style.setProperty('--rx',(Math.random()*720-360)+'deg');
+    d.style.setProperty('--ry',(Math.random()*720-360)+'deg'); d.style.setProperty('--rz',(Math.random()*540-270)+'deg');
+    d.style.animationDelay=(i*55)+'ms'; face(d,rnd(type)); tray.appendChild(d); dice.push(d);
+    if(!reduce){ d.classList.add('rolling');
+      const t=setInterval(()=>face(d,rnd(type)),70); timers.push(t);
+      setTimeout(()=>{ clearInterval(t); face(d,v); d.classList.remove('rolling'); void d.offsetWidth; d.classList.add('land'); mark(d,v); },620+i*55);
+    } else { face(d,v); mark(d,v); }
+  });
+  const done=()=>{ const s=vals.reduce((a,b)=>a+b,0), hi=Math.max(...vals);
+    sum.innerHTML=n>1?`Summe <b>${s}</b> · Höchster <b>${hi}</b>`:(type===20&&vals[0]===20?'<b>Volltreffer!</b>':type===20&&vals[0]===1?'<b>Patzer!</b>':''); };
+  setTimeout(done,reduce?0:680+n*55);
+}
+function mark(d,v){ if(v===type) d.classList.add('max'); if(v===1) d.classList.add('one'); }
+btn.onclick=e=>{ e.stopPropagation(); pop.hidden=!pop.hidden; btn.classList.toggle('open',!pop.hidden); if(!pop.hidden) sync(); };
+pop.addEventListener('click',e=>{
+  e.stopPropagation();
+  const t=e.target.closest('[data-dt]'); if(t){ type=+t.dataset.dt; tray.innerHTML=''; sum.textContent=''; save(); sync(); return; }
+  const k=e.target.closest('[data-dn]'); if(k){ n=Math.max(1,Math.min(20,n+(+k.dataset.dn))); save(); sync(); return; }
+  if(e.target.closest('#dp-roll')) roll();
+});
+document.addEventListener('click',()=>{ if(!pop.hidden){ pop.hidden=true; btn.classList.remove('open'); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!pop.hidden){ pop.hidden=true; btn.classList.remove('open'); } });
+sync();
 })();
 </script>
 <script>
