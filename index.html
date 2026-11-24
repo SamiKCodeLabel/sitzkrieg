@@ -2470,7 +2470,6 @@ function render(){
   el.innerHTML=`<div class="gp">
     <p class="gp-info">${S.end!==null?(S.end<0?`<b>Rundenende</b> · Rauch und Feuer`:`<b>Rundenende</b> · Missionsziel ${S.end+1} von ${objList().length}`):`<b>Runde ${S.round}</b> · noch ${S.deck.length} Karte${S.deck.length===1?'':'n'} im Deck`}</p>
     <button class="big gp-next" id="sp-next" aria-label="Nächste Karte aufdecken" title="Nächste Karte aufdecken">${ARROW}</button>
-    ${S.newRound?`<div class="gp-round">★ Neue Runde ${S.round} ★</div>`:''}
     ${S.end!==null?endHTML():(S.cur?cardHTML(S.cur):'')}
   </div>`;
   $('sp-next').onclick=draw;
