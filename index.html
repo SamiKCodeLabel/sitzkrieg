@@ -3092,15 +3092,15 @@ function sync(){
   pop.querySelector('[data-dn="-1"]').disabled=n<=1; pop.querySelector('[data-dn="1"]').disabled=n>=10;
 }
 const rnd=m=>1+Math.floor(Math.random()*m);
-let timers=[];
+let timers=[], rollId=0;
 function roll(given){
-  timers.forEach(clearInterval); timers=[];
+  timers.forEach(clearInterval); timers=[]; const myRoll=++rollId;
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   tray.innerHTML=''; tray.classList.remove('shake'); void tray.offsetWidth; tray.classList.add('shake');
   const cnt=given?given.length:(type===20?1:n), vals=given||Array.from({length:cnt},()=>rnd(type)), dice=[];
   if(!given&&window.lobby&&lobby.send) lobby.send({type:'dice',t:type,vals});
   vals.forEach((v,i)=>{
-    const d=document.createElement('div'); d.className=`wf d${type}`;
+    const d=document.createElement('div'); d.className=`wf d${type}`; d.dataset.v=v; d.dataset.i=i;
     d.style.setProperty('--dx',(Math.random()*80-40)+'px'); d.style.setProperty('--rx',(Math.random()*720-360)+'deg');
     d.style.setProperty('--ry',(Math.random()*720-360)+'deg'); d.style.setProperty('--rz',(Math.random()*540-270)+'deg');
     d.style.animationDelay=(i*55)+'ms'; face(d,rnd(type)); tray.appendChild(d); dice.push(d);
@@ -3108,6 +3108,27 @@ function roll(given){
       const t=setInterval(()=>face(d,rnd(type)),70); timers.push(t);
       setTimeout(()=>{ clearInterval(t); face(d,v); d.classList.remove('rolling'); void d.offsetWidth; d.classList.add('land'); mark(d,v); },620+i*55);
     } else { face(d,v); mark(d,v); }
+  });
+  // Nach dem Wurf: Würfel sortieren sich von groß nach klein (springen im Bogen an ihren Platz)
+  if(cnt>1) setTimeout(()=>{ if(myRoll===rollId) sortDice(reduce); },reduce?0:620+(cnt-1)*55+420);
+}
+function sortDice(reduce){
+  const els=[...tray.children], order=[...els].sort((a,b)=>(b.dataset.v-a.dataset.v)||(a.dataset.i-b.dataset.i));
+  if(order.every((e,i)=>e===els[i])) return;
+  const first=new Map(els.map(e=>[e,e.getBoundingClientRect()]));
+  els.forEach(e=>e.classList.remove('land','rolling'));
+  order.forEach(e=>tray.appendChild(e));
+  if(reduce||!Element.prototype.animate) return;
+  order.forEach((e,i)=>{
+    const f=first.get(e), l=e.getBoundingClientRect(), dx=f.left-l.left, dy=f.top-l.top;
+    if(!dx&&!dy) return;
+    const lift=-18-Math.min(20,Math.abs(dx)/6);
+    e.animate([
+      {transform:`translate(${dx}px,${dy}px)`},
+      {transform:`translate(${dx*.5}px,${dy*.5+lift}px) scale(1.15) rotate(${dx>0?-12:12}deg)`,offset:.45},
+      {transform:'translate(0,2px) scale(.96)',offset:.85},
+      {transform:'none'}
+    ],{duration:520,delay:i*45,easing:'cubic-bezier(.3,.7,.25,1)',fill:'backwards'});
   });
 }
 function mark(d,v){ if(v===type) d.classList.add('max'); if(v===1) d.classList.add('one'); }
