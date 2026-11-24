@@ -253,6 +253,7 @@ html[data-theme="dark"] .vp-lbl{color:#e3dcc0}
 .re-ic{display:flex;justify-content:center;align-items:flex-end;height:96px;margin:2px 0 2px}
 .re-ic .re-emo img.emj{width:84px;height:84px} .re-ic .re-emo{font-size:64px;line-height:1}
 .re-ic .re-art svg{height:96px;width:auto;max-width:200px}
+.re-art{--u1:#6f7769;--u2:#5d6458;--hl:#56604f;--tp:#646a5c;--v1:#7a7f5a;--v2:#62674a;--c1:#5d6a33;--c2:#6d4e33}
 .gcard.rend .gc-name+.tw{margin-top:10px} .gcard.rend .tw+.gc-note{margin-top:10px}
 .re-ort{text-align:center;font-size:.82rem;color:#5e5b45;margin-bottom:8px}
 .re-hint{border:1px dashed #9b2d20;padding:6px 8px;margin:0 0 8px}
@@ -1149,6 +1150,12 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <p>Ein Gewehrschützen-Trupp besteht aus 5 Gewehrschützen. Ein Spezialtrupp ist eine einzelne <a href="#spezialeinheiten">Spezialeinheit</a>.</p>
     </article>
 
+    <article class="rcard" id="bewegung">
+      <h2>Bewegung</h2>
+      <p>Ein aktivierter Trupp darf zwei Dinge ausführen: Diese sind sich zu <b>Bewegen</b> und/oder zu <b>Schießen</b>.</p>
+      <p>Die Reihenfolge davon ist jedoch egal, aber eine Bewegung oder eine Schießen-Aktion muss vollständig beendet sein (man kann somit auch keine Bewegung „aufsparen“ oder „unterbrechen“). Durch unwegsames Gelände bewegen sich Truppen und Fahrzeuge nur genau halb so weit. Zudem muss jede Einheit und jedes Fahrzeug nach seiner Bewegung sofort einen Durchschlagswurf vollziehen, falls sie sich auf oder durch einen passenden Minentyp oder Feuer bewegt haben. Jeder Trupp darf pro Runde nur 1 mal aktiviert werden.</p>
+    </article>
+
     <article class="rcard" id="angreifen">
       <h2>Angreifen</h2>
       <p>Ein Angriff läuft in diesen Schritten ab:</p>
@@ -1164,6 +1171,11 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <article class="rcard" id="infanterie">
       <h2>Infanterie</h2>
       <p>Jeder Infanterietrupp hat eine Bewegungsreichweite von <b>1</b> und eine Panzerung von <b>0</b>.</p>
+    </article>
+
+    <article class="rcard" id="gelaende">
+      <h2>Unwegsames Gelände</h2>
+      <p>Durch unwegsames Gelände bewegen sich Truppen und Fahrzeuge nur genau halb so weit.</p>
     </article>
 
     <article class="rcard" id="spezialeinheiten">
@@ -1188,8 +1200,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <p>Jeder General hat eine Pistole und eine Generalsfähigkeit. Zu Spielbeginn bekommt er eine der folgenden Fähigkeiten:</p>
       <dl class="abil">
         <dt>Verschanzer</dt><dd>Der General zählt am Rundenende wie zwei Trupps, wenn die Trupps an einem Missionsziel gezählt werden.</dd>
-        <dt>Hellseher</dt><dd>Der Spieler darf sich jederzeit die nächste Aktivierung ansehen.</dd>
-        <dt>Blitzer</dt><dd>Der Trupp des Generals darf in derselben Runde mit einer zweiten passenden Aktivierung noch einmal aktiviert werden.</dd>
         <dt>Kartograf</dt><dd>Infanterietrupps, die ihre Bewegung in Nahkampfreichweite des Generals beginnen, durchqueren unwegsames Gelände ohne Abzug und haben beim Angriff keinen Nachteil durch Rauch.</dd>
         <dt>Feldherr</dt><dd>Infanterietrupps, die in Nahkampfreichweite des Generals angreifen, erhalten beim Trefferwurf eine Erleichterung von 1. Ihre Kl. und Gr. Scheiben weichen nie ab.</dd>
         <dt>Taktiker</dt><dd>Infanterietrupps, die in Nahkampfreichweite des Generals angreifen, dürfen den Trefferwurf einmal pro Runde komplett wiederholen, wenn kein einziger Treffer dabei war.</dd>
@@ -1225,13 +1235,8 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <p>Braucht ein Angriff eine Scheibe, wird sie über das Ziel gelegt und ein W20 geworfen. Dieser Abweichwurf ersetzt den Trefferwurf.</p>
       <div class="dice"><div><b>W20: 1–8</b><span>Daneben: von Norden aus im 45°-Winkel um 1 Scheibenlänge verschieben (an der Kante anlegen)</span></div><div><b>W20: 9–20</b><span>Genauer Treffer</span></div></div>
       <p>Flammenwerfer, Schrotflinte und Minen weichen nie ab.</p>
-      <p>Bringt ein Angriff mehrere Scheiben ins Ziel, wird für jede Scheibe einzeln ein W20 auf Abweichung geworfen. Jede Einheit kann höchstens 1 mal getroffen werden, auch wenn sich Scheiben überschneiden.</p>
     </article>
 
-    <article class="rcard" id="gelaende">
-      <h2>Unwegsames Gelände</h2>
-      <p>In unwegsamem Gelände bewegen sich Trupps und Fahrzeuge nur halb so weit.</p>
-    </article>
 
     <article class="rcard" id="deckung">
       <h2>Deckung</h2>
@@ -1243,14 +1248,15 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
       <p>Eine Einheit, die lediglich einen einzigen Würfel als Angriffswurf nutzt, erhält immer einen Konzentrationsbonus beim Trefferwurf. Einheiten mit Waffen, die diesen Bonus erhalten, sind: Panzerfaust, Scharfschütze, Fahrzeuge, die mit AP-Munition feuern.</p>
     </article>
 
-    <article class="rcard" id="nahkampf">
-      <h2>Nahkampfreichweite</h2>
-      <p>Nahkampfreichweite heißt: Die Einheit muss ihr Ziel unmittelbar berühren können.</p>
+    <article class="rcard" id="mehrere-scheiben">
+      <h2>Mehrere Scheiben mit einem Angriff</h2>
+      <p>Werden bei einem Trefferwurf mehrere Scheiben ermöglicht, so werden diese jeweils einzeln mit einem W20 beim Trefferwurf ausgewürfelt, ob sie noch verschoben werden. Jede Einheit kann nur maximal 1 mal getroffen werden, selbst wenn sich die Scheiben überschneiden würden.</p>
     </article>
+
 
     <article class="rcard" id="hochexplosiv">
       <h2>Hochexplosive Munition</h2>
-      <p>Mit Sprengmunition oder Flammenwerfern, die beim Trefferwurf eine Kl. oder Gr. Scheibe bzw. einen Marker nutzen (außer Minen, Schrotflinten und Rauchgranaten), können Deckungen, Mauern und ganze Gebäude zerstört werden.</p>
+      <p>Mit Sprengmunition, die beim Trefferwurf eine Kl. oder Gr. Scheibe bzw. einen Marker nutzt (außer Minen, Schrotflinten und Rauchgranaten), können Deckungen, Mauern und ganze Gebäude zerstört werden.</p>
     </article>
 
     <article class="rcard" id="einsturz">
@@ -1379,6 +1385,11 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
           <tr><td>Gr. Scheibe</td><td>20 cm Ø</td></tr>
         </tbody>
       </table></div>
+    </article>
+
+    <article class="rcard" id="nahkampf">
+      <h2>Nahkampf</h2>
+      <p>Nahkampfreichweite bedeutet, dass die Einheit ihr Ziel unmittelbar berühren können muss.</p>
     </article>
 
     <article class="rcard" id="aktivierung-geht-nicht">
