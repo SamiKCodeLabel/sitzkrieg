@@ -294,10 +294,8 @@ html[data-theme="dark"] #dice-pop{background:#2a2f20;color:#e3dcc0;border-color:
 #dice-pop .dp-type button.on{background:#5f6838;color:#f2ecd6;border-color:#2b2f1c}
 .dp-n{display:grid;grid-template-columns:32px 34px 32px;align-items:stretch;border:2px solid #4a4a32}
 .dp-n button{padding:0;font-size:1.1rem;border:0;border-radius:0} .dp-n output{display:grid;place-items:center;font-family:var(--head);font-size:1.15rem;background:#efe7cc;color:#23241c}
-.dp-tray{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;min-height:62px;margin:10px 0 4px;padding:8px 4px;border-radius:6px;
+.dp-tray{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;min-height:62px;margin:10px 0;padding:8px 4px;border-radius:6px;
   background:radial-gradient(ellipse at 50% 40%,#4d5a35,#2c331f);box-shadow:inset 0 2px 10px rgba(0,0,0,.55);perspective:500px}
-.dp-sum{text-align:center;font-family:var(--type);font-size:.85rem;min-height:1.2em;margin-bottom:8px}
-.dp-sum b{font-family:var(--head);font-size:1.05rem;color:var(--stamp)}
 .dp-roll{width:100%;padding:9px!important;font-size:1rem!important}
 /* W6 */
 .wf{position:relative;width:42px;height:42px;flex:none;transform-style:preserve-3d}
@@ -1635,7 +1633,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
     <div class="dp-n" role="group" aria-label="Anzahl"><button type="button" class="sec" data-dn="-1" aria-label="weniger">−</button><output id="dp-n">1</output><button type="button" class="sec" data-dn="1" aria-label="mehr">+</button></div>
   </div>
   <div class="dp-tray" id="dp-tray" aria-live="polite"></div>
-  <div class="dp-sum" id="dp-sum"></div>
   <button type="button" class="big dp-roll" id="dp-roll">🎲 Würfeln</button>
 </div>
 <button id="fab"><span class="lbl-map">🎲 Neue Karte</span><span class="lbl-army">🎲 Zufällige Armeen</span></button>
@@ -3074,8 +3071,8 @@ if(window.renderSpiel) renderSpiel();
 <script>
 // ---------- Würfel (nur auf diesem Gerät) ----------
 (function(){
-const btn=$('dice-btn'), pop=$('dice-pop'), tray=$('dp-tray'), sum=$('dp-sum');
-let type=6, n=1; try{ const o=JSON.parse(localStorage.getItem('sitzkrieg-wuerfel')); if(o){ type=o.t===20?20:6; n=Math.max(1,Math.min(20,o.n|0||1)); } }catch(e){}
+const btn=$('dice-btn'), pop=$('dice-pop'), tray=$('dp-tray');
+let type=6, n=1; try{ const o=JSON.parse(localStorage.getItem('sitzkrieg-wuerfel')); if(o){ type=o.t===20?20:6; n=Math.max(1,Math.min(10,o.n|0||1)); } }catch(e){}
 const save=()=>{ try{ localStorage.setItem('sitzkrieg-wuerfel',JSON.stringify({t:type,n})); }catch(e){} };
 const PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
 const D20='<svg viewBox="0 0 48 48"><polygon class="f0" points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#3f4a2a" stroke="#1b1d14" stroke-width="2"/><polygon points="24,9 38,32 10,32" fill="rgba(255,255,255,.1)" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/><path d="M24 2 24 9 M44 13 38 32 M4 13 10 32 M24 46 10 32 M24 46 38 32 M4 35 10 32 M44 35 38 32" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/></svg>';
@@ -3087,14 +3084,14 @@ function face(el,v){
 function sync(){
   pop.querySelectorAll('[data-dt]').forEach(b=>b.classList.toggle('on',+b.dataset.dt===type));
   $('dp-n').textContent=n; pop.querySelector('.dp-n').style.visibility=type===20?'hidden':'';   // W20: immer nur einer
-  pop.querySelector('[data-dn="-1"]').disabled=n<=1; pop.querySelector('[data-dn="1"]').disabled=n>=20;
+  pop.querySelector('[data-dn="-1"]').disabled=n<=1; pop.querySelector('[data-dn="1"]').disabled=n>=10;
 }
 const rnd=m=>1+Math.floor(Math.random()*m);
 let timers=[];
 function roll(){
   timers.forEach(clearInterval); timers=[];
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  tray.innerHTML=''; sum.textContent=''; tray.classList.remove('shake'); void tray.offsetWidth; tray.classList.add('shake');
+  tray.innerHTML=''; tray.classList.remove('shake'); void tray.offsetWidth; tray.classList.add('shake');
   const cnt=type===20?1:n, vals=Array.from({length:cnt},()=>rnd(type)), dice=[];
   vals.forEach((v,i)=>{
     const d=document.createElement('div'); d.className=`wf d${type}`;
@@ -3106,16 +3103,13 @@ function roll(){
       setTimeout(()=>{ clearInterval(t); face(d,v); d.classList.remove('rolling'); void d.offsetWidth; d.classList.add('land'); mark(d,v); },620+i*55);
     } else { face(d,v); mark(d,v); }
   });
-  const done=()=>{ const s=vals.reduce((a,b)=>a+b,0), hi=Math.max(...vals);
-    sum.innerHTML=cnt>1?`Summe <b>${s}</b> · Höchster <b>${hi}</b>`:(type===20&&vals[0]===20?'<b>Volltreffer!</b>':type===20&&vals[0]===1?'<b>Patzer!</b>':''); };
-  setTimeout(done,reduce?0:680+cnt*55);
 }
 function mark(d,v){ if(v===type) d.classList.add('max'); if(v===1) d.classList.add('one'); }
 btn.onclick=e=>{ e.stopPropagation(); pop.hidden=!pop.hidden; btn.classList.toggle('open',!pop.hidden); if(!pop.hidden) sync(); };
 pop.addEventListener('click',e=>{
   e.stopPropagation();
-  const t=e.target.closest('[data-dt]'); if(t){ type=+t.dataset.dt; tray.innerHTML=''; sum.textContent=''; save(); sync(); return; }
-  const k=e.target.closest('[data-dn]'); if(k){ n=Math.max(1,Math.min(20,n+(+k.dataset.dn))); save(); sync(); return; }
+  const t=e.target.closest('[data-dt]'); if(t){ type=+t.dataset.dt; tray.innerHTML=''; save(); sync(); return; }
+  const k=e.target.closest('[data-dn]'); if(k){ n=Math.max(1,Math.min(10,n+(+k.dataset.dn))); save(); sync(); return; }
   if(e.target.closest('#dp-roll')) roll();
 });
 document.addEventListener('click',()=>{ if(!pop.hidden){ pop.hidden=true; btn.classList.remove('open'); } });
