@@ -583,7 +583,8 @@ html[data-theme="dark"] .re-ort{color:#a9a486}
   .step output{display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:1.05rem;
                border-left:1px solid #6f6a4a;border-right:1px solid #6f6a4a}
   .sfoot{display:flex;justify-content:center;margin:14px 0 4px}
-  .ext-g{margin-top:14px;border-left-color:#6b5a2e} .ext-g .srow{grid-template-columns:28px minmax(0,1fr) auto;border-bottom:0} .ext-g .snm{overflow-wrap:anywhere;hyphens:auto}
+  .ext-ic{width:24px;height:24px;display:block;color:#6b5a2e} html[data-theme="dark"] .ext-ic{color:#c9b98a}
+  .ext-g{margin-top:14px;border-left-color:#6b5a2e} .ext-g .srow{grid-template-columns:28px minmax(0,1fr) auto;border-bottom:0} .ext-g .snm{hyphens:manual;font-size:.92em}
   .rules ul{margin:6px 0 0;padding-left:1.3em}
   .rules li{margin:2px 0}
   @media (max-width:640px){
@@ -1824,7 +1825,7 @@ function buildPool(){
 }
 function syncExt(){
   const sz=$('size').value, mx=EXT_MAX[sz]??3, box=$('ext-set'); box.innerHTML='';
-  box.appendChild(srow('🧱','Felderweiterungen',`${sz==='3x8'?'Episch':'Normal'} · max. ${mx}`,stepper(()=>Math.min(mx,settings.ext?.[sz]??mx),v=>{
+  box.appendChild(srow('<svg class="ext-ic" viewBox="0 0 28 28" aria-hidden="true"><g stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M7 3.5v7M3.5 7h7"/><path d="M20 9v7M16.5 12.5h7"/><path d="M9 17.5v7M5.5 21h7"/></g></svg>','Feld&shy;erweite&shy;rungen',`${sz==='3x8'?'Episch':'Normal'} · max. ${mx}`,stepper(()=>Math.min(mx,settings.ext?.[sz]??mx),v=>{
     settings.ext={...settings.ext,[sz]:v}; if(current) current._ms=null; render(); if(window.netChanged) netChanged(); },0,mx)));
 }
 $('reset').onclick=()=>{ settings=structuredClone(DEFAULTS); saveSettings(); buildPool(); run(newSeed()); };
