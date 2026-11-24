@@ -250,6 +250,9 @@ html[data-theme="dark"] .vp-lbl{color:#e3dcc0}
 .re-body{padding:12px 16px 16px}
 .re-step{font-family:var(--head);text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;text-align:center;opacity:.75;margin-top:4px}
 .gcard.rend .gc-name{margin:2px 0 0}
+.re-ic{display:flex;justify-content:center;align-items:flex-end;height:96px;margin:2px 0 2px}
+.re-ic .re-emo img.emj{width:84px;height:84px} .re-ic .re-emo{font-size:64px;line-height:1}
+.re-ic .re-art svg{height:96px;width:auto;max-width:200px}
 .gcard.rend .gc-name+.tw{margin-top:10px} .gcard.rend .tw+.gc-note{margin-top:10px}
 .re-ort{text-align:center;font-size:.82rem;color:#5e5b45;margin-bottom:8px}
 .re-hint{border:1px dashed #9b2d20;padding:6px 8px;margin:0 0 8px}
@@ -271,6 +274,7 @@ html[data-theme="dark"] .re-ort{color:#a9a486}
   .gcard.rend .gc-top{grid-column:auto}
   .re-body{padding:6px 12px 10px} .gcard.rend .gc-name{font-size:1.05rem;margin:0}
   .re-ort{margin-bottom:4px;font-size:.72rem} .re-hint{margin-bottom:4px;padding:3px 6px}
+  .re-ic{height:56px} .re-ic .re-emo img.emj{width:52px;height:52px} .re-ic .re-art svg{height:56px}
   .refire .re-body{display:grid;grid-template-columns:minmax(0,38%) 1fr;column-gap:12px;align-items:center}
   .refire .re-step,.refire .gc-name{grid-column:1} .refire .fire-wrap{grid-column:1;grid-row:1;margin:0} .refire .gc-name{grid-row:2} .refire .fire-art{max-height:26vh} .refire .re-step{margin:0}
   .refire .tw{grid-column:2;grid-row:1/span 2} .refire .re-hint{grid-column:1/-1}
@@ -1081,10 +1085,6 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
   <section id="tab-mission" class="tabpane" hidden>
     <div class="bar mbar">
       <button id="army-gen" class="big">🎲 Zufällige Armeen</button>
-      <div class="seg" role="group" aria-label="Kartengröße">
-        <button class="sec" data-size="3x6">Normal</button>
-        <button class="sec" data-size="3x8">Episch</button>
-      </div>
       <div class="seg flyer fair" role="group" aria-label="Faire Armeen">
         <span class="flyer-lbl">Faire Armeen</span>
         <button class="sec" data-fair="1">Ja</button>
@@ -2410,6 +2410,13 @@ function fireHTML(){
       ${objList().length?'':'<p class="gc-note re-hint">Keine Missionsziele auf der Karte – danach beginnt direkt die nächste Runde.</p>'}
     </div></div>`;
 }
+const OBJ_ART={Transporter:'trans',Kampfflieger:'flieger','Artilleriegeschütz':'art','Flakgeschütz':'art'};
+const FLAK_ART=`<svg class="fig" viewBox="0 0 120 90" aria-hidden="true"><g stroke="#1b1d14" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="60" cy="84" rx="44" ry="4" fill="rgba(0,0,0,.25)" stroke="none"/><path d="M14 80 L60 70 L106 80" fill="none" stroke-width="5"/><path d="M14 80 L60 70 L106 80" fill="none" stroke="#6b6a4a" stroke-width="2.4"/><path d="M60 70 L60 82" stroke-width="5"/><rect x="38" y="56" width="44" height="14" rx="3" fill="#5e6440"/><path d="M44 56 L52 40 L70 40 L76 56 Z" fill="#6f7650"/><rect x="50" y="44" width="16" height="10" rx="2" fill="#4a4f33"/><g transform="rotate(-62 60 46)"><rect x="60" y="38" width="46" height="4.5" rx="1.5" fill="#3d4129"/><rect x="60" y="45" width="46" height="4.5" rx="1.5" fill="#3d4129"/><rect x="100" y="36.5" width="8" height="7.5" rx="1.5" fill="#2b2e1f"/><rect x="100" y="43.5" width="8" height="7.5" rx="1.5" fill="#2b2e1f"/></g><path d="M30 60 L30 50 L40 48" fill="none" stroke-width="2"/><circle cx="31" cy="49" r="5" fill="none"/><path d="M31 44 V54 M26 49 H36" stroke-width="1.4"/></g></svg>`;
+function objIcon(o){
+  if(o.flex){ const k=OBJ_ART[o.name]; const svg=o.name==='Flakgeschütz'?FLAK_ART:(k&&ART[k]?ART[k]:''); return `<span class="re-art${o.name==='Flakgeschütz'?' flak':''}">${svg}</span>`; }
+  const p=PIECES.find(p=>p.name===o.name||(p.key==='wohn'&&o.name==='Wohnhaus')); return `<span class="re-emo">${p?p.icon:'⚑'}</span>`;
+}
+window.objIcon=objIcon;
 function endHTML(){
   if(S.end<0) return fireHTML();
   const L=objList(), i=S.end, o=L[i]; if(!o) return '';
@@ -2417,7 +2424,7 @@ function endHTML(){
   return `<div class="gcard rend">
     <div class="gc-top">★ Rundenende · Runde ${S.round}</div>
     <div class="re-body">
-      <div class="re-step">Missionsziel ${i+1} von ${L.length}</div>
+      <div class="re-ic">${objIcon(o)}</div>
       <h3 class="gc-name">⚑ ${i+1} · ${o.name}</h3>
       <div class="tw"><table class="rt kv re-tab">
         <tr><th>1–3</th><td>Nichts passiert</td></tr>
