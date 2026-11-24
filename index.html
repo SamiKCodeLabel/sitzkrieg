@@ -1332,7 +1332,7 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
     <article class="rcard" id="felderweiterung">
       <h2>Felderweiterungen</h2>
-      <p>Ein Feld, auf dem ein flexibles Missionsziel hätte erscheinen können, aber keines erschienen ist, kann zu Spielbeginn eine der folgenden Erweiterungen bekommen (jede höchstens 1 mal pro Spielplan). Auf einer normalen Karte gibt es 0–3, auf einer epischen Karte 0–5 Felderweiterungen – die Anzahl stellst du bei <b>Karte → Einstellungen</b> ein:</p>
+      <p>Ein Feld, auf dem ein flexibles Missionsziel hätte erscheinen können, aber keines erschienen ist, kann zu Spielbeginn eine der folgenden Erweiterungen bekommen (jede höchstens 1 mal pro Spielplan). Auf einer normalen Karte gibt es 0–3, auf einer epischen Karte 0–5 Felderweiterungen (zufällig) – die Höchstzahl stellst du bei <b>Karte → Einstellungen</b> ein:</p>
       <ul>
         <li><b>Auto</b> – Deckung</li>
         <li><b>Kutsche</b> – Deckung</li>
@@ -2190,7 +2190,8 @@ const EXT_SHY={Stacheldraht:'Stachel&shy;draht',Flugzeugwrack:'Flugzeug&shy;wrac
 const OBJ_SHY={Transporter:'Trans&shy;porter',Kampfflieger:'Kampf&shy;flieger','Artilleriegeschütz':'Artillerie&shy;geschütz','Flakgeschütz':'Flak&shy;geschütz'};
 function missionSetup(){
   const m=window.CUR_MISSION; if(!current||current.error||!m) return null;
-  const nExt=Math.min(EXT_MAX[ROWS+'x'+COLS]??3, settings.ext?.[ROWS+'x'+COLS]??3);
+  const extMax=Math.min(EXT_MAX[ROWS+'x'+COLS]??3, settings.ext?.[ROWS+'x'+COLS]??3);
+  const nExt=Math.floor(mulberry32((current.seed^0xe7c0)>>>0)()*(extMax+1));   // zufällig 0 bis Höchstzahl, fest pro Karte
   const key=current.seed+'|'+ROWS+'x'+COLS+'|'+m.name+'|'+nExt;
   if(current._ms && current._ms.key===key) return current._ms;
   let h=0; for(const ch of m.name) h=(h*31+ch.charCodeAt(0))|0;
