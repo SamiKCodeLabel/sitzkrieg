@@ -93,6 +93,7 @@ function build() {
     const g = G(); g.position.set((x0 + x1) / 2, 0, (z0 + z1) / 2); board.add(g);
     const plate = brick(g, w, .08, d, TERRAIN[x.p.key] || 0x86a84a, 0, -.04, 0); plate.traverse(o => o.receiveShadow = true);
     const t = G(); t.position.y = .025; g.add(t); terrain(x.p.key, t, w, d);
+    if (x.p.key === 'kirche') { const p = w > d ? g.position.z : g.position.x; if (p > .01) t.rotation.y = Math.PI; }   // Kirchenportal zur Kartenmitte drehen
     t.traverse(o => { if (o.isMesh) o.castShadow = o.receiveShadow = true; });
     const oi = ms ? ms.objectives.indexOf(x) : -1, ex = ms && ms.exts ? ms.exts.find(e => e.p === x) : null;
     if (oi >= 0) { const f = flag(g, .02); f.scale.setScalar(1.35); S3.flags.push(f); const o = ms.objInfo[oi];

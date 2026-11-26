@@ -1,6 +1,6 @@
 // Gelände-Modelle der Kartenfelder (Klemmbaustein-Stil) – genutzt vom 3D-Spieltisch und von den Rundenende-Bildern
 import { THREE, brick, slope, plastic } from './modelle.js';
-const TERRAIN = { wald: 0x4f7a34, flach: 0x86a84a, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0xd9c591, wohn: 0x8fa357, graben: 0x6e5a3e, hafen: 0x1f5fb0, see: 0x4a86a8, strasse: 0x8b8a84, ruine: 0x7a6e62, kirche: 0xa3a7a8 };
+const TERRAIN = { wald: 0x4f7a34, flach: 0x86a84a, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0xd9c591, wohn: 0x8fa357, graben: 0x6e5a3e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
 const R = Math.random;
 
 // ---------- Gelände-Modelle (Mittelpunkt 0,0; Fläche w x d) ----------
@@ -115,9 +115,9 @@ function terrain(key, g, w, d) {
     case 'wohn': house3(g); break;
     case 'graben': trench(g, w, d); break;
     case 'hafen': harbor2(g, w, d); break;
-    case 'see': water(g, w, d); for (let i = 0; i < 5; i++) brick(g, .04, .3, .04, 0x5a7a2a, -.6 + R() * .2, .15, -.6 + i * .3, { studs: false }); break;
+    case 'see': see3(g, w, d); break;
     case 'strasse': road(g, w, d); break;
-    case 'ruine': ruin(g); break;
+    case 'ruine': ruin3(g, w, d); break;
     case 'kirche': church2(g, w, d); break;
   }
 }
@@ -331,6 +331,62 @@ function farm3(g) {
   for (let i = 0; i < 8; i++) box(g, .02, .1, .12, 0xf2c020, .48 + (i % 4) * .055, .07, .32 + Math.floor(i / 4) * .17);
   for (const [x, z, c] of [[-.4, .5, 0x2a4a3a], [.1, .62, 0x8a9a8a], [-.65, .62, 0x2a6a5a], [.62, -.3, 0x2a6a5a]]) for (let k = 0; k < 5; k++) box(g, .16, .012, .03, c, x, .01, z, 0, k * Math.PI / 5, 0);
   for (const [x, z] of [[.25, .1], [.62, .05], [-.2, .45], [.65, .65]]) box(g, .07, .012, .07, 0xc8b07a, x, .01, z, 0, Math.random() * 3, 0);
+}
+
+// See nach Foto: blaue Noppenplatte, Holzsteg mit Pfosten, Fass, Schilf mit Rohrkolben, Laub auf der Wiese
+const LBLUE = 0x2456b8, PLANT = 0x1f7a4a;
+function reed(g, x, z, s = 1) {
+  const n = G(); n.position.set(x, 0, z); n.rotation.y = R() * 6.28; n.scale.setScalar(s); g.add(n);
+  for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2, t = .55 + (k % 2) * .25;
+    const f = box(n, .022, .3, .05, PLANT, Math.cos(a) * .08, .13, Math.sin(a) * .08); f.rotation.set(Math.sin(a) * t, 0, -Math.cos(a) * t);
+    for (const e of [.35, .7]) { const b = new THREE.Mesh(new THREE.SphereGeometry(.018, 8, 6), plastic(PLANT)); b.position.set(Math.cos(a) * (.08 + e * .14), .03 + e * .22, Math.sin(a) * (.08 + e * .14)); n.add(b); } }
+  for (const [dx, dz, h] of [[0, 0, .3], [.03, .02, .24]]) { cyl(n, .006, h, 0x3a5a2a, dx, h / 2, dz); cyl(n, .016, .06, 0x6b3a1e, dx, h + .02, dz, 0, 0, 8); }
+}
+function tanLeaf(g, x, z, c = 0xc8b48a) { const l = leaf(g, x, .012, z, .45, R() * 6.28); l.material = plastic(c); }
+function see3(g, w, d) {
+  const ww = w - .36, dd = d - .36, ox = -.02, oz = .04;
+  brick(g, ww, .035, dd, LBLUE, ox, .0175, oz);                                              // Wasser als blaue Noppenplatte
+  // Holzsteg vom oberen Ufer ins Wasser, sechs Pfosten mit hellen Köpfen
+  const sx = ox - ww * .18, sl = Math.min(.6, dd * .45), sz0 = oz - dd / 2 - .05;
+  box(g, .28, .04, sl, 0x6b3a1e, sx, .07, sz0 + sl / 2);
+  for (let i = 0; i < 3; i++) for (const s of [-1, 1]) { const z = sz0 + .08 + i * (sl - .14) / 2; cyl(g, .035, .14, 0x5a3418, sx + s * .12, .07, z); cyl(g, .036, .012, 0xc8a878, sx + s * .12, .145, z); }
+  // Fass am Ufer
+  const bx = sx - .25, bz = oz - dd / 2 - .1; const fass = new THREE.Mesh(new THREE.CylinderGeometry(.065, .055, .14, 16), plastic(0x8a5a2c)); fass.position.set(bx, .07, bz); g.add(fass); for (const y of [.03, .11]) cyl(g, .067, .012, 0x5a3418, bx, y, bz);
+  // Schilf rund ums Ufer
+  const ex = ww / 2, ez = dd / 2;
+  const rim = [[-ex, -ez * .2], [-ex - .02, ez * .45], [-ex * .55, ez + .02], [ex * .1, ez + .03], [ex * .7, ez], [ex + .02, ez * .4], [ex * .85, -ez * .5], [ex * .25, -ez - .02], [-ex * .75, -ez * .95]];
+  if (w > 2) rim.push([-ex * .2, ez + .02], [ex * .45, -ez - .02]);
+  for (const [x, z] of rim) reed(g, ox + x, oz + z, .75 + R() * .3);
+  // Laub, kleine Steine auf der Wiese
+  const hw = w / 2 - .08, hd = d / 2 - .08;
+  for (const [x, z] of [[-hw, -hd * .3], [-hw * .9, hd], [hw * .2, hd], [hw, hd * .6], [hw * .6, -hd], [-hw * .3, -hd]]) tanLeaf(g, x, z);
+  for (const [x, z, c] of [[hw - .02, -hd * .2, 0x8a4a2a], [-hw + .02, hd * .3, 0x9a4a22], [hw * .9, -hd * .9, 0xb8d84a], [-hw * .9, -hd * .85, 0xb8d84a]]) box(g, .12, .025, .07, c, x, .0125, z, 0, (x * 7) % 1.5, 0);
+}
+
+// Ruine nach Foto: hellgraue Platte mit Fliesen, ausgebrannte Mauerschale mit gezackter Oberkante, dunkler Schutt innen
+const MSG = 0x62676c, DSG = 0x3c4044;
+function ruin3(g, w, d) {
+  const hw = w / 2 - .06, hd = d / 2 - .06;
+  for (let i = 0; i < 22; i++) { const long = R() < .4; box(g, long ? .2 + R() * .12 : .06 + R() * .06, .012, .06 + (long ? 0 : R() * .05), R() < .55 ? 0x9a9ea2 : (R() < .6 ? MSG : DSG), (R() - .5) * 2 * hw, .006, (R() - .5) * 2 * hd, 0, R() < .5 ? 0 : HALF, 0); }
+  const W = .82 + R() * .12, D = .66 + R() * .1, x0 = (R() - .5) * .15, z0 = -.12 + (R() - .5) * .1;
+  box(g, W - .08, .045, D - .08, DSG, x0, .0225, z0);                                         // dunkler Boden innen
+  for (let i = 0; i < 10; i++) box(g, .05 + R() * .1, .025 + R() * .04, .05 + R() * .08, [0x2a2c2e, DSG, 0x1b1b1b, MSG][i % 4], x0 + (R() - .5) * (W - .2), .03, z0 + (R() - .5) * (D - .2), R() * .4, R() * 3, R() * .4);
+  // Mauern aus Einzelsteinen, Höhe springt (oben abgebrochen), vorne niedriger
+  const unit = .1, sides = [[0, -D / 2, W, 0, .55], [W / 2, 0, D, HALF, .45], [0, D / 2, W, Math.PI, .25], [-W / 2, 0, D, -HALF, .5]];
+  for (const [cx, cz, len, ry, hMax] of sides) {
+    const wl = G(); wl.position.set(x0 + cx, 0, z0 + cz); wl.rotation.y = ry; g.add(wl);
+    const n = Math.round(len / unit); let h = hMax * (.6 + R() * .4);
+    for (let i = 0; i < n; i++) {
+      if (i % 2 === 0) h = Math.max(.12, Math.min(hMax, h + Math.round((R() - .5) * 3) * .06));
+      const rows = Math.max(1, Math.round(h / .06));
+      for (let k = 0; k < rows; k++) { const c = R() < .2 ? DSG : (R() < .3 ? 0x7f8488 : MSG); box(wl, unit - .004, .058, .08, c, -len / 2 + (i + .5) * unit, .03 + k * .06, 0); }
+      if (rows > 1 && R() < .5) { const st = new THREE.Mesh(new THREE.CylinderGeometry(.018, .018, .016, 10), plastic(MSG)); st.position.set(-len / 2 + (i + .5) * unit, rows * .06 + .008, 0); wl.add(st); }
+      if (rows >= 3 && R() < .25) box(wl, unit * .6, .08, .085, 0x2a2c2e, -len / 2 + (i + .5) * unit, .12, 0);   // Fensterloch / Brandspur
+    }
+  }
+  // Schutt vor der Ruine und ein paar Mauerreste
+  for (let i = 0; i < 6; i++) box(g, .1, .05 + R() * .05, .08, R() < .5 ? MSG : DSG, x0 + (R() - .5) * W, .03, z0 + D / 2 + .08 + R() * .2, R() * .5, R() * 3, R() * .5);
+  for (const [x, z] of [[hw * .75, hd * .7], [-hw * .7, hd * .8]]) for (let k = 0; k < 2 + Math.floor(R() * 2); k++) box(g, .1, .058, .08, MSG, x + (R() - .5) * .04, .03 + k * .06, z);
 }
 
 // Ein einzelnes Feld als Modell (Bauplatte + Gelände), z. B. für das Bild am Rundenende
