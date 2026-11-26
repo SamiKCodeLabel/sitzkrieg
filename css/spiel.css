@@ -132,3 +132,69 @@ button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,
 }
 /* Armee-Liste: eine einzelne Figur bekommt die volle Breite (vorher immer nur die halbe, daher so klein) */
 .slot-art.duo svg.fig:only-of-type{width:auto;max-width:100%;height:100%}
+
+/* ===== Einheiten-Animationen beim Aufdecken (Spiel-Tab) – kurz, starten nach dem Umdrehen ===== */
+.gc-art.anim svg.fig{transform-origin:50% 100%;animation-delay:.26s;animation-fill-mode:both}
+.gc-art.anim::after{content:"";position:absolute;pointer-events:none;opacity:0;animation-delay:.26s;animation-fill-mode:both}
+/* Gewehrschützen: marschieren nacheinander */
+.anim-rif svg.fig{animation:aMarch .5s ease-out}
+.anim-rif svg.fig:nth-child(2){animation-delay:.32s} .anim-rif svg.fig:nth-child(3){animation-delay:.38s}
+.anim-rif svg.fig:nth-child(4){animation-delay:.44s} .anim-rif svg.fig:nth-child(5){animation-delay:.5s}
+@keyframes aMarch{0%,100%{transform:none}30%{transform:translateY(-9%)}60%{transform:translateY(0) rotate(-2deg)}}
+/* Schusswaffen: Rückstoß + Mündungsfeuer */
+.anim-sniper svg.fig,.anim-shotgun svg.fig,.anim-pzf svg.fig,.anim-general svg.fig{animation:aRecoil .45s ease-out}
+@keyframes aRecoil{0%,100%{transform:none}15%{transform:translateX(-5%) rotate(-3deg)}40%{transform:translateX(1%)}}
+.anim-shotgun::after,.anim-pzf::after,.anim-mg::after,.anim-art::after,.anim-schwer::after,.anim-leicht::after{
+  width:44px;height:44px;right:12%;top:26%;border-radius:50%;
+  background:radial-gradient(circle,#fff6c8 0 18%,#f6c445 30%,#e8803a 52%,rgba(232,128,58,0) 70%);animation:aFlash .4s ease-out}
+.anim-schwer::after,.anim-leicht::after{right:4%;top:20%} .anim-art::after{right:2%;top:16%}
+@keyframes aFlash{0%{opacity:0;transform:scale(.3)}20%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(1.6)}}
+/* Scharfschütze: Glanz im Zielfernrohr */
+.anim-sniper::after{width:30px;height:30px;left:52%;top:38%;background:radial-gradient(circle,#fff 0 12%,rgba(255,255,255,.6) 22%,transparent 60%);
+  clip-path:polygon(50% 0,58% 42%,100% 50%,58% 58%,50% 100%,42% 58%,0 50%,42% 42%);animation:aGlint .7s ease-out}
+@keyframes aGlint{0%{opacity:0;transform:scale(.2) rotate(0)}35%{opacity:1;transform:scale(1.2) rotate(45deg)}100%{opacity:0;transform:scale(.6) rotate(90deg)}}
+/* MG: Feuerstoß */
+.anim-mg svg.fig{animation:aBurst .6s linear}
+@keyframes aBurst{0%,100%{transform:none}10%,30%,50%,70%{transform:translate(-2%,1%)}20%,40%,60%,80%{transform:translate(1%,-1%)}}
+.anim-mg::after{animation:aFlash .12s ease-out 5}
+/* Flammenwerfer: Flamme lodert */
+.anim-flame svg.fig{animation:aPush .7s ease-out}
+@keyframes aPush{0%,100%{transform:none}25%,75%{transform:translateX(2%) scale(1.02)}50%{transform:translateX(-1%)}}
+.anim-flame::after{width:70px;height:46px;right:2%;top:12%;border-radius:50% 60% 40% 50%;
+  background:radial-gradient(ellipse at 30% 60%,#fff2a0 0 18%,#f6a43a 40%,#d8452c 62%,rgba(216,69,44,0) 75%);animation:aFire .7s ease-out}
+@keyframes aFire{0%{opacity:0;transform:scale(.3)}25%{opacity:1;transform:scale(1.15) rotate(-6deg)}55%{opacity:1;transform:scale(.95) rotate(4deg)}100%{opacity:0;transform:scale(1.3)}}
+/* Granatwerfer: Wurf */
+.anim-grenade svg.fig{animation:aThrow .55s ease-out}
+@keyframes aThrow{0%,100%{transform:none}30%{transform:rotate(-6deg) translateX(-3%)}60%{transform:rotate(4deg) translateX(2%)}}
+.anim-grenade::after{width:12px;height:12px;left:62%;top:14%;border-radius:50%;background:#4a4238;border:2px solid #1f1a14;animation:aArc .7s cubic-bezier(.3,.6,.6,1)}
+@keyframes aArc{0%{opacity:1;transform:translate(0,0)}50%{opacity:1;transform:translate(60px,-30px) rotate(180deg)}100%{opacity:0;transform:translate(110px,30px) rotate(360deg)}}
+/* Mörser: Granate fliegt hoch + Rauch */
+.anim-mortar svg.fig{animation:aRecoil .4s ease-out .5s both}
+.anim-mortar::after{width:10px;height:16px;right:22%;top:40%;border-radius:50% 50% 30% 30%;background:#4a4238;border:2px solid #1f1a14;animation:aShell .7s ease-in}
+@keyframes aShell{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-120px) scale(.6)}}
+/* Minenleger: bückt sich zweimal */
+.anim-mine svg.fig{animation:aCrouch .7s ease-in-out}
+@keyframes aCrouch{0%,50%,100%{transform:none}25%,75%{transform:scaleY(.9) scaleX(1.04)}}
+/* Mechaniker: schraubt (wackelt) */
+.anim-mech svg.fig{animation:aWrench .7s ease-in-out}
+@keyframes aWrench{0%,100%{transform:none}20%{transform:rotate(-5deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(3deg)}}
+/* Mediziner: Rotkreuz pulsiert */
+.anim-medic::after{width:38px;height:38px;left:calc(50% - 19px);top:6%;background:#f6ecd4;
+  clip-path:polygon(35% 0,65% 0,65% 35%,100% 35%,100% 65%,65% 65%,65% 100%,35% 100%,35% 65%,0 65%,0 35%,35% 35%);
+  box-shadow:inset 0 0 0 40px #b0352a;animation:aCross .9s ease-out}
+@keyframes aCross{0%{opacity:0;transform:scale(.3)}30%{opacity:1;transform:scale(1.15)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translateY(-20px) scale(.8)}}
+/* General: grüßt, Wappen stempelt sich ein */
+.anim-general .gc-crest{animation:aStamp .45s cubic-bezier(.2,.8,.3,1.3) .45s both}
+@keyframes aStamp{0%{opacity:0;transform:rotate(6deg) scale(2.2)}100%{opacity:1;transform:rotate(6deg) scale(1)}}
+/* Panzer: rumpeln, Rückstoß */
+.anim-schwer svg.fig,.anim-leicht svg.fig{animation:aTank .6s ease-out}
+@keyframes aTank{0%,100%{transform:none}10%{transform:translate(1%,-1%)}20%{transform:translate(-1%,1%)}35%{transform:translateX(-4%)}55%{transform:translateX(1%)}}
+/* Geschütz: Rückstoß */
+.anim-art svg.fig{animation:aTank .6s ease-out}
+/* Kraftrad und Transporter: fahren ein */
+.anim-krad svg.fig,.anim-trans svg.fig{animation:aDrive .6s cubic-bezier(.2,.8,.3,1.1)}
+@keyframes aDrive{0%{transform:translateX(-60%);opacity:.3}70%{transform:translateX(3%) rotate(-1deg)}100%{transform:none;opacity:1}}
+/* Kampfflieger: rauscht vorbei und kommt zurück */
+.anim-flieger svg.fig{animation:aFly .9s cubic-bezier(.4,0,.2,1)}
+@keyframes aFly{0%{transform:translate(-120%,20%) rotate(8deg);opacity:.3}45%{transform:translate(20%,-8%) rotate(-4deg);opacity:1}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){ .gc-art.anim svg.fig,.gc-art.anim::after,.anim-general .gc-crest{animation:none!important} .gc-art.anim::after{opacity:0!important} }

@@ -176,7 +176,16 @@ function render(){
   const gc=el.querySelector('.gcard');
   // Neue Karte (oder neuer Rundenende-Bildschirm): kurz umdrehen. Bei bloßem Neuzeichnen (Lobby, Seitenwahl) nicht.
   const cardKey=S.round+'|'+S.deck.length+'|'+S.end;
-  if(gc&&cardKey!==lastCardKey&&lastCardKey!==null) gc.classList.add('flip-in');
+  if(gc&&cardKey!==lastCardKey&&lastCardKey!==null){
+    gc.classList.add('flip-in');
+    // Passende Kurz-Animation zur aufgedeckten Einheit (läuft nach dem Umdrehen)
+    const c=S.end===null?S.cur:null, art=gc.querySelector('.gc-art');
+    if(c&&art){
+      const kind=c.kind==='rif'?'rif':c.kind==='veh'?c.key:(c.unit?c.unit.key:'');
+      if(kind) art.classList.add('anim','anim-'+kind);
+      if(kind==='flieger'&&typeof Sounds!=='undefined') try{ setTimeout(()=>Sounds.play('plane'),250); }catch(e){}
+    }
+  }
   lastCardKey=cardKey;
   if(gc){
     if(window.linkRules) linkRules(gc);
