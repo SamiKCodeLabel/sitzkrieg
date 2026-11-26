@@ -1785,6 +1785,7 @@ html[data-theme="dark"] .dg-fxcard{background:#2a2f20;color:#e3dcc0;border-color
 </div>
 <button id="fab"><span class="lbl-map">🎲 Neue Karte</span><span class="lbl-army">🎲 Zufällige Armeen</span></button>
 
+<script src="js/regeln.js?v=fc6c3894ce"></script>
 <script>
 const PIECES = [
   {key:'wald',    name:'Wald',          biome:'g', size:1, count:3, icon:'🌲'},
@@ -2173,10 +2174,7 @@ const RIFLEMAN_FACTION={de:"<svg class=\"fig\" viewBox=\"0 0 30 42\" aria-hidden
 const RIFLEMAN="<svg class=\"fig\" viewBox=\"0 0 30 42\" aria-hidden=\"true\"><g><ellipse class=\"sh\" cx=\"15\" cy=\"40\" rx=\"9\" ry=\"1.6\"/><path class=\"u2\" d=\"M12.5 26 L10 38 L13 38 L15.5 28 Z\"/><path class=\"u1\" d=\"M15 27 L17.5 38 L20.5 38 L18.5 26 Z\"/><path class=\"u1\" d=\"M10.5 15 Q15 13 19.5 15 L20.5 27 Q15 28.5 9.5 27 Z\"/><rect class=\"dk\" x=\"9.6\" y=\"23\" width=\"11\" height=\"2\"/><path class=\"sk\" d=\"M12.4 8.4 Q12 13.6 15 14 Q18.4 13.6 18 8.6 Z\"/><path class=\"hl\" d=\"M11 9.6 Q11 3 15.2 3 Q19.6 3 19.6 8 L21.6 9.6 L18 9.2 Q15 8.6 12.4 9.2 L10 10 Z\"/><path class=\"wd\" d=\"M5 27 L22 17.6 L23 19.2 L6.4 28.6 Z\"/><path class=\"mt\" d=\"M22 17.6 L28 14.4 L28.6 15.6 L23 19.2 Z\"/><circle class=\"sk\" cx=\"18.6\" cy=\"20\" r=\"1.4\"/></g></svg>";
 const VEHICLES=[
   {key:'schwer',name:'Schwerer Panzer',n:1},{key:'leicht',name:'Leichter Panzer',n:1},{key:'krad',name:'Kraftrad',n:1}];
-const SPECIALS=[
-  {key:'general',name:'General',n:3},{key:'sniper',name:'Scharfschütze',n:1},{key:'mine',name:'Minenleger',n:1},
-  {key:'flame',name:'Flammenwerfer',n:1},{key:'shotgun',name:'Schrotflinte',n:1},{key:'grenade',name:'Granatwerfer',n:1},
-  {key:'mortar',name:'Mörser',n:1},{key:'mg',name:'Maschinengewehr',n:1},{key:'mech',name:'Mechaniker',n:1},{key:'medic',name:'Mediziner',n:1}];
+const SPECIALS=RULES.spezialeinheiten.map(s=>({key:s.key,name:s.name,n:s.vorrat}));   // aus js/regeln.js
 const SLOTS={'3x6':11,'3x8':9};   // Normal: 1–3 Fahrzeuge + 4 Spezialeinheiten + 6 Trupps (Wert hier nur noch als Seed-Zusatz);   // Episch: 3 Fahrzeuge + 6 Trupps (12 Spezialeinheiten = der ganze Vorrat)
 const RIFLEMEN=5; // Gewehrschützen pro Trupp
 const MAX_RIFLEMEN=35; // Gewehrschützen pro Spieler insgesamt
@@ -2397,8 +2395,7 @@ document.addEventListener('click',e=>{ const s=e.target.closest('.slot[data-veh]
 document.addEventListener('keydown',e=>{ const s=e.target.closest&&e.target.closest('.slot[data-veh]'); if(s&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); openVeh(s.dataset.veh); } });
 
 // ---------- Popup mit den Waffenwerten eines Trupps ----------
-const WEAPONS_OF={general:['Pistole'],sniper:['Scharfschütze'],mine:['Personenminen','Panzerminen','Nahkampfwaffe'],flame:['Flammenwerfer'],
-  shotgun:['Schrotflinte'],grenade:['Granate','Rauchgranate','Pistole'],mortar:['Mörser'],mg:['Maschinengewehr'],mech:['Pistole'],medic:['Pistole']};
+const WEAPONS_OF=Object.fromEntries(RULES.spezialeinheiten.map(s=>[s.key,s.waffen]));
 const EXTRA_SECTION={mech:'mechaniker',medic:'medikit',mine:'minenleger',flame:'flammenwerfer'};
 function weaponTable(names){
   const src=document.querySelector('#waffen table'); if(!src) return '';
@@ -2430,10 +2427,10 @@ document.addEventListener('keydown',e=>{ const s=e.target.closest&&e.target.clos
 // ---------- Mission auf der Karte: Startzonen und Missionsziele ----------
 const markOn=true;   // Markierungen immer an
 const OBJ_N={'3x6':3,'3x8':5};
-const OBJ_FIXED={hafen:'Hafen',kirche:'Kirche',zug:'Zug',farm:'Farm',wohn:'Wohnhaus',bunker:'Bunker',graben:'Graben',turm:'Wachturm'};
-const OBJ_HOSTS=['flach','strand','strasse','ruine'];
-const OBJ_FLEX=['Transporter','Kampfflieger','Artilleriegeschütz','Flakgeschütz'];
-const EXT_TYPES=[{name:'Auto',icon:'🚗'},{name:'Kutsche',icon:'🐴'},{name:'Jeep',icon:'🚙'},{name:'Stacheldraht',icon:'➰'},{name:'Flugzeugwrack',icon:'✈️'},{name:'Abtrünnige',icon:'🏴'}];
+const OBJ_FIXED=RULES.missionsziele.fest;
+const OBJ_HOSTS=RULES.missionsziele.felder;
+const OBJ_FLEX=RULES.missionsziele.flexibel;
+const EXT_TYPES=RULES.felderweiterungen.map(f=>({name:f.name,icon:f.icon}));
 const EXT_SHY={Stacheldraht:'Stachel&shy;draht',Flugzeugwrack:'Flugzeug&shy;wrack','Abtrünnige':'Abtrün&shy;nige'};
 const OBJ_SHY={Transporter:'Trans&shy;porter',Kampfflieger:'Kampf&shy;flieger','Artilleriegeschütz':'Artillerie&shy;geschütz','Flakgeschütz':'Flak&shy;geschütz'};
 function missionSetup(){
@@ -3478,7 +3475,7 @@ function unitsFromArmies(){
       const n=rifOf(sl); if(n>0) out.push(newUnit(side,'rif',{key:'rif',name:'Gewehrschützen',n,hitB:0,penB:0}));
     }
     // Infiltrator: General + 1 Gewehrschützen-Trupp dürfen an jede Kante
-    const gi=out.find(u=>u.side===side&&u.kind==='spec'&&u.abil&&u.abil.name==='Infiltrator');
+    const gi=out.find(u=>u.side===side&&u.kind==='spec'&&u.abil&&u.abil.name==='Flankieren');
     if(gi){ gi.inf=true; const r=out.find(u=>u.side===side&&u.kind==='rif'&&!u.inf); if(r) r.inf=true; }
   }
   return out;
@@ -3637,7 +3634,7 @@ function damage(t,k,info,fx,depth){
     log(t.side,`${t.name}: −${lost} (noch ${t.n})`);
   } else if(t.kind==='spec'){
     let hp=t.hp-k;
-    if(hp<=0&&t.abil&&t.abil.name==='Unsterblicher'&&!(k>=2||info.pen>=3)){ hp=1; fx.res.push('Unsterblicher: der General hält mit 1 Lebenspunkt durch'); }
+    if(hp<=0&&t.abil&&t.abil.name==='Unsterblich'&&!(k>=2||info.pen>=3)){ hp=1; fx.res.push('Unsterblicher: der General hält mit 1 Lebenspunkt durch'); }
     t.hp=Math.max(0,hp);
     if(t.hp<=0){ t.dead=true; G.lost[t.side]++; fx.res.push(`${t.name} (${sideTag(t.side)}) fällt`); log(t.side,`${t.name} fällt`); }
     else { fx.res.push(`${t.name} (${sideTag(t.side)}): −${k} LP · noch ${t.hp}`); log(t.side,`${t.name}: −${k} LP (noch ${t.hp})`); }
@@ -3699,7 +3696,7 @@ function attackDirect(a,o,t,ctx){
   if(isInf(a)){
     const tak=nearGeneral(a,'Taktiker');
     if(!hits&&tak&&!G.taktik[tak.id+'@'+G.round]){ G.taktik[tak.id+'@'+G.round]=1; vals=Array.from({length:nd},()=>rnd(6)); hits=vals.filter(v=>v>=need).length; fx.lines.push({lbl:`Taktiker: Trefferwurf komplett wiederholt`,type:6,vals,need}); }
-    const imp=nearGeneral(a,'Improvisator');
+    const imp=nearGeneral(a,'Improvisieren');
     if(imp&&hits<nd){ const v=rnd(6); fx.lines.push({lbl:'Improvisator: einen Fehlwurf neu',type:6,vals:[v],need}); if(v>=need) hits++; }
   }
   if(!hits){ fx.res.push(`${nd} W6 auf ${need}+: kein Treffer`); return fx; }
@@ -4228,7 +4225,7 @@ function newRound(){
 }
 function holders(pi){
   const cnt={de:0,al:0};
-  for(const u of G.units) if(alive(u)&&(u.kind==='rif'||u.kind==='spec')&&inPiece(pi,u)) cnt[u.side]+=(u.abil&&u.abil.name==='Verschanzer')?2:1;
+  for(const u of G.units) if(alive(u)&&(u.kind==='rif'||u.kind==='spec')&&inPiece(pi,u)) cnt[u.side]+=(u.abil&&u.abil.name==='Besetzen')?2:1;
   return {de:Math.min(3,cnt.de),al:Math.min(3,cnt.al)};
 }
 function objectiveRoll(k){
