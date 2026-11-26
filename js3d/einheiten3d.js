@@ -191,7 +191,26 @@ function act(v) {
       break;
     }
     case 'mech': if (gs) gs.fromTo(d.armR.rotation, { x: d.armR.rotation.x }, { x: d.armR.rotation.x + .9, duration: .14, yoyo: true, repeat: 5, ease: 'power2.in' }); for (let i = 0; i < 3; i++) fx.at(.14 + i * .28, () => { const p = d.tool.getWorldPosition(new THREE.Vector3()); for (let k = 0; k < 8; k++) fx.spawn({ p, v: V((Math.random() - .5) * 3, Math.random() * 3, (Math.random() - .5) * 3), life: .4, s0: .06, s1: .02, c0: 0xffe090, c1: 0xff7020, g: -9 }); fx.flash(p, 1.5); }); break;
-    case 'medic': fx.at(.2, () => { fx.sparkle(V(.2, 1.2, .4), 'plus', 0x6dff7a, 14); fx.flash(V(0, 1.4, .8), 1.5); }); break;
+    case 'medic': {   // verwundeten Kameraden heilen: der steht auf, springt zweimal und rennt rechts raus
+      if (v.patient) v.stage.remove(v.patient);
+      const ax = new THREE.Box3().setFromObject(v.root).max.x, pt = buildUnit('rif', v.side); v.patient = pt; v.stage.add(pt);
+      if (pt.userData.shadow) pt.userData.shadow.visible = false;
+      const px = ax + .55, pz = .15; pt.position.set(px, .16, pz); pt.rotation.set(-HALF, 0, HALF * .9);   // liegt am Boden
+      const body = d.body;
+      if (gs) { gs.to(body.rotation, { x: .45, duration: .35, ease: 'power2.out' }); gs.to(body.rotation, { x: 0, duration: .35, delay: 1.45 });
+        gs.fromTo(d.armR.rotation, { x: d.armR.rotation.x }, { x: d.armR.rotation.x + .5, duration: .3, yoyo: true, repeat: 3, delay: .3 }); }
+      fx.at(.35, () => { fx.sparkle(V(px, .45, pz), 'plus', 0x6dff7a, 14); fx.flash(V(px, .8, pz + .3), 2); snd('button', 1.3); });
+      fx.at(.9, () => fx.sparkle(V(px, .45, pz), 'plus', 0x6dff7a, 10));
+      fx.at(1.5, () => { if (!gs) return;
+        const tl = gs.timeline();
+        tl.to(pt.rotation, { x: 0, z: 0, y: HALF, duration: .4, ease: 'back.out(1.6)' }, 0).to(pt.position, { y: 0, duration: .4 }, 0)
+          .to(pt.position, { y: .38, duration: .18, ease: 'power2.out' }, .5).to(pt.position, { y: 0, duration: .18, ease: 'power2.in' })
+          .to(pt.position, { y: .38, duration: .18, ease: 'power2.out' }).to(pt.position, { y: 0, duration: .18, ease: 'power2.in' })
+          .to(pt.position, { x: px + 4.5, duration: 1.1, ease: 'power1.in', onUpdate() { pt.position.y = Math.abs(Math.sin(pt.position.x * 9)) * .06; pt.rotation.z = Math.sin(pt.position.x * 9) * .08; } })
+          .call(() => { pt.visible = false; });
+      });
+      break;
+    }
     case 'schwer': case 'leicht': {
       const heavy = kind === 'schwer';
       if (gs) gs.fromTo(d.turret.rotation, { y: -.35 }, { y: 0, duration: .5, ease: 'power2.inOut' });
