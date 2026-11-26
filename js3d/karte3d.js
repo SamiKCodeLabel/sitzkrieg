@@ -44,7 +44,7 @@ function setup(box) {
   const scene = new THREE.Scene(); lights(scene, r);
   const sun = new THREE.DirectionalLight(0xfff0d8, 1.6); sun.position.set(-6, 12, 8); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: 1, far: 40 }); sun.shadow.bias = -.0008; scene.add(sun);
-  const cam = new THREE.PerspectiveCamera(35, 1, .1, 200);
+  const cam = new THREE.PerspectiveCamera(35, 1, 1, 120);   // größeres near = genauere Tiefe (weniger Flackern am Handy)
   const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true; ctl.maxPolarAngle = 1.35; ctl.minDistance = 4; ctl.maxDistance = 40; ctl.enablePan = true;
   ctl.addEventListener('change', () => S3 && (S3.dirty = true));
   S3 = { r, scene, cam, ctl, box, board: null, dirty: true, flags: [] };

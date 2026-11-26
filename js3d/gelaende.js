@@ -124,7 +124,9 @@ function terrain(key, g, w, d) {
 // Missionsziel-Fahne und Felderweiterung
 // ======== Nach Fotos der echten Klemmbaustein-Felder ========
 const LG = 0xa0a5a9, DGY = 0x5b6066, WHT2 = 0xf2f2ee, TANW = 0xd9c08a, TANW2 = 0xc8ab78, SLATE = 0x4e5458, OLIVE = 0x4d5530;
-function box(g, w, h, d, c, x, y, z, rx = 0, ry = 0, rz = 0) { return brick(g, w, h, d, c, x, y, z, { studs: false, rot: [rx, ry, rz] }); }
+let ZF = 0;
+function box(g, w, h, d, c, x, y, z, rx = 0, ry = 0, rz = 0) { if (h < .05 && y < .15) y += .0015 + (ZF++ % 9) * .0011;   // flache Fliesen leicht versetzt, damit nichts auf gleicher Höhe flackert
+  return brick(g, w, h, d, c, x, y, z, { studs: false, rot: [rx, ry, rz] }); }
 function cyl(g, r, h, c, x, y, z, rx = 0, rz = 0, seg = 18) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), plastic(c)); m.position.set(x, y, z); m.rotation.set(rx, 0, rz); g.add(m); return m; }
 // Feldgeschütz als Ladung (schwarz)
 function cargoGun(g, x, y, z, ry = 0, s = 1) { const k = G(); k.position.set(x, y, z); k.rotation.y = ry; k.scale.setScalar(s); g.add(k); for (const sz of [-1, 1]) cyl(k, .09, .03, 0x1b1b1b, 0, .09, sz * .12, HALF); box(k, .32, .05, .05, 0x1b1b1b, -.12, .05, 0, 0, 0, .3); cyl(k, .03, .4, 0x1b1b1b, .12, .16, 0, 0, HALF - .25); box(k, .06, .14, .2, 0x1b1b1b, .02, .14, 0); }
@@ -177,7 +179,7 @@ function harbor2(g, w, d) {
   const ring = new THREE.Mesh(new THREE.TorusGeometry(.07, .022, 8, 18), plastic(0xf2a01e)); ring.position.set(bx + .1, .58, .32); sh.add(ring);
 }
 // ---- Bunker: grauer Beton, schräge Seiten, Risse, Schießscharte, Tarngrün, rostige Eisen ----
-function leaf(g, x, y, z, s = 1, ry = 0) { const sh = new THREE.Shape(); for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = (i % 2 ? .07 : .16) * s; sh[i ? 'lineTo' : 'moveTo'](Math.cos(a) * r * 1.3, Math.sin(a) * r); } const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .015, bevelEnabled: false }), plastic(0x2c5a34)); m.rotation.set(-HALF, 0, ry); m.position.set(x, y, z); g.add(m); return m; }
+function leaf(g, x, y, z, s = 1, ry = 0) { const sh = new THREE.Shape(); for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = (i % 2 ? .07 : .16) * s; sh[i ? 'lineTo' : 'moveTo'](Math.cos(a) * r * 1.3, Math.sin(a) * r); } const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .015, bevelEnabled: false }), plastic(0x2c5a34)); m.rotation.set(-HALF, 0, ry); m.position.set(x, y + .004 + (ZF++ % 7) * .0012, z); g.add(m); return m; }
 function bunker2(g) {
   const C1 = 0xa6abaf, C2 = 0x969ba0;
   box(g, 1.0, .5, .95, C1, 0, .25, -.05);
