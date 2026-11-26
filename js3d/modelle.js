@@ -285,7 +285,12 @@ function soldier(side, kind = 'rif', opt = {}) {
       const r = rifle(); r.position.set(0, .82, -.3); r.rotation.set(-1.2, 0, .6); body.add(r);
       u.armR = arm(body, 1, ARM, -2.7); u.armL = arm(body, -1, ARM, -1.0, .2);
       const gr = G(); if (side === 'de') { P(gr, CY(.025, .025, .26, 10), BRN, 0, .1, 0); P(gr, CY(.06, .06, .11, 16), 0x5d6a4a, 0, .27, 0); } else { P(gr, SP(.075), 0x55603a, 0, .08, 0).scale.set(1, 1.25, 1); P(gr, CY(.022, .022, .05, 10), DGR, 0, .19, 0); }
-      u.armR.userData.hand.add(gr); u.grenade = gr; break;
+      if (body.userData.glb) {   // Granate groß und sichtbar oben aus der Faust
+        gr.scale.setScalar(2.3); g.updateMatrixWorld(true);
+        const hp = u.armR.userData.hand.localToWorld(new THREE.Vector3()); body.worldToLocal(hp);
+        gr.position.copy(hp).add(new THREE.Vector3(0, .02, .04)); body.add(gr); g.updateMatrixWorld(true); u.armR.userData.hand.attach(gr);
+      } else u.armR.userData.hand.add(gr);
+      u.grenade = gr; break;
     }
     case 'mortar': {
       const m = G(); m.position.set(.6, 0, .4); body.add(m);
