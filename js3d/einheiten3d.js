@@ -346,8 +346,22 @@ function fireScene() {
   const embers = Array.from({ length: 10 }, () => { const m = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, .03, 10), glass(0xffa020)); scene.add(m); return { m, t: Math.random() * 1.5, x: 0, z: 0, vx: 0, vz: 0 }; });
   return { scene, flames, light, puffs, embers };
 }
+// Kaminfeuer-Knistern als leise Endlosschleife (CC0, opengameart.org „Fireplace sound loop“)
+let KAMIN = null, kaminBuf = null;
+async function kaminStart() {
+  try {
+    const vol = typeof MASTER_VOL !== 'undefined' ? MASTER_VOL : .8; if (vol <= 0 || KAMIN) return;
+    FCTX = FCTX || new (window.AudioContext || window.webkitAudioContext)(); const c = FCTX; if (c.state === 'suspended') c.resume();
+    if (!kaminBuf) kaminBuf = await c.decodeAudioData(await (await fetch('assets/sounds/kamin.mp3')).arrayBuffer());
+    if (!fire3 || KAMIN) return;
+    const src = c.createBufferSource(), g = c.createGain(); src.buffer = kaminBuf; src.loop = true;
+    g.gain.setValueAtTime(0, c.currentTime); g.gain.linearRampToValueAtTime(.55 * vol, c.currentTime + 1.2);
+    src.connect(g).connect(c.destination); src.start(); KAMIN = { src, g };
+  } catch (e) { }
+}
+function kaminStop() { if (!KAMIN) return; const { src, g } = KAMIN, c = FCTX; KAMIN = null; try { g.gain.cancelScheduledValues(c.currentTime); g.gain.setValueAtTime(g.gain.value, c.currentTime); g.gain.linearRampToValueAtTime(0, c.currentTime + .6); src.stop(c.currentTime + .7); } catch (e) { } }
 function mountFire() {
-  const wrap = document.querySelector('#tab-spiel .gcard.refire .fire-wrap'); if (!wrap) { fire3 = null; return; }
+  const wrap = document.querySelector('#tab-spiel .gcard.refire .fire-wrap'); if (!wrap) { fire3 = null; kaminStop(); return; }
   if (fire3 && fire3.wrap === wrap) return;
   if (!THREE) { heavy().then(mountFire); return; }
   if (!FR) { FR = new THREE.WebGLRenderer({ antialias: true, alpha: true }); FR.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); FR.outputColorSpace = THREE.SRGBColorSpace; FR.toneMapping = THREE.NeutralToneMapping; FR.toneMappingExposure = 1; FR.domElement.className = 'fire3d'; }
@@ -355,9 +369,9 @@ function mountFire() {
   const w = Math.max(200, wrap.clientWidth), h = Math.max(140, wrap.clientHeight); FR.setSize(w, h, false);
   const sc = fireScene(), cam = new THREE.PerspectiveCamera(30, w / h); cam.position.set(0, 2.0, 4.6); cam.lookAt(0, .65, 0);
   const me = fire3 = { wrap, ...sc, cam, last: performance.now(), t0: performance.now() };
-  if (typeof Sounds !== 'undefined') flameSound(1.6);
+  kaminStart();
   (function loop() {
-    if (fire3 !== me || !wrap.isConnected) { if (fire3 === me) fire3 = null; return; } requestAnimationFrame(loop); if (document.hidden) return;
+    if (fire3 !== me || !wrap.isConnected) { if (fire3 === me) { fire3 = null; kaminStop(); } return; } requestAnimationFrame(loop); if (document.hidden) return;
     const now = performance.now(), dt = Math.min(.05, (now - me.last) / 1000), t = (now - me.t0) / 1000; me.last = now;
     for (const f of me.flames) { const k = 1 + Math.sin(t * 13 + f.ph) * .12 + Math.sin(t * 7.3 + f.ph * 2) * .08; f.f.scale.set(1 - (k - 1) * .5, k, 1 - (k - 1) * .5); f.f.rotation.y += dt * 2; }
     me.light.intensity = 5 + Math.sin(t * 17) * 1.2 + Math.sin(t * 9) * .8;
