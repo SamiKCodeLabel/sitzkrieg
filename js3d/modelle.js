@@ -320,7 +320,7 @@ function soldier(side, kind = 'rif', opt = {}) {
     }
     case 'general': {
       if (opt.veteran) { hold(mgun(), .04, .8, .24, -.05); u.armL = arm(body, -1, ARM, -1.2, .2); u.armR = arm(body, 1, ARM, -.75); break; }
-      hold(pistol(), 0, 0, 0, 0); u.armR = arm(body, 1, ARM, -2.05); u.armL = arm(body, -1, ARM, -.6); break;
+      const pw = hold(pistol(), 0, 0, 0, 0); pw.scale.setScalar(body.userData.glb ? 2.6 : 1.6); u.armR = arm(body, 1, ARM, -2.05); u.armL = arm(body, -1, ARM, -.6); break;   // Pistole gut sichtbar
     }
     default: hold(rifle(), .1, .96, .22, -.08); u.armL = arm(body, -1, ARM, -1.35, .25); u.armR = arm(body, 1, ARM, -.95);
   }
