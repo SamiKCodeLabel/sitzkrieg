@@ -46,3 +46,5 @@ html.lego3d-wait .slot-art,html.lego3d-wait .gc-art{background:radial-gradient(e
 .re-ic :is(.re-emo,.re-art){display:flex;height:100%;align-items:center;justify-content:center}
 .re-ic img.fig{height:100%!important;width:auto!important;max-width:min(300px,100%)!important;object-fit:contain}
 @media (orientation:landscape) and (max-height:560px){ .re-ic{height:70px!important} }
+/* Rundenende: alte 2D-Symbole nicht aufblitzen lassen, bis das 3D-Bild da ist (ohne 3D bleiben sie sichtbar) */
+html:is(.lego3d,.lego3d-wait) .re-ic :is(img.emj,svg){visibility:hidden}
