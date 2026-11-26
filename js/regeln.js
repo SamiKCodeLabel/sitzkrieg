@@ -6,6 +6,23 @@
 //  Eine Regel ändern = hier eine Zeile ändern.
 // =====================================================================
 const RULES={
+  // Regeln je Geländeart: Text eintragen, dann erscheint er beim Antippen des Feldes auf der Karte
+ "felder": {
+  "wald": {"name": "Wald", "regel": ""},
+  "flach": {"name": "Flachland", "regel": ""},
+  "zug": {"name": "Zug", "regel": ""},
+  "farm": {"name": "Farm", "regel": ""},
+  "turm": {"name": "Wachturm", "regel": ""},
+  "bunker": {"name": "Bunker", "regel": ""},
+  "strand": {"name": "Strand", "regel": ""},
+  "wohn": {"name": "Wohnhaus", "regel": ""},
+  "graben": {"name": "Graben", "regel": ""},
+  "hafen": {"name": "Hafen", "regel": ""},
+  "see": {"name": "See", "regel": ""},
+  "strasse": {"name": "Leere Straße", "regel": ""},
+  "ruine": {"name": "Ruine", "regel": ""},
+  "kirche": {"name": "Kirche", "regel": ""}
+ },
  "armee": {
   "normal": {"spezialeinheiten": 6, "trupps": 6},
   "episch": {"spezialeinheiten": 8, "trupps": 8}

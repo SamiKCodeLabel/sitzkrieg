@@ -89,3 +89,34 @@ sync();
 new MutationObserver(()=>{ if(window.renderSpiel) renderSpiel(); }).observe($('lb-on'),{attributes:true,attributeFilter:['hidden']});
 if(window.renderSpiel) renderSpiel();
 })();
+
+// ---------- Kartenfeld antippen -> passende Regeln zu genau diesem Feld ----------
+(function(){
+  function openField(pi){
+    const x=current&&current.pieces[pi]; if(!x) return;
+    const ms=typeof missionSetup==='function'?missionSetup():null;
+    const oi=ms?ms.objectives.indexOf(x):-1, obj=oi>=0?ms.objInfo[oi]:null;
+    const ex=ms&&ms.exts?ms.exts.find(e=>e.p===x):null;
+    const f=(RULES.felder||{})[x.p.key]||{};
+    const icon=EMOJI_IMG[x.p.icon.replace('️','')];
+    let h=`<div class="fi-head">${icon?`<img src="${icon}" alt="">`:''}<div><b>${x.p.biome==='b'?'Stadtfeld':'Grünes Feld'}</b> · belegt ${x.cells.length} Feld${x.cells.length>1?'er':''}</div></div>`;
+    if(f.regel) h+=`<p class="fi-rule">${f.regel}</p>`;
+    if(obj){
+      const row=(RULES.missionsziele.tabelle||[]).find(r=>r.name===obj.name);
+      h+=`<h4 class="fi-h">⚑ Missionsziel${obj.flex?`: ${obj.name}`:''}</h4>`;
+      if(row) h+=`<div class="tw"><table class="rt kv"><tr><th>1–3</th><td>Nichts passiert</td></tr><tr><th>4–5 · Zieleffekt</th><td>${row.ziel}</td></tr><tr><th>6 · Übereffekt</th><td>${row.ueber}</td></tr></table></div>`;
+      h+=`<p class="fi-note">Am Rundenende werden die Trupps beider Seiten hier gezählt (je höchstens 3). <span class="rlink" data-r="missionsziele" role="button" tabindex="0">Regeln</span></p>`;
+    }
+    if(ex){
+      const fe=(RULES.felderweiterungen||[]).find(e=>e.name===ex.name);
+      h+=`<h4 class="fi-h">${ex.icon} Felderweiterung: ${ex.name}</h4><p>${fe?fe.effekt:''}${fe&&fe.link?` <span class="rlink" data-r="${fe.link}" role="button" tabindex="0">Regeln</span>`:''}</p>`;
+    }
+    if(!obj&&!ex&&(RULES.missionsziele.felder||[]).includes(x.p.key)) h+=`<p class="fi-note">Auf diesem Feld können flexible Missionsziele und Felderweiterungen erscheinen – diesmal ist hier keins.</p>`;
+    if(!f.regel&&!obj&&!ex) h+=`<p class="fi-note">Für dieses Gelände stehen im Regelwerk keine Sonderregeln.</p>`;
+    $('pop-k').textContent='Kartenfeld'; $('pop-t').textContent=x.p.name; $('pop-d').hidden=true;
+    $('pop-body').innerHTML=h; if(window.linkRules) linkRules($('pop-body'));
+    $('pop').classList.remove('wide','nohead'); $('pop').hidden=false; $('pop-x').focus();
+  }
+  $('map').addEventListener('click',e=>{ const c=e.target.closest('.cell[data-pi]'); if(c) openField(+c.dataset.pi); });
+  $('map').addEventListener('keydown',e=>{ const c=e.target.closest&&e.target.closest('.cell[data-pi]'); if(c&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); openField(+c.dataset.pi); } });
+})();

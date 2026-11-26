@@ -191,6 +191,7 @@ function render(){
     const c0=Math.min(...pos.map(p=>p[1])), c1=Math.max(...pos.map(p=>p[1]));
     const el=document.createElement('div');
     el.className=`cell ${x.p.biome} k-${x.p.key}${x.cells.length>1?' multi':''}`;
+    el.dataset.pi=current.pieces.indexOf(x); el.setAttribute('role','button'); el.tabIndex=0;
     el.style.gridRow=`${r0+1} / ${r1+2}`; el.style.gridColumn=`${c0+1} / ${c1+2}`;
     const cs=x.cells.map(coord).join('+');
     el.innerHTML=`<span class="ic">${x.p.icon}</span><span class="nm">${x.p.name}</span>`;
