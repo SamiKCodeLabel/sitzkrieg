@@ -1,6 +1,7 @@
 // Standbilder der 3D-Modelle (für Armee-Liste, Popups, Mini-Symbole)
 import { THREE, buildUnit } from './modelle.js';
 import { GFREADY } from './glbfig.js';
+import { FIG_V } from './version.js';
 import { RoomEnvironment } from '../vendor/RoomEnvironment.js';
 const ENVS = new WeakMap();
 export function envFor(r) { if (!ENVS.has(r)) { const pm = new THREE.PMREMGenerator(r); ENVS.set(r, pm.fromScene(new RoomEnvironment(), .04).texture); } return ENVS.get(r); }
@@ -41,7 +42,25 @@ export function frame(cam, obj, aspect, pad = 1.08, dir = new THREE.Vector3(.9, 
 }
 export const ASPECT = { inf: 121 / 145, veh: 222 / 126, air: 222 / 126 };
 // Ein Modell als Bild (Blob-URL)
+// Fertige Bilder werden auf dem Gerät gespeichert (Cache Storage): beim nächsten Laden sofort da.
+// Neu berechnet wird nur, wenn sich Modelle oder das Soldaten-Modell ändern (FIG_V kommt vom Build).
+const STORE = 'fig-' + FIG_V;
+let store = null;
+function openStore() {
+  if (!store) store = (async () => {
+    if (!('caches' in self)) return null;
+    try { for (const k of await caches.keys()) if (k.startsWith('fig-') && k !== STORE) caches.delete(k); return await caches.open(STORE); } catch (e) { return null; }
+  })();
+  return store;
+}
 export async function photo(key, side, h = 300) {
+  const req = new Request(new URL(`__fig/${side}/${encodeURIComponent(key)}/${h}.png`, location.href).href), c = await openStore();
+  if (c) { try { const hit = await c.match(req); if (hit) return URL.createObjectURL(await hit.blob()); } catch (e) { } }
+  const blob = await render(key, side, h);
+  if (c) c.put(req, new Response(blob, { headers: { 'Content-Type': 'image/png' } })).catch(() => {});
+  return URL.createObjectURL(blob);
+}
+async function render(key, side, h) {
   await GFREADY;
   const g = buildUnit(key, side), type = g.userData.type, a = ASPECT[type];
   if (type === 'inf') g.rotation.y = .55; else g.rotation.y = type === 'air' ? -.35 : -.25;
@@ -50,6 +69,5 @@ export async function photo(key, side, h = 300) {
   frame(cam, g, a, type === 'inf' ? 1.1 : 1.0, type === 'inf' ? new THREE.Vector3(.15, .3, 1.3) : new THREE.Vector3(.25, .5, 1.25));
   const w = Math.round(h * a);
   r.setPixelRatio(2); r.setSize(w, h, false); r.setClearColor(0, 0); r.render(scene, cam);
-  const blob = await new Promise(res => r.domElement.toBlob(res, 'image/png'));
-  return URL.createObjectURL(blob);
+  return await new Promise(res => r.domElement.toBlob(res, 'image/png'));
 }

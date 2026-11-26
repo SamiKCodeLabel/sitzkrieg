@@ -21,16 +21,13 @@ function veteranFix(root = document) {
 }
 for (const id of ['army-de', 'army-al']) { const el = document.getElementById(id); if (el) new MutationObserver(() => veteranFix(el)).observe(el, { childList: true }); }
 async function swapArt() {
+  const VEH = ['schwer', 'leicht', 'trans', 'art', 'krad', 'flieger'];
   for (const side of ['de', 'al']) {
-    for (const k of KEYS) {
-      const veh = ['schwer', 'leicht', 'trans', 'art', 'krad', 'flieger'].includes(k);
-      const url = await photo(k, side, veh ? 260 : 300);
-      ART_FACTION[side][k] = `<img class="fig f3d${veh ? ' veh' : ''}" src="${url}" alt="" draggable="false">`;
-      if (side === 'de') ART[k] = ART_FACTION.de[k];
-    }
-    RIFLEMAN_FACTION[side] = `<img class="fig f3d" src="${await photo('rif', side, 300)}" alt="" draggable="false">`;
+    const urls = await Promise.all([...KEYS, 'rif'].map(k => photo(k, side, VEH.includes(k) ? 260 : 300)));
+    KEYS.forEach((k, i) => { ART_FACTION[side][k] = `<img class="fig f3d${VEH.includes(k) ? ' veh' : ''}" src="${urls[i]}" alt="" draggable="false">`; if (side === 'de') ART[k] = ART_FACTION.de[k]; });
+    RIFLEMAN_FACTION[side] = `<img class="fig f3d" src="${urls[KEYS.length]}" alt="" draggable="false">`;
   }
-  document.documentElement.classList.add('lego3d'); veteranFix();
+  document.documentElement.classList.add('lego3d'); document.documentElement.classList.remove('lego3d-wait'); veteranFix();
   try { renderArmy('de'); renderArmy('al'); } catch (e) { }
   try { window.renderSpiel && renderSpiel(); } catch (e) { }
 }
@@ -157,4 +154,4 @@ new MutationObserver(() => attach(false)).observe(tab, { childList: true });
 function refit() { const v = view; if (!v) return; const r = { width: v.art.clientWidth, height: v.art.clientHeight }; if (r.width < 10 || r.height < 10) return; R.setSize(r.width, r.height, false); frame(v.cam, v.stage, r.width / r.height, 1.02, new THREE.Vector3(0, .42, 1)); v.base = v.cam.position.clone(); }
 new ResizeObserver(refit).observe(tab);
 
-swapArt().then(() => attach(false));
+swapArt().then(() => attach(false), e => { console.warn(e); document.documentElement.classList.remove('lego3d-wait'); });

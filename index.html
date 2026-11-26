@@ -13,7 +13,9 @@
 <script>
 (function(){ var t=null; try{ t=localStorage.getItem('sitzkrieg-theme'); }catch(e){}
   if(t!=='light'&&t!=='dark') t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
-  document.documentElement.setAttribute('data-theme',t); })();
+  document.documentElement.setAttribute('data-theme',t);
+  // 3D-Figuren kommen gleich: alte Zeichnungen bis dahin nicht zeigen (Notfall: nach 12 s doch)
+  if(window.WebGLRenderingContext){ document.documentElement.classList.add('lego3d-wait'); setTimeout(function(){ document.documentElement.classList.remove('lego3d-wait'); },12000); } })();
 </script>
 <!-- Schriften fest eingebettet (SIL Open Font License): Stardos Stencil, Special Elite, Courier Prime -->
 <link rel="stylesheet" href="css/schriften.css?v=d0f53fa5cb">
@@ -22,7 +24,7 @@
 
 <link rel="stylesheet" href="css/spiel.css?v=277e257cdd">
 <link rel="stylesheet" href="css/krass.css?v=b1cbb3d17f">
-<link rel="stylesheet" href="css/lego3d.css?v=238820696d">
+<link rel="stylesheet" href="css/lego3d.css?v=6b1019bfe2">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -556,7 +558,7 @@
 <script src="js/wuerfel.js?v=c6fea4303f"></script>
 <script src="js/krass.js?v=7248b0143c"></script>
 <script src="vendor/gsap.min.js"></script>
-<script type="module" src="js3d/einheiten3d.js?v=523174a502"></script>
+<script type="module" src="js3d/einheiten3d.js?v=8fe59914aa"></script>
 <script type="module" src="js3d/karte3d.js?v=db6a40fb88"></script>
 <script>
 // App-Modus: Offline-Speicher aktivieren (nur wenn die Seite über eine Web-Adresse geladen wird)
