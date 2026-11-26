@@ -51,7 +51,8 @@ for (const p of pages) {
 const offline = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './reroll.mp4',
   ...Object.keys(fp).map(f => `./${f}?v=${fp[f]}`), ...list('assets/fonts'), ...list('assets/sounds'), ...list('assets/symbole')]
   .map(f => f.startsWith('./') ? f : './' + f);
-const version = hash(readFileSync(rel('index.html')) + JSON.stringify(fp) + offline.join());
+const assetHash = [...list('assets/fonts'), ...list('assets/sounds'), ...list('assets/symbole')].map(f => hash(readFileSync(rel(f)))).join();   // auch geänderte Bilder/Töne erzwingen eine neue Version
+const version = hash(readFileSync(rel('index.html')) + readFileSync(rel('digital.html')) + JSON.stringify(fp) + assetHash + offline.join());
 let sw = readFileSync(rel('sw.js'), 'utf8');
 sw = sw.replace(/const CACHE = '[^']*';/, `const CACHE = 'sitzkrieg-${version}';`)
        .replace(/const FILES = \[[\s\S]*?\];/, `const FILES = ${JSON.stringify(offline, null, 0)};`);
