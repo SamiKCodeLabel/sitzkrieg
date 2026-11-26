@@ -33,3 +33,10 @@ git add -A && git commit -m "…" && git push
 ```
 
 Eine Regel ändern (z. B. Waffenwert oder neue Generalsfähigkeit): nur `js/regeln.js` bearbeiten.
+
+## Quellen
+
+- Waffen-Sounds (`assets/sounds/gewehr|scharf|pistole|schrot|mg.mp3`): *The Free Firearm Sound Library*, CC0 – https://opengameart.org/content/the-free-firearm-sound-library
+- Kanone, Explosion, Abschuss (`kanone|explosion|abschuss.mp3`): *25 CC0 bang / firework SFX*, CC0 – https://opengameart.org/content/25-cc0-bang-firework-sfx
+- 3D: Three.js (MIT), GSAP; Soldaten-Modell mit Erlaubnis des Erstellers
+

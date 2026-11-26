@@ -1,5 +1,5 @@
 // ---------- Sounds (eigene Dateien, eingebettet) ----------
-const SOUND_FILES={"plane": "assets/sounds/plane.mp3", "chair": "assets/sounds/chair.mp3", "dice": "assets/sounds/dice.mp3", "flash": "assets/sounds/flash.mp3", "menu": "assets/sounds/menu.mp3", "button": "assets/sounds/button.mp3"};
+const SOUND_FILES={"gewehr": "assets/sounds/gewehr.mp3", "scharf": "assets/sounds/scharf.mp3", "pistole": "assets/sounds/pistole.mp3", "schrot": "assets/sounds/schrot.mp3", "mg": "assets/sounds/mg.mp3", "kanone": "assets/sounds/kanone.mp3", "explosion": "assets/sounds/explosion.mp3", "abschuss": "assets/sounds/abschuss.mp3", "plane": "assets/sounds/plane.mp3", "chair": "assets/sounds/chair.mp3", "dice": "assets/sounds/dice.mp3", "flash": "assets/sounds/flash.mp3", "menu": "assets/sounds/menu.mp3", "button": "assets/sounds/button.mp3"};
 const NO_STACK={menu:true,plane:true};
 const FULL_VOL={flash:true};
 // Würfel: dice1.mp3 in 5 Tonhöhen-Varianten; jeder Wurf nimmt zufällig eine andere als beim letzten Mal
@@ -8,7 +8,7 @@ const VARIANTS={dice:[0.88,0.94,1.0,1.06,1.13], chair:[0.86,0.93,1.0,1.07,1.15]}
 const lastVariant={};
 function nextVariant(name){ const v=VARIANTS[name]; let i; do{ i=Math.floor(Math.random()*v.length); }while(i===lastVariant[name] && v.length>1); lastVariant[name]=i; return v[i]; }
 function nextDiceVariant(){ return nextVariant('dice'); }   // diese Sounds starten nicht neu, solange sie noch laufen
-const SOUND_VOL={menu:.8,button:.9,flash:1,dice:1,chair:.85,plane:.8};
+const SOUND_VOL={menu:.8,button:.9,flash:1,dice:1,chair:.85,plane:.8,gewehr:.55,scharf:.7,pistole:.55,schrot:.7,mg:.65,kanone:.9,explosion:.85,abschuss:.6};   // Waffen-Sounds: CC0, opengameart.org (Free Firearm Sound Library, 25 CC0 bang SFX)
 let MASTER_VOL=0.8; try{ const v=localStorage.getItem('sitzkrieg-vol'); if(v!==null) MASTER_VOL=Math.max(0,Math.min(1,+v)); }catch(e){}
 const Sounds=(()=>{
   let ctx=null; const buf={}; let loading=null; const busy={};
