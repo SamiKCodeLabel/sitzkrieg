@@ -6,6 +6,10 @@
 //  Eine Regel ändern = hier eine Zeile ändern.
 // =====================================================================
 const RULES={
+ "armee": {
+  "normal": {"spezialeinheiten": 6, "trupps": 6},
+  "episch": {"spezialeinheiten": 8, "trupps": 8}
+ },
  "waffen": [
   {
    "name": "Mörser",
@@ -383,6 +387,8 @@ function renderRegelwerk(doc){
   if(dl) dl.innerHTML=RULES.generalsfaehigkeiten.map(g=>`<dt>${g.name}</dt><dd>${g.text}</dd>`).join('');
   const ul=q('felderweiterung')&&q('felderweiterung').querySelector('ul');
   if(ul) ul.innerHTML=RULES.felderweiterungen.map(f=>`<li><b>${f.link?`<a href="#${f.link}">${f.name}</a>`:f.name}</b> – ${f.effekt}</li>`).join('');
+  const tz=q('truppenzusammensetzung')&&q('truppenzusammensetzung').querySelector('tbody');
+  if(tz) tz.innerHTML=[['Normal',RULES.armee.normal],['Episch',RULES.armee.episch]].map(([n,a])=>`<tr><td>${n}</td><td>${a.spezialeinheiten}</td><td>${a.trupps}</td><td>bis zu 1 pro Typ</td></tr>`).join('');
   tbody('missionsziel-tabelle',RULES.missionsziele.tabelle.map(z=>`<tr><td>${z.name}</td><td>${z.ziel}</td><td>${z.ueber}</td></tr>`).join(''));
   const fx=q('flexible-missionsziele'); if(fx){ const u=fx.querySelectorAll('.vgrid ul'); if(u[1]) u[1].innerHTML=RULES.missionsziele.flexibel.map(n=>`<li>${n}</li>`).join(''); }
 }

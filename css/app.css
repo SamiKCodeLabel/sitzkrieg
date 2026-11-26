@@ -487,9 +487,9 @@
   .slot .slot-art svg.fig g{stroke-width:1.15}
   .slot-art svg.fig{max-height:100%}
   .slot{grid-template-columns:30px 136px 1fr}
-  .slot.inf .slot-art{height:92px}
-  .slot.veh .slot-art{height:66px}
-  @media (max-width:640px){ .slot{grid-template-columns:26px 104px 1fr} .slot.inf .slot-art{height:78px} .slot.veh .slot-art{height:54px} }
+  .slot.inf .slot-art{height:116px}
+  .slot.veh .slot-art{height:76px}
+  @media (max-width:640px){ .slot{grid-template-columns:26px 110px 1fr} .slot.inf .slot-art{height:100px} .slot.veh .slot-art{height:64px} }
   .mini svg.fig{width:14px;height:20px}
   html[data-theme="dark"] svg.fig .sh{fill:rgba(0,0,0,.45)}
   html[data-theme="dark"] svg.fig g{stroke:#0d0e09}
@@ -633,6 +633,4 @@ svg.fig .f1{fill:#c8452c;stroke:#1f1a14} svg.fig .f2{fill:#e8a04a} svg.fig .f3{f
 html[data-theme="dark"] svg.fig g{stroke:#1f1a14}
 /* Rasterpunkte hinter den Figuren */
 .gc-art,.slot-art,.pu-fig{position:relative;isolation:isolate}
-.gc-art::before,.slot-art::before{content:"";position:absolute;inset:6% 12%;z-index:-1;border-radius:50%;
-  background:radial-gradient(circle,rgba(214,186,120,.42) 1.15px,transparent 1.5px) 0 0/6px 6px;
-  -webkit-mask:radial-gradient(closest-side,#000 55%,transparent 100%);mask:radial-gradient(closest-side,#000 55%,transparent 100%)}
+/* Rasterpunkte hinter den Figuren entfernt (Figuren dafür größer) */

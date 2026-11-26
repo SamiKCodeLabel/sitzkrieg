@@ -50,11 +50,11 @@ function rollArmy(){
 }
 
 // Aufbau je Kartengröße:
-//  Normal: je Fahrzeugtyp höchstens 1 Fahrzeug (mindestens 1 insgesamt), 4 einzelne Spezialeinheiten, 6 Trupps à 5 Gewehrschützen
-//  Episch: alle (erlaubten) Fahrzeuge, 6 einzelne Spezialeinheiten, 8 Trupps à 5 Gewehrschützen
+//  Normal: je Fahrzeugtyp höchstens 1 Fahrzeug (mindestens 1 insgesamt), 6 einzelne Spezialeinheiten, 6 Trupps à 5 Gewehrschützen
+//  Episch: alle (erlaubten) Fahrzeuge, 8 einzelne Spezialeinheiten, 8 Trupps à 5 Gewehrschützen
 let vehN=3; try{ const v=localStorage.getItem('sitzkrieg-fahrzeug-anzahl'); if(v!=null) vehN=Math.max(0,Math.min(3,+v|0)); }catch(e){}   // Fahrzeuge pro Seite (0–3)
 let genCount=1; try{ const g=localStorage.getItem('sitzkrieg-generale'); if(g!=null) genCount=Math.max(0,Math.min(3,+g|0)); }catch(e){}   // Anzahl Generäle pro Seite (0–3)
-const ARMY_SETUP={'3x6':{solo:4,squads:6,allVeh:false},'3x8':{solo:6,squads:8,allVeh:true}};
+const ARMY_SETUP={'3x6':{solo:RULES.armee.normal.spezialeinheiten,squads:RULES.armee.normal.trupps,allVeh:false},'3x8':{solo:RULES.armee.episch.spezialeinheiten,squads:RULES.armee.episch.trupps,allVeh:true}};   // Zahlen aus js/regeln.js
 function rollArmyNormal(){
   const cfg=ARMY_SETUP[$('size').value]||ARMY_SETUP['3x6'], NORMAL_SOLO=cfg.solo, NORMAL_SQUADS=cfg.squads;
   const out=[];
@@ -154,7 +154,7 @@ document.querySelectorAll('.fair button').forEach(b=>b.onclick=()=>{ setFair(b.d
 setFair(fairOn);
 function renderPoolInfo(){
   $('pool-veh').innerHTML=VEHICLES.map(v=>`<li>${v.n}× ${v.name}</li>`).join('')+`<li>Fahrzeuge pro Seite: ${vehN} (in den Einstellungen 0–3)</li>`;
-  $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Generäle pro Seite: ${genCount} (in den Einstellungen 0–3)</li><li>Normal: 4 einzelne Spezialeinheiten, 6 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Episch: 6 einzelne Spezialeinheiten, 8 Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
+  $('pool-spec').innerHTML=SPECIALS.map(p=>`<li>${p.n}× ${p.name}</li>`).join('')+`<li>Generäle pro Seite: ${genCount} (in den Einstellungen 0–3)</li><li>Normal: ${RULES.armee.normal.spezialeinheiten} einzelne Spezialeinheiten, ${RULES.armee.normal.trupps} Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Episch: ${RULES.armee.episch.spezialeinheiten} einzelne Spezialeinheiten, ${RULES.armee.episch.trupps} Trupps à ${RIFLEMEN} Gewehrschützen</li><li>Jeder General bekommt eine zufällige Generals-Fähigkeit</li>`;
 }
 const catChance=()=>{ if(Math.random()<0.01&&window.playReroll) playReroll(); };   // 1 % Chance auf die Katze bei „Neue Armee“
 $('army-gen').onclick=()=>{ genArmies(); catChance(); };

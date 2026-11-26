@@ -1785,7 +1785,7 @@ html[data-theme="dark"] .dg-fxcard{background:#2a2f20;color:#e3dcc0;border-color
 </div>
 <button id="fab"><span class="lbl-map">🎲 Neue Karte</span><span class="lbl-army">🎲 Zufällige Armeen</span></button>
 
-<script src="js/regeln.js?v=fc6c3894ce"></script>
+<script src="js/regeln.js?v=6e99863ba1"></script>
 <script>
 const PIECES = [
   {key:'wald',    name:'Wald',          biome:'g', size:1, count:3, icon:'🌲'},
@@ -2223,7 +2223,7 @@ function rollArmy(){
 //  Episch: alle (erlaubten) Fahrzeuge, 6 einzelne Spezialeinheiten, 8 Trupps à 5 Gewehrschützen
 let vehN=3; try{ const v=localStorage.getItem('sitzkrieg-fahrzeug-anzahl'); if(v!=null) vehN=Math.max(0,Math.min(3,+v|0)); }catch(e){}   // Fahrzeuge pro Seite (0–3)
 let genCount=1; try{ const g=localStorage.getItem('sitzkrieg-generale'); if(g!=null) genCount=Math.max(0,Math.min(3,+g|0)); }catch(e){}   // Anzahl Generäle pro Seite (0–3)
-const ARMY_SETUP={'3x6':{solo:4,squads:6,allVeh:false},'3x8':{solo:6,squads:8,allVeh:true}};
+const ARMY_SETUP={'3x6':{solo:RULES.armee.normal.spezialeinheiten,squads:RULES.armee.normal.trupps,allVeh:false},'3x8':{solo:RULES.armee.episch.spezialeinheiten,squads:RULES.armee.episch.trupps,allVeh:true}};
 function rollArmyNormal(){
   const cfg=ARMY_SETUP[$('size').value]||ARMY_SETUP['3x6'], NORMAL_SOLO=cfg.solo, NORMAL_SQUADS=cfg.squads;
   const out=[];
