@@ -235,3 +235,6 @@ button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,
   .slot.veh .slot-art{height:72px}
   .slot{padding:4px 4px}
 }
+/* Alle Zeilen gleiche Bildspalte -> Text und Kästchen immer an derselben Stelle */
+.slot,.slot.inf,.slot.veh{grid-template-columns:30px 180px 1fr}
+@media (max-width:640px){ .slot,.slot.inf,.slot.veh{grid-template-columns:22px 124px 1fr} }
