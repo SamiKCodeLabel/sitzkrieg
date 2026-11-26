@@ -86,6 +86,7 @@ const NO_TARGET = new Set(['mech', 'medic', 'flak']);
 const AT = new Set(['schwer', 'leicht', 'pzf', 'art']);
 function targetKind(kind) { if (NO_TARGET.has(kind)) return null; return AT.has(kind) ? 'tank' : 'inf'; }
 function spawnTargets(v) {
+  if (v.wreck) { v.scene.remove(v.wreck.g); v.wreck = null; }
   for (const t of v.targets) v.stage.remove(t); for (const d of v.debris) v.scene.remove(d.m); for (const m of v.mineMeshes || []) v.stage.remove(m); v.targets = []; v.debris = []; v.mineMeshes = [];
   if (!v.tKind) return;
   const foe = v.side === 'de' ? 'al' : 'de';
@@ -102,6 +103,7 @@ function breakApart(v, power = 1, only = null) {
     const chunks = [], tur = t.userData.turret;
     (function walk(o) { for (const c of [...o.children]) { if (c === t.userData.shadow) continue; if (c.userData.brick || (c.isMesh && !c.children.some(k => k.isMesh)) || c === tur) chunks.push(c); else walk(c); } })(t);
     const center = new THREE.Box3().setFromObject(t).getCenter(new THREE.Vector3());
+    if (t.userData.type === 'veh') setTimeout(() => wreckSmoke(v, center.clone().setY(0)), 450);
     for (const m of chunks) {
       const isTur = m === tur;
       v.scene.attach(m);
@@ -113,6 +115,23 @@ function breakApart(v, power = 1, only = null) {
       v.debris.push({ m, vel, spin: V((Math.random() - .5) * sp, (Math.random() - .5) * sp, (Math.random() - .5) * sp), r: Math.max(.04, Math.min(size * .22, .3)) });
     }
   }
+}
+// Qualmendes Wrack: Rauch aus runden grauen 1x1-Steinen + kleines Lego-Flämmchen
+function wreckSmoke(v, pos) {
+  if (view !== v) return;
+  const g = new THREE.Group(); g.position.copy(pos); v.scene.add(g);
+  const puffGeo = new THREE.CylinderGeometry(.11, .11, .1, 16), studGeo = new THREE.CylinderGeometry(.06, .06, .05, 12), puffs = [];
+  for (let i = 0; i < 14; i++) { const c = [0x5b6066, 0x3e4044, 0x8a8f94, 0x2a2c2e][i % 4], m = new THREE.Group(); const a = new THREE.Mesh(puffGeo, plastic(c)), b = new THREE.Mesh(studGeo, plastic(c)); b.position.y = .075; m.add(a, b); g.add(m); puffs.push({ m, t: i * .2, x: (Math.random() - .5) * .3, z: (Math.random() - .5) * .3, w: Math.random() * 6 }); }
+  const fm = c => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: .9, toneMapped: false });
+  const fl = new THREE.Group(); fl.position.set(.05, .1, .1); g.add(fl);
+  const o = new THREE.Mesh(new THREE.ConeGeometry(.13, .4, 6), fm(0xff4a00)); o.position.y = .2; fl.add(o);
+  const i2 = new THREE.Mesh(new THREE.ConeGeometry(.07, .24, 6), fm(0xffc400)); i2.position.y = .13; fl.add(i2);
+  v.wreck = { g, puffs, fl, t: 0 };
+}
+function stepWreck(v, dt) {
+  const w = v.wreck; w.t += dt;
+  for (const p of w.puffs) { p.t += dt; const k = (p.t % 2.8) / 2.8; p.m.position.set(p.x + Math.sin(w.t * 1.2 + p.w) * .1 * k - k * .3, .25 + k * 1.8, p.z - k * .2); p.m.scale.setScalar(.5 + k * 1.1); p.m.visible = k > .03 && k < .96; }
+  const s = 1 + Math.sin(w.t * 14) * .14 + Math.sin(w.t * 8.3) * .08; w.fl.scale.set(1, s, 1);
 }
 function stepDebris(v, dt) {
   for (const d of v.debris) {
@@ -244,6 +263,7 @@ function loop() {
   const t = (now - v.t0) / 1000;
   for (const u of v.units) { const d = u.userData; if (d.prop) d.prop.rotation.x += dt * 40; if (d.type === 'inf' && d.body) d.body.position.y = Math.abs(Math.sin(t * 2.2 + u.position.x)) * .012; if (d.type === 'air') d.body.position.y = 1.25 + Math.sin(t * 1.6) * .06; }
   if (v.debris.length) stepDebris(v, dt);
+  if (v.wreck) stepWreck(v, dt);
   const sh = v.fx.update(dt);
   v.cam.position.copy(v.base).add(V((Math.random() - .5) * sh, (Math.random() - .5) * sh, 0));
   R.render(v.scene, v.cam);
