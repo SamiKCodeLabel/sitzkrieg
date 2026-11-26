@@ -77,3 +77,5 @@ canvas.turn3d{display:block;margin:0 auto}
 html:is(.lego3d,.lego3d-wait) .fire-wrap svg{visibility:hidden}
 /* Regelwerk-Bilder nur im Regelwerk – nicht in der Spielkarte oder im Popup (dort nur die wichtigen Infos) */
 .gcard .rw3d,.pop-card .rw3d{display:none!important}
+/* Noch nicht berechnete 3D-Bilder: keine alten Zeichnungen zeigen, nur Platzhalter */
+html.lego3d :is(.slot-art,.mini,.pu-fig) svg.fig{visibility:hidden}

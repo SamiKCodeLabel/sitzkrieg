@@ -40,7 +40,8 @@ for (const r of refs) if (!existsSync(rel(r))) fail(`fehlt: ${r}`);
 if (errors) { console.error(`\nBuild abgebrochen (${errors} Fehler).`); process.exit(1); }
 
 // 2b. Version der 3D-Modelle (gespeicherte Figurenbilder werden nur bei Änderungen neu berechnet)
-{ const parts = [...list('js3d').filter(f => !f.endsWith('version.js')), ...list('assets/modelle')].map(f => readFileSync(rel(f)));
+{ const MODEL_FILES = ['js3d/modelle.js', 'js3d/glbfig.js', 'js3d/gelaende.js', 'js3d/foto.js'];   // nur was das Aussehen der Bilder bestimmt
+  const parts = [...MODEL_FILES.filter(f => existsSync(rel(f))), ...list('assets/modelle')].map(f => readFileSync(rel(f)));
   writeFileSync(rel('js3d/version.js'), `// Wird vom Build gesetzt: ändert sich, sobald sich ein 3D-Modell ändert\nexport const FIG_V = '${hash(Buffer.concat(parts))}';\n`); }
 
 // 3. Fingerabdrücke in die Seiten schreiben

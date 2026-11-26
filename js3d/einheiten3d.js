@@ -25,13 +25,16 @@ function veteranFix(root = document) {
 for (const id of ['army-de', 'army-al']) { const el = document.getElementById(id); if (el) new MutationObserver(() => veteranFix(el)).observe(el, { childList: true }); }
 async function swapArt() {
   const VEH = ['schwer', 'leicht', 'trans', 'art', 'krad', 'flieger'];
-  for (const side of ['de', 'al']) {
-    const urls = await Promise.all([...KEYS, 'rif'].map(k => getPhoto(k, side, VEH.includes(k) ? 260 : 300)));
-    [...KEYS, 'rif'].forEach((k, i) => URLKEY.set(urls[i], [k, side]));
-    KEYS.forEach((k, i) => { ART_FACTION[side][k] = `<img class="fig f3d${VEH.includes(k) ? ' veh' : ''}" src="${urls[i]}" alt="" draggable="false">`; if (side === 'de') ART[k] = ART_FACTION.de[k]; });
-    RIFLEMAN_FACTION[side] = `<img class="fig f3d" src="${urls[KEYS.length]}" alt="" draggable="false">`;
-  }
-  document.documentElement.classList.add('lego3d'); document.documentElement.classList.remove('lego3d-wait'); veteranFix();
+  const put = (side, k, u) => { URLKEY.set(u, [k, side]);
+    if (k === 'rif') RIFLEMAN_FACTION[side] = `<img class="fig f3d" src="${u}" alt="" draggable="false">`;
+    else { ART_FACTION[side][k] = `<img class="fig f3d${VEH.includes(k) ? ' veh' : ''}" src="${u}" alt="" draggable="false">`; if (side === 'de') ART[k] = ART_FACTION.de[k]; } };
+  // Zuerst nur die Einheiten der aktuellen Armeen (die sieht man sofort), der Rest danach im Hintergrund
+  const need = { de: new Set(['rif']), al: new Set(['rif']) };
+  try { for (const side of ['de', 'al']) for (const sl of armies[side] || []) { if (sl.veh) need[side].add(sl.key); for (const u of sl.units || []) need[side].add(u.key); } } catch (e) { }
+  await Promise.all(['de', 'al'].flatMap(side => [...need[side]].filter(k => k === 'rif' || KEYS.includes(k)).map(k => getPhoto(k, side, VEH.includes(k) ? 260 : 300).then(u => put(side, k, u)))));
+  setTimeout(async () => { for (const side of ['de', 'al']) for (const k of KEYS) if (!need[side].has(k)) put(side, k, await getPhoto(k, side, VEH.includes(k) ? 260 : 300));
+    try { renderArmy('de'); renderArmy('al'); } catch (e) { } }, 300);   // danach neu zeichnen (falls inzwischen neu gewürfelt wurde)
+  document.documentElement.classList.add('lego3d'); document.documentElement.classList.remove('lego3d-wait'); try { performance.mark('figuren-da'); } catch (e) { } veteranFix();
   try { renderArmy('de'); renderArmy('al'); } catch (e) { }
   try { window.renderSpiel && renderSpiel(); } catch (e) { }
 }
