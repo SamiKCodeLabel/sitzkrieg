@@ -1,6 +1,6 @@
 // Gelände-Modelle der Kartenfelder (Klemmbaustein-Stil) – genutzt vom 3D-Spieltisch und von den Rundenende-Bildern
 import { THREE, brick, slope, plastic } from './modelle.js';
-const TERRAIN = { wald: 0x4f7a34, flach: 0x86a84a, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0xd9c591, wohn: 0x8fa357, graben: 0x6e5a3e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
+const TERRAIN = { wald: 0x4f7a34, flach: 0x86a84a, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0xd9c591, wohn: 0x8fa357, graben: 0x17765e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
 const R = Math.random;
 
 // ---------- Gelände-Modelle (Mittelpunkt 0,0; Fläche w x d) ----------
@@ -113,7 +113,7 @@ function terrain(key, g, w, d) {
     case 'bunker': bunker2(g); break;
     case 'strand': beach(g, w, d); break;
     case 'wohn': house3(g); break;
-    case 'graben': trench(g, w, d); break;
+    case 'graben': trench3(g, w, d); break;
     case 'hafen': harbor2(g, w, d); break;
     case 'see': see3(g, w, d); break;
     case 'strasse': road(g, w, d); break;
@@ -387,6 +387,53 @@ function ruin3(g, w, d) {
   // Schutt vor der Ruine und ein paar Mauerreste
   for (let i = 0; i < 6; i++) box(g, .1, .05 + R() * .05, .08, R() < .5 ? MSG : DSG, x0 + (R() - .5) * W, .03, z0 + D / 2 + .08 + R() * .2, R() * .5, R() * 3, R() * .5);
   for (const [x, z] of [[hw * .75, hd * .7], [-hw * .7, hd * .8]]) for (let k = 0; k < 2 + Math.floor(R() * 2); k++) box(g, .1, .058, .08, MSG, x + (R() - .5) * .04, .03 + k * .06, z);
+}
+
+// Schützengraben nach Foto: Mosaik-Wiese, braune Grabensohle im Zickzack, beidseitig Sandsäcke (Kissen mit Noppen)
+const SACK = 0x9c8862, DIRT = 0x6a3d1c, DIRT2 = 0x7d4c22;
+function grass(g, x, z, s = 1) { const n = G(); n.position.set(x, 0, z); n.scale.setScalar(s); g.add(n); g = n; for (let k = 0; k < 16; k++) { const a = k * 2.4, t = .25 + (k % 3) * .18; const c = new THREE.Mesh(new THREE.ConeGeometry(.018, .32, 4), plastic(0x10594a)); c.position.set(Math.cos(a) * .04, .15, Math.sin(a) * .04); c.rotation.set(Math.sin(a) * t, 0, -Math.cos(a) * t); n.add(c); } return n; }
+function sack(g, x, y, z, ry = 0, tilt = 0) {   // Sandsack-Kissen mit zwei Noppen
+  const n = G(); n.position.set(x, y, z); n.rotation.set(tilt, ry, (R() - .5) * .12); g.add(n);
+  const b = new THREE.Mesh(new THREE.SphereGeometry(.1, 20, 12), plastic(SACK)); b.scale.set(1.3, .42, .85); n.add(b);
+  const e = new THREE.Mesh(new THREE.CylinderGeometry(.108, .108, .03, 20), plastic(SACK)); e.scale.set(1.2, 1, .78); e.position.y = -.01; n.add(e);
+  for (const dx of [-.045, .045]) { const st = new THREE.Mesh(new THREE.CylinderGeometry(.022, .022, .02, 12), plastic(SACK)); st.position.set(dx, .042, 0); n.add(st); }
+  return n;
+}
+function trench3(g, w, d) {
+  const along = w > d, L = Math.max(w, d), S = Math.min(w, d), n = G(); if (!along) n.rotation.y = HALF; g.add(n);
+  const hl = L / 2 - .02, hs = S / 2 - .02;
+  // Verlauf: links breite Bucht, Mitte schmal, rechts leicht versetzt
+  const cz = x => x < -L * .14 ? .02 : x < L * .12 ? -.08 : .1;
+  const hw = x => x < -L * .14 ? .4 : x < L * .12 ? .27 : .29;
+  const inT = (x, z) => Math.abs(x) < hl - .16 && Math.abs(z - cz(x)) < hw(x);
+  const nx = Math.round(L / .19), nz = Math.round(S / .19), cx = L / nx, cw = S / nz, GH = .1;
+  box(n, L - .3, .03, S * .86, DIRT, 0, .015, 0);                                              // Grabensohle
+  const MOS = [0x8cc42a, 0x237a62, 0x5a8758, 0x154a38, 0x2f9a78, 0x4a7a2e, 0xb0d838, 0x1d6650];
+  const edge = [];
+  for (let i = 0; i < nx; i++) for (let k = 0; k < nz; k++) {
+    const x = -L / 2 + (i + .5) * cx, z = -S / 2 + (k + .5) * cw;
+    if (inT(x, z)) continue;
+    const nb = inT(x + cx, z) || inT(x - cx, z) || inT(x, z + cw) || inT(x, z - cw);
+    const c = nb ? [DIRT2, 0xb0642a, DIRT][(i + k) % 3] : MOS[Math.floor(R() * MOS.length)];
+    brick(n, cx - .004, GH, cw - .004, c, x, GH / 2, z, { studs: !nb && R() < .55 });
+    if (!nb && R() < .35) box(n, cx * (.4 + R() * .5), .02, cw * (.4 + R() * .5), MOS[Math.floor(R() * MOS.length)], x + (R() - .5) * .05, GH + .01, z + (R() - .5) * .05);
+    if (nb) edge.push([x, z, inT(x, z + cw) ? 1 : inT(x, z - cw) ? -1 : 0]);
+  }
+  // Sandsäcke auf der Grabenkante, stellenweise doppelt
+  for (const [x, z, dir] of edge) {
+    const ry = dir === 0 ? HALF : 0, t = dir * .25;
+    sack(n, x, GH + .03, z, ry + (R() - .5) * .25, t);
+    if (R() < .3) sack(n, x + (R() - .5) * .06, GH + .085, z - dir * .03, ry + (R() - .5) * .4, t * .5);
+  }
+  // Sohle: helle, orange und dunkle Fliesen, runde Platte, Pfosten, kleine Stufen
+  for (let k = 0; k < 26; k++) { const x = (R() - .5) * (L - .7), z = cz(x) + (R() - .5) * hw(x) * 1.6; box(n, .06 + R() * .12, .015, .06 + R() * .08, [0xc8b48a, 0xd98a3a, DIRT2, 0x4a2a14, 0xb0642a][k % 5], x, .037, z, 0, R() < .5 ? 0 : HALF, 0); }
+  cyl(n, .12, .015, 0xb3a179, -L * .36, .04, .05, 0, 0, 22);
+  for (const [x, z] of [[-L * .1, -.3], [L * .3, .32], [L * .08, -.3], [-L * .25, -.38]]) box(n, .05, .18, .05, 0x3a2414, x, .09, z);
+  for (const x of [-L * .3, L * .2]) slope(n, .1, .08, .16, 0xb0642a, x, .07, cz(x) - hw(x) + .08, HALF);
+  // Gras, Laub, Sprossen auf der Wiese
+  for (const [x, z, sc] of [[-hl + .15, -hs + .15, 1.1], [-hl + .2, hs - .15, 1], [hl - .25, hs - .15, 1.2], [hl - .55, hs - .12, 1], [L * .05, -hs + .1, .8]]) grass(n, x, z, sc).position.y = GH;
+  for (const [x, z, c] of [[L * .05, hs - .12, 0xc8b48a], [L * .28, hs - .2, 0x3fb38f], [-L * .3, hs - .12, 0xc8b48a], [L * .4, -hs + .12, 0xc8b48a], [-L * .42, -hs + .12, 0x3fb38f]]) { const l = leaf(n, x, GH + .012, z, .45, R() * 6); l.material = plastic(c); }
+  for (const [x, z] of [[-L * .35, hs - .1], [L * .15, hs - .1], [L * .45, -hs + .15], [-L * .05, hs - .1]]) { const t = new THREE.Mesh(new THREE.TorusGeometry(.03, .008, 6, 12, Math.PI * 1.3), plastic(0xb8e03a)); t.position.set(x, GH + .06, z); n.add(t); cyl(n, .007, .06, 0xb8e03a, x - .03, GH + .03, z); }
 }
 
 // Ein einzelnes Feld als Modell (Bauplatte + Gelände), z. B. für das Bild am Rundenende
