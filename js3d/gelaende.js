@@ -131,24 +131,29 @@ function cargoGun(g, x, y, z, ry = 0, s = 1) { const k = G(); k.position.set(x, 
 // ---- Hafen: Frachter, Kai mit Kettenzaun, roter Portalkran mit Container ----
 function harbor2(g, w, d) {
   const along = w > d, n = G(); if (!along) n.rotation.y = HALF; g.add(n); const L = Math.max(w, d), D = Math.min(w, d);
-  // Kai hinten
-  const qz = -D / 2 + .26;
-  brick(n, L * .96, .18, .5, LG, 0, .09, qz);
-  for (let i = 0; i < 6; i++) { const a = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .02, 16, 1, false, 0, Math.PI), plastic(0x2a2c2e)); a.rotation.set(HALF, 0, HALF); a.position.set(-L * .4 + i * L * .16, .06, qz + .255); n.add(a); }
-  for (let i = 0; i < 6; i++) { cyl(n, .025, .14, 0x1b1b1b, -L * .1 + i * .24, .25, qz + .2); cyl(n, .035, .03, 0x1b1b1b, -L * .1 + i * .24, .33, qz + .2); if (i < 5) { const ch = new THREE.Mesh(new THREE.TorusGeometry(.12, .008, 4, 16, Math.PI), plastic(0x1b1b1b)); ch.rotation.set(0, 0, Math.PI); ch.position.set(-L * .1 + i * .24 + .12, .3, qz + .2); ch.scale.y = .35; n.add(ch); } }
+  // Kai hinten: breite Plattform zum Laufen, Pflaster, Bänke, Laternen, Kisten
+  const QD = .74, qz = -D / 2 + QD / 2 + .02, qf = qz + QD / 2;
+  brick(n, L * .96, .18, QD, LG, 0, .09, qz);
+  for (let i = 0; i < 16; i++) box(n, .26 + Math.random() * .2, .012, .14 + Math.random() * .12, [0x8f9498, 0xb4b8bb, 0x9aa0a4][i % 3], (Math.random() - .5) * L * .85, .19, qz + (Math.random() - .5) * QD * .8);
+  for (let i = 0; i < 6; i++) { const a = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .02, 16, 1, false, 0, Math.PI), plastic(0x2a2c2e)); a.rotation.set(HALF, 0, HALF); a.position.set(-L * .4 + i * L * .16, .06, qf + .005); n.add(a); }
+  for (let i = 0; i < 7; i++) { const x = -L * .05 + i * .22; cyl(n, .025, .14, 0x1b1b1b, x, .26, qf - .05); cyl(n, .035, .03, 0x1b1b1b, x, .34, qf - .05); if (i < 6) { const ch = new THREE.Mesh(new THREE.TorusGeometry(.11, .008, 4, 16, Math.PI), plastic(0x1b1b1b)); ch.rotation.set(0, 0, Math.PI); ch.position.set(x + .11, .31, qf - .05); ch.scale.y = .35; n.add(ch); } }
+  for (const bx2 of [L * .12, L * .34]) { box(n, .3, .03, .1, 0x7a4a26, bx2, .29, qz - .18); box(n, .3, .1, .02, 0x7a4a26, bx2, .34, qz - .23); for (const sx of [-.12, .12]) box(n, .03, .1, .08, 0x1b1b1b, bx2 + sx, .23, qz - .18); }   // Bänke
+  for (const lx of [L * .02, L * .44]) { cyl(n, .02, .7, 0x1b1b1b, lx, .53, qz - .26); box(n, .12, .03, .03, 0x1b1b1b, lx + .05, .88, qz - .26); cyl(n, .035, .06, 0xfff2b0, lx + .1, .84, qz - .26); }   // Laternen
+  for (const [x, y] of [[L * .26, .26], [L * .3, .26], [L * .28, .4]]) brick(n, .14, .14, .14, 0x8a5a32, x, y, qz + .12, { studs: true });   // Kisten
+  for (let i = 0; i < 3; i++) cyl(n, .06, .13, OLIVE, -L * .02 + i * .13, .25, qz + .18, 0, 0, 14);
   // Roter Portalkran auf dem Kai, Ausleger rot-weiß über das Wasser
   const cx = -L * .3;
   for (const sx of [-.32, .32]) { box(n, .14, 1.35, .14, 0xc4201c, cx + sx, .85, qz); box(n, .2, .1, .3, 0xc4201c, cx + sx, .22, qz); }
   box(n, .78, .14, .16, 0xc4201c, cx, 1.55, qz);
-  for (let i = 0; i < 9; i++) box(n, .16, .14, .14, i % 2 ? WHT2 : 0xc4201c, cx, 1.68, qz - .1 + i * .14 - .4 + .5);
-  for (const sx of [-.07, .07]) { const l = cyl(n, .035, .03, 0xf2a01e, cx + sx, 1.77, qz + .1 + 8 * .14 - .4 + .5 - .05); }
-  cyl(n, .012, .45, 0x1b1b1b, cx, 1.38, qz + .45);
-  const ct = G(); ct.position.set(cx, .82, qz + .45); n.add(ct);                     // Container (Rahmen) mit Geschütz
+  for (let i = 0; i < 9; i++) box(n, .16, .14, .14, i % 2 ? WHT2 : 0xc4201c, cx, 1.68, qz - .2 + i * .14);
+  for (const sx of [-.07, .07]) { const l = cyl(n, .035, .03, 0xf2a01e, cx + sx, 1.77, qz - .2 + 8 * .14); }
+  cyl(n, .012, .45, 0x1b1b1b, cx, 1.38, qf + .1);
+  const ct = G(); ct.position.set(cx, .82, qf + .1); n.add(ct);                     // Container (Rahmen) mit Geschütz
   box(ct, .56, .05, .42, 0xd8892a, 0, .3, 0); box(ct, .56, .05, .42, 0xd8892a, 0, -.04, 0);
   for (const sx of [-.26, .26]) for (const sz of [-.19, .19]) box(ct, .04, .32, .04, 0xd8892a, sx, .13, sz);
   cargoGun(ct, 0, -.01, 0, 0, .8);
   // Frachter
-  const sh = G(); sh.position.set(.05, .04, D / 2 - .5); n.add(sh); const SL = L * .82;
+  const sh = G(); sh.position.set(.05, .04, D / 2 - .36); sh.scale.set(.92, .9, .78); n.add(sh); const SL = L * .82;
   box(sh, SL, .22, .62, 0x1f3d2c, 0, .13, 0);                                    // dunkelgrüner Rumpf
   box(sh, SL, .05, .63, 0xe0601c, 0, .03, 0);                                    // orange Wasserlinie
   box(sh, SL, .12, .64, WHT2, 0, .3, 0);                                         // weißes Schanzkleid
