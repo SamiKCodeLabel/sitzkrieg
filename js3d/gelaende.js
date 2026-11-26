@@ -181,7 +181,11 @@ function bunker2(g) {
   box(g, .56, .12, .03, 0x1e2022, 0, .34, .435);                                    // Schießscharte
   box(g, .64, .04, .06, 0x8a8f94, 0, .42, .45); box(g, .64, .04, .06, 0x8a8f94, 0, .26, .45);
   for (const sx of [-.3, .3]) box(g, .04, .2, .06, 0x8a8f94, sx, .34, .45);
-  box(g, .3, .22, .03, 0x2a2c2e, -.33, .11, .435);                                  // Eingang
+  // Eingang hinten: Türöffnung mit Rahmen, kleine Mauer seitlich, Treppe hinunter
+  box(g, .3, .3, .03, 0x1e2022, .15, .15, -.535); box(g, .38, .05, .06, 0x8a8f94, .15, .32, -.54);
+  for (const sx of [-.02, .32]) box(g, .05, .32, .06, 0x8a8f94, sx, .16, -.54);
+  box(g, .06, .3, .24, 0x969ba0, -.06, .15, -.65); box(g, .06, .3, .24, 0x969ba0, .36, .15, -.65);
+  for (let i = 0; i < 3; i++) box(g, .32, .05, .07, 0xa6abaf, .15, .025 + i * .05, -.73 + i * .07);
   // Dachplatten mit Rissen
   for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) box(g, .32, .06, .3, (i + j) % 2 ? C1 : 0xb3b7ba, -.33 + i * .33, .53, -.37 + j * .31);
   for (const [x, z, r] of [[-.1, -.2, .6], [.2, .1, -.4], [-.3, .15, .2]]) box(g, .3, .005, .012, 0x3a3d40, x, .565, z, 0, r, 0);
