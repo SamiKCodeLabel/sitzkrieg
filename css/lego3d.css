@@ -27,9 +27,9 @@ body.map3d-on #map3d{display:block}
 body.map3d-on #map{position:absolute!important;left:-9999px;visibility:hidden}
 @media (max-width:640px){ #map3d{height:72vh} #map3d.quer{height:38vh} }
 #map-wrap{position:relative}
-#map-tools{position:absolute;z-index:8;top:-16px;right:-8px;display:flex;gap:6px}
-body.map3d-on #map-tools{top:-16px}
-#map-tools button{grid-column:auto;min-width:46px;height:36px;padding:0 12px!important;font-size:1rem!important;line-height:1;border-radius:18px!important;letter-spacing:.06em;
+#map-tools{display:flex;gap:8px}
+@media (max-width:640px){ #tab-gen .bar{grid-template-columns:1fr auto} #tab-gen .bar #gen{grid-column:1 / -1} #tab-gen .bar .seg{grid-column:1;grid-template-columns:1fr 1fr} #map-tools{grid-column:2} }
+#map-tools button{grid-column:auto;min-width:50px;height:100%;min-height:42px;padding:0 12px!important;font-size:1rem!important;line-height:1;border-radius:10px!important;letter-spacing:.06em;
   background:linear-gradient(#6b7540,#454d27)!important;color:#f3ecd2!important;border:2px solid #c9bf8e!important;box-shadow:0 2px 6px rgba(0,0,0,.5)!important;text-transform:none;margin:0}
 #map-tools #rot{font-size:1.3rem!important}
 

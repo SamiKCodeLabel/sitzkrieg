@@ -134,7 +134,7 @@ const map = document.getElementById('map');
 const box = document.createElement('div'); box.id = 'map3d';
 // Karte + 3D-Tisch in einer gemeinsamen Hülle; Knöpfe (Drehen + 2D/3D) sitzen oben rechts auf der Ecke, in beiden Ansichten an derselben Stelle
 const wrap = document.createElement('div'); wrap.id = 'map-wrap'; map.before(wrap); wrap.append(map, box);
-const tools = document.createElement('div'); tools.id = 'map-tools'; wrap.appendChild(tools);
+const tools = document.createElement('div'); tools.id = 'map-tools'; (document.querySelector('#tab-gen .bar') || wrap).appendChild(tools);   // neben Normal/Episch: stört die Karte nicht, gleiche Stelle in 2D und 3D
 const rot = document.getElementById('rot'); if (rot) { rot.textContent = '↻'; rot.title = 'Karte drehen'; rot.setAttribute('aria-label', 'Karte drehen'); tools.appendChild(rot); }
 const sw = document.createElement('button'); sw.type = 'button'; sw.className = 'sec v3d-sw'; tools.appendChild(sw);
 sw.onclick = e => { e.stopPropagation(); on = !on; try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (er) { } apply(); };
