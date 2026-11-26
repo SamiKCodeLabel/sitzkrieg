@@ -164,7 +164,7 @@ let lastCardKey=null;
 function playFx(gc,c,replay){
   const art=gc&&gc.querySelector('.gc-art'); if(!art||!c) return;
   art.classList.remove('anim','replay'); [...art.classList].filter(k=>k.startsWith('anim-')||k.startsWith('g-')).forEach(k=>art.classList.remove(k));
-  art.querySelectorAll('.fxl').forEach(n=>n.remove()); gc.classList.remove('fx-shake','flip-in'); void art.offsetWidth;
+  art.querySelectorAll('.fxl').forEach(n=>n.remove()); gc.classList.remove('fx-shake','flip-in','no-flip'); void art.offsetWidth;
   const kind=c.kind==='rif'?'rif':c.kind==='veh'?c.key:(c.unit?c.unit.key:''); if(!kind) return;
   const abil=kind==='general'&&c.unit&&c.unit.abil?c.unit.abil.name:'';
   art.classList.add('anim','anim-'+kind); if(replay) art.classList.add('replay');
@@ -172,7 +172,7 @@ function playFx(gc,c,replay){
   const fx=abil?(FX_GEN[abil]||FX.general):(FX[kind]||[]), base=replay?0:.26;
   if(fx.length) art.insertAdjacentHTML('beforeend','<span class="fxl">'+fx.map(f=>fxEl(f,base)).join('')+'</span>');
   if(FX_SHAKE.has(kind)||FX_SHAKE.has(abil)) gc.classList.add('fx-shake');
-  if(!replay) gc.classList.add('flip-in');
+  if(replay) gc.classList.add('no-flip'); else gc.classList.add('flip-in');
   if(kind==='flieger'&&typeof Sounds!=='undefined') try{ setTimeout(()=>Sounds.play('plane'),replay?0:250); }catch(e){}
 }
 // Bild der Einheit antippen -> Animation nochmal

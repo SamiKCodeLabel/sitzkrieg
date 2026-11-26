@@ -347,3 +347,7 @@ button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,
 .g-unbarmherzig svg.fig{animation:aRecoil .4s ease-out!important}
 @media (prefers-reduced-motion:reduce){ [class*="g-"] svg.fig{animation:none!important} }
 .gc-art.anim:not(.replay)[class*="g-"] svg.fig{animation-delay:.26s!important}
+
+/* Antippen: nur wackeln, nicht nochmal umdrehen */
+.gcard.no-flip{animation:none}
+.gcard.fx-shake.no-flip{animation:fxShake .45s ease-out .12s}
