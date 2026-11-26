@@ -108,11 +108,11 @@ function terrain(key, g, w, d) {
     case 'wald': for (let i = 0; i < 4; i++) tree(g, (i % 2 - .5) * .7 + (R() - .5) * .15, (Math.floor(i / 2) - .5) * .7 + (R() - .5) * .15, .9 + R() * .3); break;
     case 'flach': field(g); break;
     case 'zug': train(g, w, d); break;
-    case 'farm': farm(g); break;
-    case 'turm': tower(g); break;
+    case 'farm': farm3(g); break;
+    case 'turm': tower3(g); break;
     case 'bunker': bunker2(g); break;
     case 'strand': beach(g, w, d); break;
-    case 'wohn': house(g, 0, -.1); tree(g, .55, .5, .7); break;
+    case 'wohn': house3(g); break;
     case 'graben': trench(g, w, d); break;
     case 'hafen': harbor2(g, w, d); break;
     case 'see': water(g, w, d); for (let i = 0; i < 5; i++) brick(g, .04, .3, .04, 0x5a7a2a, -.6 + R() * .2, .15, -.6 + i * .3, { studs: false }); break;
@@ -209,10 +209,10 @@ function mottled(g, w, h, d, x, y, z) {   // Mauer aus gemischten Steinen (sand,
     else box(g, .012, hh, ww, c, x + sgn * (w / 2 + .005), yy, z + (Math.random() - .5) * (d - ww));
   }
 }
-function gable(g, L, W, H, x, y, z, ry = 0) {   // Satteldach aus zwei Dachsteinen + Giebeldreiecke
+function gable(g, L, W, H, x, y, z, ry = 0, rc = SLATE, wc = TANW) {   // Satteldach aus zwei Dachsteinen + Giebeldreiecke
   const n = G(); n.position.set(x, y, z); n.rotation.y = ry; g.add(n);
-  for (const sz of [-1, 1]) slope(n, W / 2 + .05, H, L + .06, SLATE, 0, H / 2, sz * (W / 4 + .02), sz > 0 ? -HALF : HALF);
-  for (const sx of [-1, 1]) { const sh = new THREE.Shape(); sh.moveTo(-W / 2, 0); sh.lineTo(W / 2, 0); sh.lineTo(0, H); sh.closePath(); const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .04, bevelEnabled: false }), plastic(TANW)); m.rotation.y = HALF; m.position.set(sx * L / 2 - (sx > 0 ? .04 : 0), 0, 0); n.add(m); }
+  for (const sz of [-1, 1]) slope(n, W / 2 + .05, H, L + .06, rc, 0, H / 2, sz * (W / 4 + .02), sz > 0 ? -HALF : HALF);
+  for (const sx of [-1, 1]) { const sh = new THREE.Shape(); sh.moveTo(-W / 2, 0); sh.lineTo(W / 2, 0); sh.lineTo(0, H); sh.closePath(); const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .04, bevelEnabled: false }), plastic(wc)); m.rotation.y = HALF; m.position.set(sx * L / 2 - (sx > 0 ? .04 : 0), 0, 0); n.add(m); }
   box(n, L + .1, .04, .06, 0x3a3f42, 0, H + .01, 0);
 }
 function archWin(g, x, y, z, ry, h = .3) { const n = G(); n.position.set(x, y, z); n.rotation.y = ry; g.add(n); box(n, .14, h, .015, 0x2a2c30, 0, 0, 0); const t = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .015, 16, 1, false, 0, Math.PI), plastic(0x2a2c30)); t.rotation.set(HALF, 0, HALF); t.position.y = h / 2; n.add(t); }
@@ -237,6 +237,100 @@ function church2(g, w, d) {
   const sp = new THREE.Mesh(new THREE.ConeGeometry(.38, .9, 4), plastic(SLATE)); sp.position.set(tx, 2.2, tz); sp.rotation.y = Math.PI / 4; n.add(sp);
   for (const sx of [-.24, .24]) for (const sz of [-.24, .24]) { const pn = new THREE.Mesh(new THREE.ConeGeometry(.05, .22, 4), plastic(0xc8ccce)); pn.position.set(tx + sx, 1.86, tz + sz); n.add(pn); }
   for (const lx of [-L * .55, L * .45]) { cyl(n, .02, .75, 0x1b1b1b, lx, .38, .62); box(n, .14, .03, .03, 0x1b1b1b, lx + .06, .76, .62); cyl(n, .035, .06, 0xfff2b0, lx + .12, .72, .62); }
+}
+
+// ---- Wohnhaus „Steindorf“ (Bahnhofsgebäude) mit Garten und Lattenzaun ----
+const NOUG = 0x6e3520, BONE = 0xe8e4d6, TANH = 0xd8c08a, DGRN = 0x1f4a34, FIN = 0xe6d08a;
+function fenceRow(g, x0, z0, x1, z1) { const n = Math.round(Math.hypot(x1 - x0, z1 - z0) / .09); for (let i = 0; i <= n; i++) { const t = i / n; box(g, .035, .14, .035, WHT2, x0 + (x1 - x0) * t, .07, z0 + (z1 - z0) * t); } box(g, Math.abs(x1 - x0) + .04, .025, Math.abs(z1 - z0) + .04, WHT2, (x0 + x1) / 2, .1, (z0 + z1) / 2); }
+function flower(g, x, z, c = 0xd8322a) { cyl(g, .008, .08, 0x2a6a3a, x, .04, z); const f = new THREE.Mesh(new THREE.CylinderGeometry(.035, .035, .015, 6), plastic(c)); f.position.set(x, .085, z); g.add(f); cyl(g, .012, .018, 0xf2d23a, x, .095, z); }
+function win(g, x, y, z, ry, w = .16, h = .16) { const n = G(); n.position.set(x, y, z); n.rotation.y = ry; g.add(n); box(n, w + .03, h + .03, .02, DGRN, 0, 0, 0); box(n, w, h, .022, WHT2, 0, 0, .003); for (const [dx, dy] of [[-.25, .25], [.25, .25], [-.25, -.25], [.25, -.25]]) box(n, w * .42, h * .4, .024, 0x6f8a9a, dx * w, dy * h, .005); }
+function steppedGable(g, x, z, w, h, ry, col) { const n = G(); n.position.set(x, 0, z); n.rotation.y = ry; g.add(n); const st = 6; for (let i = 0; i < st; i++) { const ww = w * (1 - i / st) + .04; box(n, .05, h / st, .02, col, -ww / 2, (i + .5) * h / st, 0); box(n, .05, h / st, .02, col, ww / 2, (i + .5) * h / st, 0); } }
+function house3(g) {
+  const hx = -.12, hz = -.12, W = .95, D = .82;
+  // Garten: Zaun, Weg, Blumen, Bank
+  fenceRow(g, -.72, .7, .72, .7); fenceRow(g, .72, -.7, .72, .7);
+  for (let i = 0; i < 6; i++) box(g, .12, .012, .12, 0xd9c08a, .12 + (i % 2) * .12, .006, .4 + Math.floor(i / 2) * .12 - .12);
+  for (let i = 0; i < 16; i++) flower(g, (Math.random() < .5 ? .42 + Math.random() * .25 : -.6 + Math.random() * .9), .38 + Math.random() * .27, i % 3 ? 0xd8322a : 0xe86a5a);
+  for (let i = 0; i < 8; i++) flower(g, .45 + Math.random() * .22, -.55 + Math.random() * .9);
+  box(g, .3, .04, .08, DGRN, .55, .1, .05, 0, HALF, 0); box(g, .3, .1, .02, DGRN, .6, .15, .05, 0, HALF, 0);
+  // Gebäude: unten hell, Band dunkelgrün, oben sand
+  box(g, W, .3, D, BONE, hx, .15, hz); box(g, W + .01, .035, D + .01, DGRN, hx, .31, hz); box(g, W, .3, D, TANH, hx, .475, hz);
+  for (const x of [-.3, .05]) win(g, hx + x, .17, hz + D / 2 + .012, 0, .14, .14);
+  win(g, hx + .3, .14, hz + D / 2 + .012, 0, .12, .2);                       // Tür
+  for (const x of [-.25, .15]) win(g, hx + x, .48, hz + D / 2 + .012, 0, .18, .16);
+  for (const z of [-.2, .15]) { win(g, hx + W / 2 + .012, .17, hz + z, HALF, .14, .14); win(g, hx - W / 2 - .012, .48, hz + z, -HALF, .16, .16); }
+  // Schild „Steindorf“
+  const sg = new THREE.Mesh(new THREE.PlaneGeometry(.34, .07), new THREE.MeshStandardMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 52; const x = c.getContext('2d'); x.fillStyle = '#f2f0e8'; x.fillRect(0, 0, 256, 52); x.fillStyle = '#1b1b1b'; x.font = '700 34px Arial,sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('Steindorf', 128, 28); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })(), roughness: .4 }));
+  sg.position.set(hx + .05, .37, hz + D / 2 + .016); g.add(sg);
+  for (const x of [-.4, .42]) { cyl(g, .035, .06, 0x1b1b1b, hx + x, .36, hz + D / 2 + .05); }       // Wandlampen
+  cyl(g, .045, .012, WHT2, hx + W / 2 + .03, .5, hz + D / 2 - .05, HALF, 0, 16);                     // Uhr
+  // Steiles Dach (rotbraun) mit Quergiebel vorn
+  const RH = .62;
+  for (const sz of [-1, 1]) slope(g, D / 2 + .1, RH, W + .12, NOUG, hx, .625 + RH / 2, hz + sz * (D / 4 + .05), sz > 0 ? -HALF : HALF);
+  box(g, W + .12, .04, .06, 0x6a3a22, hx, .63 + RH, hz);
+  for (const sx of [-1, 1]) { steppedGable(g, hx + sx * (W / 2 + .04), hz, D + .1, RH, HALF, NOUG); cyl(g, .025, .08, FIN, hx + sx * (W / 2 + .04), .68 + RH, hz); box(g, .07, .025, .07, FIN, hx + sx * (W / 2 + .04), .73 + RH, hz); }
+  // Quergiebel vorn: kleines Satteldach quer zum Hauptdach, gestufte Kante, Zierspitze
+  const gx = hx + .05, gz = hz + D / 2 - .02;
+  box(g, .42, .3, .3, TANH, gx, .775, gz - .05); win(g, gx, .78, gz + .102, 0, .14, .14);
+  gable(g, .5, .46, .4, gx, .925, gz - .1, HALF, NOUG, TANH);
+  steppedGable(g, gx, gz + .15, .46, .4, 0, NOUG); g.children[g.children.length - 1].position.y = .925;
+  cyl(g, .025, .08, FIN, gx, 1.36, gz + .15); box(g, .07, .025, .07, FIN, gx, 1.41, gz + .15);
+  for (const x of [-.2, .18]) { box(g, .1, .32, .1, 0x9aa0a4, hx + x, 1.05, hz - .08); box(g, .12, .04, .12, 0x7c8186, hx + x, 1.22, hz - .08); cyl(g, .03, .05, 0x7c8186, hx + x, 1.27, hz - .08); }   // Schornsteine
+}
+// ---- Wachturm: Holzgerüst mit Kreuzstreben, Plattform, Funk, Scheinwerfer, Antenne, Windsack ----
+const WOOD2 = 0xa87a42, WOOD3 = 0x8a6234;
+function beam(g, a, b, t, col) { const d = b.clone().sub(a), m = new THREE.Mesh(new THREE.BoxGeometry(t, d.length(), t), plastic(col)); m.position.copy(a).add(b).multiplyScalar(.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(m); return m; }
+function tower3(g) {
+  box(g, .9, .03, .9, 0x7c8186, 0, .015, 0);                                               // Steinfundament
+  for (let i = 0; i < 10; i++) box(g, .1 + Math.random() * .1, .02, .08, [0x2a6a4a, 0x8ac04a, 0xc8d84a, 0x6a4a2a][i % 4], (Math.random() - .5) * 1.3, .01, (Math.random() - .5) * 1.3);
+  for (const [x, z] of [[-.6, .55], [.55, .5], [.55, -.5], [-.55, -.55], [-.2, .62]]) for (let k = 0; k < 7; k++) { const c = new THREE.Mesh(new THREE.ConeGeometry(.012, .16, 4), plastic(0xe0c888)); c.position.set(x + (Math.random() - .5) * .08, .08, z + (Math.random() - .5) * .08); c.rotation.set((Math.random() - .5) * .8, 0, (Math.random() - .5) * .8); g.add(c); }
+  const B = .38, T = .3, H = 1.7, V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const legs = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+  for (const [sx, sz] of legs) beam(g, V(sx * B, 0, sz * B), V(sx * T, H, sz * T), .06, WOOD2);
+  const lvl = [0, .85, H];
+  for (let k = 0; k < 2; k++) for (let i = 0; i < 4; i++) {                                 // Kreuzstreben je Seite
+    const [ax, az] = legs[i], [bx, bz] = legs[(i + 1) % 4], y0 = lvl[k], y1 = lvl[k + 1], w0 = B - (B - T) * y0 / H, w1 = B - (B - T) * y1 / H;
+    beam(g, V(ax * w0, y0, az * w0), V(bx * w1, y1, bz * w1), .04, WOOD3); beam(g, V(bx * w0, y0, bz * w0), V(ax * w1, y1, az * w1), .04, WOOD3);
+    beam(g, V(ax * w1, y1, az * w1), V(bx * w1, y1, bz * w1), .045, WOOD2);
+  }
+  // Plattform mit Geländer
+  brick(g, 1.0, .06, 1.0, WOOD2, 0, H + .03, 0);
+  for (const [sx, sz] of legs) cyl(g, .03, .26, WOOD2, sx * .47, H + .19, sz * .47);
+  for (const sz of [-1, 1]) { box(g, .98, .035, .035, WOOD2, 0, H + .29, sz * .47); box(g, .035, .035, .98, WOOD2, sz * .47, H + .29, 0); box(g, .98, .03, .03, WOOD2, 0, H + .17, sz * .47); box(g, .03, .03, .98, WOOD2, sz * .47, H + .17, 0); }
+  box(g, .4, .015, .26, 0x8a3a1a, .1, H + .07, .15);                                        // Luke
+  box(g, .14, .1, .12, 0xb4b8bb, -.3, H + .11, -.3); box(g, .12, .08, .1, 0x9aa0a4, .32, H + .1, -.32);   // Funkkisten
+  const sl = G(); sl.position.set(-.25, H + .16, .28); g.add(sl); cyl(sl, .02, .08, 0x9aa0a4, 0, 0, 0); const lamp = cyl(sl, .06, .14, WHT2, 0, .07, .05, HALF, 0, 14); cyl(sl, .05, .01, 0xfff2b0, 0, .07, .12, HALF, 0, 14);
+  cyl(g, .012, .75, 0x1b1b1b, -.4, H + .45, -.4); for (const y of [.55, .65]) cyl(g, .08, .02, 0xc8ccce, -.4, H + y, -.4, 0, 0, 18);   // Antennenmast mit Schüsseln
+  cyl(g, .006, .35, 0x1b1b1b, -.3, H + .3, -.42, .15);
+  cyl(g, .012, .5, 0x1b1b1b, .42, H + .3, .42); const ws = new THREE.Mesh(new THREE.ConeGeometry(.05, .22, 10, 1, true), plastic(WHT2, { side: THREE.DoubleSide })); ws.rotation.z = HALF; ws.position.set(.53, H + .52, .42); g.add(ws);   // Windsack
+  // Kraftrad und Fass am Fuß
+  cyl(g, .05, .1, 0x4d5530, .18, .05, -.18);
+}
+// ---- Farm: sandfarbener Stall, graues Dach, Bogentor, Pumpe, Blumen, Beet ----
+function farm3(g) {
+  const sx0 = -.2, sz0 = -.35, W = 1.0, D = .52;
+  box(g, W + .12, .025, D + .12, 0x6b3f22, sx0, .0125, sz0);                                // Holzboden ringsum
+  brick(g, W, .42, D, 0xc8b07a, sx0, .23, sz0, { studs: false });
+  for (let i = 0; i < 22; i++) box(g, .08 + Math.random() * .08, .05, .012, [0xd9c08a, 0xb39b6a][i % 2], sx0 + (Math.random() - .5) * (W - .1), .08 + Math.random() * .3, sz0 + D / 2 + .006);
+  for (const sz of [-1, 1]) slope(g, D / 2 + .1, .3, W + .14, 0x7e8388, sx0, .44 + .15, sz0 + sz * (D / 4 + .05), sz > 0 ? -HALF : HALF);
+  box(g, W + .14, .035, .06, 0x8a8f94, sx0, .75, sz0);
+  for (const x of [-.32, .1]) { box(g, .08, .12, .08, 0x7c8186, sx0 + x, .8, sz0); box(g, .11, .03, .11, 0x7c8186, sx0 + x, .87, sz0); }   // Schornsteine
+  // Bogentor mit zwei offenen Türen
+  const tx = sx0 + .05, fz = sz0 + D / 2;
+  box(g, .2, .24, .02, 0x2a241c, tx, .14, fz + .004); const arc = new THREE.Mesh(new THREE.CylinderGeometry(.1, .1, .02, 16, 1, false, 0, Math.PI), plastic(0x2a241c)); arc.rotation.set(HALF, 0, HALF); arc.position.set(tx, .26, fz + .004); g.add(arc);
+  for (const s of [-1, 1]) { const d = box(g, .1, .28, .02, 0xc8ccce, tx + s * .16, .16, fz + .06); d.rotation.y = s * .9; }
+  win(g, sx0 + .32, .3, fz + .012, 0, .18, .1);
+  for (const s of [-1, 1]) box(g, .12, .3, .02, 0xc8ccce, sx0 - W / 2 - .012, .17, sz0 + s * .065, 0, HALF, 0);   // Doppeltor an der Giebelseite
+  box(g, .06, .05, .04, 0xd9c08a, tx - .3, .28, fz + .02);
+  // Schwengelpumpe mit Eimer, gelbe Blumen
+  cyl(g, .025, .3, 0x1b1b1b, sx0 - .32, .15, fz + .2); box(g, .14, .02, .02, 0x1b1b1b, sx0 - .27, .3, fz + .2, 0, 0, -.5); cyl(g, .045, .07, 0x8a6a3a, sx0 - .24, .035, fz + .24);
+  for (const [x, z] of [[-.62, .1], [-.55, .2], [-.68, .25]]) { cyl(g, .012, .22, 0x2a6a3a, x, .11, z); cyl(g, .065, .025, 0xf2c020, x, .23, z, 0, 0, 8); cyl(g, .02, .03, 0x8a5a1a, x, .245, z); const l = new THREE.Mesh(new THREE.ConeGeometry(.07, .06, 5), plastic(0x2a7a4a)); l.position.set(x, .06, z); g.add(l); }
+  // Beet: Gemüse (hellgrün) und Getreide (gelb)
+  box(g, .55, .03, .42, 0x6b3f22, .38, .015, .38);
+  for (let i = 0; i < 6; i++) { const c = new THREE.Mesh(new THREE.TorusGeometry(.03, .01, 6, 10, Math.PI * 1.3), plastic(0x9ad84a)); c.position.set(.2 + (i % 3) * .08, .09, .28 + Math.floor(i / 3) * .12); c.rotation.z = HALF; g.add(c); cyl(g, .01, .08, 0x9ad84a, .2 + (i % 3) * .08, .06, .28 + Math.floor(i / 3) * .12); }
+  for (let i = 0; i < 8; i++) box(g, .02, .1, .12, 0xf2c020, .48 + (i % 4) * .055, .07, .32 + Math.floor(i / 4) * .17);
+  for (const [x, z, c] of [[-.4, .5, 0x2a4a3a], [.1, .62, 0x8a9a8a], [-.65, .62, 0x2a6a5a], [.62, -.3, 0x2a6a5a]]) for (let k = 0; k < 5; k++) box(g, .16, .012, .03, c, x, .01, z, 0, k * Math.PI / 5, 0);
+  for (const [x, z] of [[.25, .1], [.62, .05], [-.2, .45], [.65, .65]]) box(g, .07, .012, .07, 0xc8b07a, x, .01, z, 0, Math.random() * 3, 0);
 }
 
 // Ein einzelnes Feld als Modell (Bauplatte + Gelände), z. B. für das Bild am Rundenende
