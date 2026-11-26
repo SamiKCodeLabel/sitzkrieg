@@ -1,6 +1,7 @@
 // Gelände-Modelle der Kartenfelder (Klemmbaustein-Stil) – genutzt vom 3D-Spieltisch und von den Rundenende-Bildern
 import { THREE, brick, slope, plastic } from './modelle.js';
-const TERRAIN = { wald: 0x4f7a34, flach: 0x186a56, zug: 0x186a56, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0x1667c8, wohn: 0x8fa357, graben: 0x17765e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
+import { mergeGeometries } from '../vendor/BufferGeometryUtils.js';
+const TERRAIN = { wald: 0x1a7262, flach: 0x186a56, zug: 0x186a56, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x45b35a, strand: 0x1667c8, wohn: 0x8fa357, graben: 0x17765e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
 const R = Math.random;
 
 // ---------- Gelände-Modelle (Mittelpunkt 0,0; Fläche w x d) ----------
@@ -105,12 +106,12 @@ function field(g) { for (let i = 0; i < 4; i++) bush(g, (R() - .5) * 1.1, (R() -
 
 function terrain(key, g, w, d) {
   switch (key) {
-    case 'wald': for (let i = 0; i < 4; i++) tree(g, (i % 2 - .5) * .7 + (R() - .5) * .15, (Math.floor(i / 2) - .5) * .7 + (R() - .5) * .15, .9 + R() * .3); break;
+    case 'wald': wald3(g, w, d); break;
     case 'flach': flat3(g, w, d); break;
     case 'zug': train3(g, w, d); break;
     case 'farm': farm3(g); break;
     case 'turm': tower3(g); break;
-    case 'bunker': bunker2(g); break;
+    case 'bunker': bunker3(g); break;
     case 'strand': beach3(g, w, d); break;
     case 'wohn': house3(g); break;
     case 'graben': trench3(g, w, d); break;
@@ -536,6 +537,85 @@ function train3(g, w, d) {
   frond(n, xx(-.9), zz(.05), 0x9fbfa0, .6, 2.2);
   for (const [fx, fz, a, b, fr] of [[-.15, .15, .45, .22, 1], [.75, .45, .3, .25, 1], [-.65, .2, .3, .1, 0], [.05, .55, .25, .16, 0], [-.9, .3, .1, .2, 0], [.85, .8, .1, .22, 0]]) { const x = xx(fx), z = zz(fz); box(n, a, .025, b, fr ? 0x9a5a22 : 0x6e3a1c, x, .0125, z); if (fr) frond(n, x, z, 0x1f8a6a, .65, .3, .04); }
   box(n, .2, .025, .2, 0x3fc07a, xx(-.3), .0125, zz(.65)); dot(n, xx(-.45), zz(.55), 0xd8e030);
+}
+
+// ---- Bunker nach Fotos: Betonklotz mit abgeschrägter Dachkante, runder Ecke, breiter Schießscharte, Rampe mit Schläuchen, Hof mit Eingang hinten ----
+function bunker3(g) {
+  const C = 0x939799, C2 = 0x84888b, IVY = 0x1f4a34, DK = 0x2a2c2e, H = .42;
+  // Hauptkörper vorne (mit runder Ecke vorn rechts) und zwei Flügel hinten
+  box(g, .72, H, .55, C, -.08, H / 2, .02); box(g, .2, H, .35, C, .38, H / 2, -.08); cyl(g, .2, H, C, .28, H / 2, .1, 0, 0, 28);
+  box(g, .26, H, .36, C, -.31, H / 2, -.43); box(g, .26, H, .36, C, .35, H / 2, -.43);
+  box(g, .4, .01, .36, 0x6a6f74, .02, .006, -.43);                                                  // Hof-Boden dunkelgrau
+  for (let i = 0; i < 4; i++) for (let k = 0; k < 3; k++) cyl(g, .03, .02, 0x6a6f74, -.13 + i * .1, .02, -.55 + k * .1, 0, 0, 10);
+  box(g, .2, .3, .02, DK, .02, .15, -.245); box(g, .12, .2, .03, 0x3c3f42, .02, .1, -.24);        // Tür im Hof
+  // Dach: Platte mit Fliesenfugen, Schrägen an der Kante
+  box(g, .66, .05, .5, C, -.08, H + .025, .0); box(g, .2, .05, .3, C, .36, H + .025, -.1); cyl(g, .16, .05, C, .28, H + .025, .1, 0, 0, 28);
+  for (const [x, z, w2] of [[-.08, .275, .72], [-.31, -.61, .26], [.35, -.61, .26]]) box(g, w2, .03, .05, C2, x, H + .01, z);   // abgesetzte Dachkante
+  box(g, .26, .05, .36, C, -.31, H + .025, -.43); box(g, .26, .05, .36, C, .35, H + .025, -.43);
+  for (const [x, z, w2, d2] of [[-.2, -.1, .3, .002], [.1, .05, .002, .3], [-.3, .12, .2, .002], [.05, -.2, .25, .002], [-.4, -.4, .2, .002]]) box(g, Math.max(w2, .004), .003, Math.max(d2, .004), 0x7c8084, x, H + .052, z);
+  for (const [x, z, r] of [[-.15, -.05, .7], [.05, .12, -.5], [.2, -.15, .3]]) box(g, .18, .003, .008, 0x3a3d40, x, H + .053, z, 0, r, 0);
+  // Breite Schießscharte vorne mit gestuftem Sims
+  box(g, .5, .08, .03, DK, -.12, .27, .3); box(g, .56, .03, .06, C2, -.12, .21, .31); box(g, .6, .03, .1, C2, -.12, .18, .32); box(g, .56, .03, .05, C2, -.12, .33, .31);
+  // Rampe links vom Dach zum Boden mit orangen Schläuchen
+  slope(g, .42, H + .04, .4, C2, -.65, (H + .04) / 2, .04, Math.PI);
+  for (let i = 0; i < 3; i++) cyl(g, .012, .55, 0xd9741a, -.64, .26, -.06 + i * .05, 0, -.87, 8);
+  for (let i = 0; i < 2; i++) box(g, .04, .04, .03, 0x7c8084, -.55 - i * .2, .37 - i * .22, .23);
+  // Efeu und Laubflecken
+  for (let k = 0; k < 7; k++) { const l = leaf(g, -.15 + (R() - .5) * .2, H + .06, -.05 + (R() - .5) * .18, .5, R() * 6); l.material = plastic(IVY); }
+  for (const [x, y, z] of [[-.38, H + .06, -.55], [.35, H + .06, .2], [.42, H + .06, -.5]]) { const l = leaf(g, x, y, z, .35, R() * 6); l.material = plastic(IVY); }
+  for (const [x, y, z, ry] of [[.49, .25, -.2, HALF], [-.2, .3, .305, 0], [.45, .15, -.5, HALF]]) { const l = leaf(g, 0, 0, 0, .35, 0); l.material = plastic(IVY); l.rotation.set(0, ry, 0); l.position.set(x, y, z); }
+  // Orange Sandsäcke an der rechten Seite
+  for (let i = 0; i < 3; i++) { const sk = sack(g, .58, .04, -.5 + i * .17, HALF); sk.traverse(o => { if (o.isMesh) o.material = plastic(0xd88a10); }); }
+  // Wiese
+  { const f = frond(g, .1, .62, 0x1d4a36, .9, .2, .012, true); }
+  frond(g, -.3, .6, 0x1f8a6a, .7, 2.4); frond(g, .5, .55, 0x9fbfa0, .7, .9); frond(g, .62, .4, 0x1f8a6a, .6, 1.8);
+  box(g, .18, .025, .12, 0x8a4a1c, -.5, .0125, .5, 0, .3, 0);
+  for (const [x, z, c, sp] of [[-.5, .5, 0xc8b48a, 0], [.62, .2, 0xc8b48a, 0], [.62, -.05, 0xc8b48a, 0], [-.15, .68, 0xc8b48a, 0], [.66, -.3, 0x3fb36f, 1], [-.62, .35, 0x3fb36f, 1]]) { const l = leaf(g, x, .015, z, .45, R() * 6); l.material = plastic(c); if (sp) sprout(g, x, z, .02); }
+  for (const [x, z] of [[-.62, .62], [.66, .62]]) grass(g, x, z, .6);
+}
+
+// ---- Wald nach Fotos: drei große Bäume aus Blatt-Sternen (sandgrün, gelb, dunkelgrün), kleine Tannen, Baumstümpfe ----
+const STAR = {};
+function starGeo() {
+  if (STAR.g) return STAR.g;
+  const parts = [], add = (geo, x, z, ry) => { geo.rotateY(ry); geo.translate(x, 0, z); parts.push(geo); };
+  for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2;
+    add(new THREE.BoxGeometry(.2, .02, .03), Math.cos(a) * .1, -Math.sin(a) * .1, a);
+    const ex = Math.cos(a) * .12, ez = -Math.sin(a) * .12;
+    for (const sd of [-1, 1]) { const b = a + sd * .9; add(new THREE.BoxGeometry(.07, .02, .022), ex + Math.cos(b) * .035, ez - Math.sin(b) * .035, b);
+      const t = new THREE.TorusGeometry(.022, .01, 5, 10); t.rotateX(HALF); add(t, ex + Math.cos(b) * .07, ez - Math.sin(b) * .07, 0); }
+    const t = new THREE.TorusGeometry(.025, .011, 5, 10); t.rotateX(HALF); add(t, Math.cos(a) * .2, -Math.sin(a) * .2, 0);
+  }
+  add(new THREE.CylinderGeometry(.035, .035, .03, 12), 0, 0, 0);
+  for (const p of parts) { if (p.index) continue; }
+  STAR.g = mergeGeometries(parts.map(p => p.index ? p.toNonIndexed() : p)); STAR.g.parameters = { cached: true };
+  return STAR.g;
+}
+function bigTree(g, x, z, c, s = 1) {
+  const n = G(); n.position.set(x, 0, z); n.scale.setScalar(s); g.add(n);
+  const TR = 0x7a4a24;
+  box(n, .1, .6, .1, TR, 0, .3, 0); for (const a of [0, HALF, Math.PI, -HALF]) box(n, .16, .04, .05, TR, Math.cos(a) * .08, .02, Math.sin(a) * .08, 0, -a, 0);   // Stamm mit Wurzelfüßen
+  for (const [a, y] of [[.5, .35], [2.6, .45], [4.4, .3], [1.6, .55]]) box(n, .05, .3, .05, TR, Math.cos(a) * .08, y + .1, Math.sin(a) * .08, Math.sin(a) * .6, 0, -Math.cos(a) * .6);
+  const geo = starGeo(), mat = plastic(c);
+  for (let i = 0; i < 22; i++) { const t = i / 22, a = i * 2.39, r = .12 + (i % 3) * .1, y = .35 + t * .55 + (R() - .5) * .08;
+    const m = new THREE.Mesh(geo, mat); m.position.set(Math.cos(a) * r, y, Math.sin(a) * r); m.rotation.set((R() - .5) * .5, R() * 6, (R() - .5) * .5); m.scale.setScalar(.9 + R() * .3); n.add(m); }
+  const top = new THREE.Mesh(geo, mat); top.position.y = .98; n.add(top);
+  return n;
+}
+function smallPine(g, x, z, s = 1) { for (let i = 0; i < 5; i++) { const c = new THREE.Mesh(new THREE.ConeGeometry((.1 - i * .016) * s, .07 * s, 10), plastic(0x16685a)); c.position.set(x, (.04 + i * .045) * s, z); g.add(c); } }
+function stump(g, x, z, h = .16) { cyl(g, .05, h, 0x5a3a1e, x, h / 2, z, 0, 0, 14); cyl(g, .052, .012, 0xc8a878, x, h + .004, z, 0, 0, 14); box(g, .015, .004, .04, 0x5a3a1e, x, h + .012, z); box(g, .04, .004, .015, 0x5a3a1e, x, h + .012, z); }
+function wald3(g, w, d) {
+  bigTree(g, -.05, -.42, 0xf0b020, 1.05);
+  bigTree(g, -.33, .02, 0x3f9a74, .95);
+  bigTree(g, .33, .02, 0x1d4a36, .9);
+  smallPine(g, -.55, .45, .9); smallPine(g, .2, .52, .8); smallPine(g, -.1, .25, .7);
+  stump(g, -.35, .5, .14); stump(g, -.22, .6, .18); stump(g, .55, .3, .15);
+  grass(g, .45, .5, .6);
+  for (const [x, z, c, sp] of [[-.62, .25, 0xc8b48a, 0], [-.6, .62, 0x3fb36f, 1], [.05, .65, 0xc8b48a, 1], [.6, .6, 0x3fb36f, 1], [.35, .68, 0xc8b48a, 0], [-.65, -.2, 0x3fb36f, 1]]) { const l = leaf(g, x, .015, z, .45, R() * 6); l.material = plastic(c); if (sp) sprout(g, x, z, .02); }
+  frond(g, -.55, -.05, 0x3fb06a, .7, .2, .012, true); frond(g, .0, .1, 0x9fbfa0, .6, 1.2);
+  box(g, .12, .025, .12, 0x7a3e14, -.3, .0125, .2); box(g, .12, .025, .12, 0x7a3e14, -.18, .0125, .3);
+  for (const [x, z, c] of [[.0, .45, 0xb8e03a], [-.45, .35, 0xc08ad8], [.25, .35, 0xd8f0d8]]) dot(g, x, z, c);
+  for (const [x, z] of [[-.4, .62], [.62, .1]]) { const t = new THREE.Mesh(new THREE.TorusGeometry(.03, .008, 6, 12, Math.PI * 1.3), plastic(0xb8e03a)); t.position.set(x, .06, z); g.add(t); cyl(g, .007, .06, 0xb8e03a, x - .03, .03, z); }
 }
 
 // Ein einzelnes Feld als Modell (Bauplatte + Gelände), z. B. für das Bild am Rundenende
