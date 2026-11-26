@@ -94,3 +94,9 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 
 .sp-grid>*{min-width:0}
 #sp-deck .deck-row.small{margin-top:4px}
+
+/* Wappen der Generalsfähigkeit oben links an der Figur (Armee-Tab) */
+.slot-art{position:relative}
+.slot-crest{position:absolute;left:calc(50% - 46px);top:-8px;width:40px;z-index:2;transform:rotate(-8deg);filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+@media (max-width:640px){ .slot-crest{width:34px;left:calc(50% - 40px)} }
+.slot-crest svg{display:block;width:100%;height:auto}
