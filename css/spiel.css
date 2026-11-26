@@ -100,3 +100,16 @@ html[data-theme="dark"] .vp-v,html[data-theme="dark"] .d-unit,html[data-theme="d
 .slot-crest{position:absolute;left:calc(50% - 46px);top:-8px;width:40px;z-index:2;transform:rotate(-8deg);filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
 @media (max-width:640px){ .slot-crest{width:34px;left:calc(50% - 40px)} }
 .slot-crest svg{display:block;width:100%;height:auto}
+
+/* ===== Übergänge – bewusst kurz, damit schnelles Neu-Würfeln nicht gebremst wird ===== */
+.tabpane.tab-in{animation:tabIn .16s ease-out}
+@keyframes tabIn{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gcard.flip-in{animation:flipIn .28s cubic-bezier(.2,.7,.3,1) both;transform-origin:50% 50%}
+@keyframes flipIn{0%{transform:perspective(900px) rotateY(-80deg) translateX(30px);opacity:.3}60%{opacity:1}100%{transform:none;opacity:1}}
+.modal:not([hidden]) .pop-card{animation:sheetIn .18s cubic-bezier(.2,.8,.3,1)}
+@keyframes sheetIn{from{transform:translateY(24px) scale(.97);opacity:.4}to{transform:none;opacity:1}}
+button.sec,button.big:not(.gp-next),.tabs button{transition:transform .08s ease-out,filter .08s}
+button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,.tabs button:active{transform:translateY(1px) scale(.97);filter:brightness(.92)}
+.gp-next{transition:transform .1s ease-out,background .2s,opacity .2s}
+.gp-next:not(:disabled):active{transform:scale(.92)}
+@media (prefers-reduced-motion:reduce){ .tabpane.tab-in,.gcard.flip-in,.modal .pop-card,#map.pop .cell{animation:none!important} }

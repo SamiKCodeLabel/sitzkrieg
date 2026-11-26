@@ -70,8 +70,8 @@
   .seg button.on{background:linear-gradient(#5f6838,#3c4322);color:#ece4c8;border-color:var(--gold)}
   .seg small{opacity:.75;font-family:var(--text);font-weight:400}
   #fab{display:none}
-  #map.pop .cell{animation:pop .35s ease-out}
-  @keyframes pop{from{transform:scale(.88)}to{transform:none}}
+  #map.pop .cell{animation:tileIn .2s cubic-bezier(.2,.8,.3,1.25) both;animation-delay:calc(var(--w,0) * 22ms)}   /* Welle, max. ~0,45 s */
+  @keyframes tileIn{from{transform:translateY(-10px) scale(.82);opacity:.35}to{transform:none;opacity:1}}
   @media (prefers-reduced-motion:reduce){#map.pop .cell{animation:none}}
 
   /* ---------- Handy ---------- */

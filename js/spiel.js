@@ -161,6 +161,7 @@ function cardHTML(c){
     <h3 class="gc-name">${name}</h3>${sub?`<div class="gc-sub">${sub}</div>`:''}
     <div class="gc-body">${body}</div>${notes?`<div class="gc-notes">${notes}</div>`:''}</div>`;
 }
+let lastCardKey=null;
 function render(){
   const el=$('tab-spiel'); if(!el) return;
   if(S.sig!==sigNow()) reset();
@@ -173,6 +174,10 @@ function render(){
   </div>`;
   $('sp-next').onclick=draw;
   const gc=el.querySelector('.gcard');
+  // Neue Karte (oder neuer Rundenende-Bildschirm): kurz umdrehen. Bei bloßem Neuzeichnen (Lobby, Seitenwahl) nicht.
+  const cardKey=S.round+'|'+S.deck.length+'|'+S.end;
+  if(gc&&cardKey!==lastCardKey&&lastCardKey!==null) gc.classList.add('flip-in');
+  lastCardKey=cardKey;
   if(gc){
     if(window.linkRules) linkRules(gc);
   }

@@ -201,6 +201,7 @@ function render(){
       el.title+=` · Missionsziel${o.flex?': '+o.name:''}`; }
     const ex=mset&&mset.exts?mset.exts.find(e=>e.p===x):null;
     if(ex){ el.classList.add('is-ext'); el.insertAdjacentHTML('beforeend',`<span class="ext" title="Felderweiterung: ${ex.name}">${ex.icon} ${EXT_SHY[ex.name]||ex.name}</span>`); el.title+=` · Felderweiterung: ${ex.name}`; }
+    el.style.setProperty('--w',r0+c0);   // Reihenfolge der Einblend-Welle (diagonal über das Raster)
     map.appendChild(el);
     x.p.biome==='g'?g+=x.cells.length:b+=x.cells.length;
   }
@@ -312,6 +313,7 @@ function showTab(t){
   document.body.classList.toggle('on-regeln', t==='regeln');
   document.body.classList.toggle('on-mission', t==='mission');
   document.body.classList.toggle('on-spiel', t==='spiel');
+  const pane=$('tab-'+t); pane.classList.remove('tab-in'); void pane.offsetWidth; pane.classList.add('tab-in');   // kurzes Einblenden
   if(t==='spiel'&&window.renderSpiel) renderSpiel();
   $('sub').textContent = {gen:'Karte',mission:'Armee',spiel:'Spiel',regeln:'Regelwerk'}[t];
   try{ localStorage.setItem('sitzkrieg-tab', t); }catch(e){}
