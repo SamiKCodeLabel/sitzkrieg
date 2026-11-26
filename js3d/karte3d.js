@@ -95,7 +95,7 @@ function build() {
       const tg = tag('⚑ ' + (o.flex ? o.name : 'Ziel'), '#b3261a'); tg.position.set(0, 2.3, 0); g.add(tg); }
     if (ex) { extProp(g, ex.name); const tg = tag(ex.name, '#e2b33a', '#1b1b14'); tg.position.set(0, oi >= 0 ? 1.8 : 1.6, .2); g.add(tg); }
     const rule = typeof RULES !== 'undefined' && RULES.felder && RULES.felder[x.p.key] && RULES.felder[x.p.key].regel;
-    g.userData.pi = pi; g.userData.tap = oi >= 0 || !!ex || !!rule;
+    g.userData.pi = pi; g.userData.tap = true;
   });
   // Startkanten: farbige Streifen am Brettrand
   if (ms) for (const side of ['de', 'al']) ms.edges[side].forEach((e, k) => {

@@ -201,8 +201,8 @@ function render(){
       el.title+=` · Missionsziel${o.flex?': '+o.name:''}`; }
     const ex=mset&&mset.exts?mset.exts.find(e=>e.p===x):null;
     if(ex){ el.classList.add('is-ext'); el.insertAdjacentHTML('beforeend',`<span class="ext" title="Felderweiterung: ${ex.name}">${ex.icon} ${EXT_SHY[ex.name]||ex.name}</span>`); el.title+=` · Felderweiterung: ${ex.name}`; }
-    // Antippbar nur, wenn es zu diesem Feld etwas im Regelwerk gibt (Missionsziel, Felderweiterung oder Geländeregel)
-    if(oi>=0||ex||(RULES.felder&&RULES.felder[x.p.key]&&RULES.felder[x.p.key].regel)){ el.dataset.pi=current.pieces.indexOf(x); el.setAttribute('role','button'); el.tabIndex=0; }
+    // Jedes Feld ist antippbar (ohne Besonderheit zeigt es nur den Namen)
+    el.dataset.pi=current.pieces.indexOf(x); el.setAttribute('role','button'); el.tabIndex=0;
     el.style.setProperty('--w',r0+c0);   // Reihenfolge der Einblend-Welle (diagonal über das Raster)
     map.appendChild(el);
     x.p.biome==='g'?g+=x.cells.length:b+=x.cells.length;

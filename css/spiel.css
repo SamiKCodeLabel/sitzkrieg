@@ -351,3 +351,6 @@ button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,
 /* Antippen: nur wackeln, nicht nochmal umdrehen */
 .gcard.no-flip{animation:none}
 .gcard.fx-shake.no-flip{animation:fxShake .45s ease-out .12s}
+#pop.plain #pop-body{display:none}
+#pop.plain .pop-card{min-width:0;padding-bottom:14px}
+#pop.plain #pop-t{margin-bottom:0;padding-right:40px}

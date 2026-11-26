@@ -98,6 +98,8 @@ if(window.renderSpiel) renderSpiel();
     const oi=ms?ms.objectives.indexOf(x):-1, obj=oi>=0?ms.objInfo[oi]:null;
     const ex=ms&&ms.exts?ms.exts.find(e=>e.p===x):null;
     const f=(RULES.felder||{})[x.p.key]||{};
+    $('pop-k').textContent='Kartenfeld'; $('pop-t').textContent=x.p.name; $('pop-d').hidden=true; $('pop').classList.remove('wide','nohead','plain');
+    if(!f.regel&&!obj&&!ex){ $('pop-body').innerHTML=''; $('pop').classList.add('plain'); $('pop').hidden=false; $('pop-x').focus(); return; }   // nichts Besonderes: nur der Name
     const icon=EMOJI_IMG[x.p.icon.replace('️','')];
     let h=`<div class="fi-head">${icon?`<img src="${icon}" alt="">`:''}<div><b>${x.p.biome==='b'?'Stadtfeld':'Grünes Feld'}</b> · belegt ${x.cells.length} Feld${x.cells.length>1?'er':''}</div></div>`;
     if(f.regel) h+=`<p class="fi-rule">${f.regel}</p>`;
@@ -111,7 +113,6 @@ if(window.renderSpiel) renderSpiel();
       const fe=(RULES.felderweiterungen||[]).find(e=>e.name===ex.name);
       h+=`<h4 class="fi-h">${ex.icon} Felderweiterung: ${ex.name}</h4><p>${fe?fe.effekt:''}${fe&&fe.link?` <span class="rlink" data-r="${fe.link}" role="button" tabindex="0">Regeln</span>`:''}</p>`;
     }
-    $('pop-k').textContent='Kartenfeld'; $('pop-t').textContent=x.p.name; $('pop-d').hidden=true;
     $('pop-body').innerHTML=h; if(window.linkRules) linkRules($('pop-body'));
     $('pop').classList.remove('wide','nohead'); $('pop').hidden=false; $('pop-x').focus();
   }
