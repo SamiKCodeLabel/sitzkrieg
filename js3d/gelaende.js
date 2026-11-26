@@ -548,7 +548,7 @@ function bunker3(g) {
   box(g, .26, H, .36, C, -.31, H / 2, -.43); box(g, .26, H, .36, C, .35, H / 2, -.43);
   box(g, .4, .01, .36, 0x6a6f74, .02, .006, -.43);                                                  // Hof-Boden dunkelgrau
   for (let i = 0; i < 4; i++) for (let k = 0; k < 3; k++) cyl(g, .03, .02, 0x6a6f74, -.13 + i * .1, .02, -.55 + k * .1, 0, 0, 10);
-  box(g, .2, .3, .02, DK, .02, .15, -.245); box(g, .12, .2, .03, 0x3c3f42, .02, .1, -.24);        // Tür im Hof
+  box(g, .2, .3, .02, DK, .02, .15, -.267); box(g, .12, .2, .02, 0x3c3f42, .02, .1, -.282);   // Tür vor der Rückwand (nicht in ihr)        // Tür im Hof
   // Dach: Platte mit Fliesenfugen, Schrägen an der Kante
   box(g, .66, .05, .5, C, -.08, H + .025, .0); box(g, .2, .05, .3, C, .36, H + .025, -.1); cyl(g, .16, .05, C, .28, H + .025, .1, 0, 0, 28);
   for (const [x, z, w2] of [[-.08, .275, .72], [-.31, -.61, .26], [.35, -.61, .26]]) box(g, w2, .03, .05, C2, x, H + .01, z);   // abgesetzte Dachkante
