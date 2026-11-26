@@ -77,7 +77,8 @@ function build() {
   if (S3.board) { S3.scene.remove(S3.board); S3.board.traverse(o => { if (o.geometry && !o.geometry.parameters?.cached) o.geometry.dispose?.(); }); }
   S3.flags = [];
   const board = G(); S3.board = board; S3.scene.add(board);
-  const port = box.clientHeight > box.clientWidth;
+  const port = typeof isPortrait === 'function' ? isPortrait() : box.clientHeight > box.clientWidth;   // gleiche Drehung wie die 2D-Karte
+  box.classList.toggle('quer', !port); resize();
   // Rastermaße; hochkant wird das Brett gedreht (lange Seite nach hinten)
   const W = COLS * CELL, D = ROWS * CELL;
   const toXZ = (r, c) => [(c + .5) * CELL - W / 2, (r + .5) * CELL - D / 2];
@@ -117,7 +118,7 @@ function build() {
     if (k === 0) { const ins = insignia(board, side, .36, x, .21, z, 0, -HALF); ins.position.set(long ? x + len * .5 / n : x, .22, long ? z : z + len * .5 / n); }
   });
   // Kamera: Anflug von schräg oben
-  const target = new THREE.Vector3(0, 0, 0), dist = Math.max(W, D) * (port ? 1.95 : 1.05);
+  const asp = box.clientWidth / Math.max(1, box.clientHeight), target = new THREE.Vector3(0, 0, 0), dist = Math.max(W, D) * (port ? 1.95 : 1.05 * Math.max(1, 1.8 / asp));   // Abstand passt sich dem Fenster an (auch gedreht)
   const endPos = port ? new THREE.Vector3(0, dist * .66, dist * .56) : new THREE.Vector3(0, dist * .62, dist * .62);
   if (port) board.rotation.y = HALF;
   S3.ctl.target.copy(target);
@@ -130,11 +131,13 @@ function build() {
 const KEY = 'sitzkrieg-3d';
 let on = false; try { on = localStorage.getItem(KEY) === '1'; } catch (e) { }
 const map = document.getElementById('map');
-const box = document.createElement('div'); box.id = 'map3d'; map.after(box);
-const mk = (txt, title) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'v3d-sw'; b.textContent = txt; b.title = title; b.onclick = e => { e.stopPropagation(); on = !on; try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (er) { } apply(); }; return b; };
-const b3 = mk('3D', 'Als 3D-Spieltisch anzeigen'), b2 = mk('2D', 'Zurück zur 2D-Karte');
-box.appendChild(b2);
-function ensureBtn() { if (!map.contains(b3) && map.children.length) map.appendChild(b3); }
-function apply() { document.body.classList.toggle('map3d-on', on); ensureBtn(); if (on) requestAnimationFrame(build); else if (typeof render === 'function') requestAnimationFrame(() => render()); }   // 2D neu vermessen
-let t = null; new MutationObserver(() => { ensureBtn(); if (!on) return; clearTimeout(t); t = setTimeout(build, 30); }).observe(map, { childList: true });
+const box = document.createElement('div'); box.id = 'map3d';
+// Karte + 3D-Tisch in einer gemeinsamen Hülle; Knöpfe (Drehen + 2D/3D) sitzen oben rechts auf der Ecke, in beiden Ansichten an derselben Stelle
+const wrap = document.createElement('div'); wrap.id = 'map-wrap'; map.before(wrap); wrap.append(map, box);
+const tools = document.createElement('div'); tools.id = 'map-tools'; wrap.appendChild(tools);
+const rot = document.getElementById('rot'); if (rot) { rot.textContent = '↻'; rot.title = 'Karte drehen'; rot.setAttribute('aria-label', 'Karte drehen'); tools.appendChild(rot); }
+const sw = document.createElement('button'); sw.type = 'button'; sw.className = 'sec v3d-sw'; tools.appendChild(sw);
+sw.onclick = e => { e.stopPropagation(); on = !on; try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (er) { } apply(); };
+function apply() { document.body.classList.toggle('map3d-on', on); sw.textContent = on ? '2D' : '3D'; sw.title = on ? 'Zurück zur 2D-Karte' : 'Als 3D-Spieltisch anzeigen'; if (on) requestAnimationFrame(build); else if (typeof render === 'function') requestAnimationFrame(() => render()); }   // 2D neu vermessen
+let t = null; new MutationObserver(() => { if (!on) return; clearTimeout(t); t = setTimeout(build, 30); }).observe(map, { childList: true });
 apply();

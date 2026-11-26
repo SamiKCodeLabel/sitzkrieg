@@ -25,10 +25,13 @@ img.fig.f3d{display:block;height:100%;width:auto;max-width:100%;object-fit:conta
 #map3d canvas{position:absolute;inset:0;display:block;width:100%!important;height:100%!important}
 body.map3d-on #map3d{display:block}
 body.map3d-on #map{position:absolute!important;left:-9999px;visibility:hidden}
-@media (max-width:640px){ #map3d{height:72vh} }
-.v3d-sw{position:absolute;z-index:8;top:-13px;right:-8px;padding:3px 10px!important;font-size:.78rem!important;line-height:1.2;border-radius:12px!important;letter-spacing:.06em;
-  background:linear-gradient(#6b7540,#454d27)!important;color:#f3ecd2!important;border:2px solid #c9bf8e!important;box-shadow:0 2px 6px rgba(0,0,0,.5)!important;text-transform:none}
-#map3d .v3d-sw{top:8px;right:8px}
+@media (max-width:640px){ #map3d{height:72vh} #map3d.quer{height:38vh} }
+#map-wrap{position:relative}
+#map-tools{position:absolute;z-index:8;top:-16px;right:-8px;display:flex;gap:6px}
+body.map3d-on #map-tools{top:-16px}
+#map-tools button{grid-column:auto;min-width:46px;height:36px;padding:0 12px!important;font-size:1rem!important;line-height:1;border-radius:18px!important;letter-spacing:.06em;
+  background:linear-gradient(#6b7540,#454d27)!important;color:#f3ecd2!important;border:2px solid #c9bf8e!important;box-shadow:0 2px 6px rgba(0,0,0,.5)!important;text-transform:none;margin:0}
+#map-tools #rot{font-size:1.3rem!important}
 
 /* Solange die 3D-Bilder laden: keine alten Zeichnungen, nur ein sanfter Platzhalter */
 html.lego3d-wait :is(.slot-art,.gc-art,.mini,.pu-fig) svg.fig{visibility:hidden}
