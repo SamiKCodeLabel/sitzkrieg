@@ -94,17 +94,23 @@ function spawnTargets(v) {
 }
 const HALF = Math.PI / 2;
 function breakApart(v, power = 1, only = null) {
-  const from = v.root.position.clone();
   for (const t of (only || v.targets)) {
     if (t.userData.broken) continue; t.userData.broken = true;
     if (t.userData.shadow) t.userData.shadow.visible = false;
-    const parts = []; t.traverse(o => { if ((o.isMesh || o.isInstancedMesh) && o !== t.userData.shadow) parts.push(o); });
     t.updateMatrixWorld(true);
-    for (const m of parts) {
-      v.scene.attach(m); const p = m.getWorldPosition(new THREE.Vector3());
-      const away = p.clone().sub(from).setY(0).normalize();
-      const vel = away.multiplyScalar((.4 + Math.random() * .8) * power).add(V((Math.random() - .5) * .7, (1.6 + Math.random() * 1.6) * power, (Math.random() - .5) * .7));
-      v.debris.push({ m, vel, spin: V((Math.random() - .5) * 14, (Math.random() - .5) * 14, (Math.random() - .5) * 14), r: .05 + Math.random() * .05 });
+    // Bruchstücke: ganze Steine (mit Noppen) und einzelne Teile außerhalb von Steinen
+    const chunks = [], tur = t.userData.turret;
+    (function walk(o) { for (const c of [...o.children]) { if (c === t.userData.shadow) continue; if (c.userData.brick || (c.isMesh && !c.children.some(k => k.isMesh)) || c === tur) chunks.push(c); else walk(c); } })(t);
+    const center = new THREE.Box3().setFromObject(t).getCenter(new THREE.Vector3());
+    for (const m of chunks) {
+      const isTur = m === tur;
+      v.scene.attach(m);
+      const bb = new THREE.Box3().setFromObject(m), size = bb.getSize(new THREE.Vector3()).length(), p = bb.getCenter(new THREE.Vector3());
+      const heavy = Math.max(1, size * 2.2), away = p.clone().sub(center).setY(0); if (away.lengthSq() < 1e-4) away.set(1, 0, 0); away.normalize();
+      const vel = isTur ? V(.6, 3.6 * power, -.4) : away.multiplyScalar((.5 + Math.random() * .9) * power / heavy).add(V((Math.random() - .3) * .6 / heavy, (1.2 + Math.random() * 1.8) * power / Math.sqrt(heavy), 0));
+      vel.z = -Math.abs(vel.z) * .6 - (isTur ? 0 : Math.random() * .3);   // nie Richtung Kamera
+      const sp = (isTur ? 5 : 9) / heavy;
+      v.debris.push({ m, vel, spin: V((Math.random() - .5) * sp, (Math.random() - .5) * sp, (Math.random() - .5) * sp), r: Math.max(.04, Math.min(size * .22, .3)) });
     }
   }
 }

@@ -124,7 +124,7 @@ function insignia(parent, side, s, x, y, z, ry = 0, rx = 0) {
 // ---------- Steine mit Noppen ----------
 const STUD = .2;   // Rastermaß
 function brick(parent, w, h, d, color, x = 0, y = 0, z = 0, o = {}) {
-  const g = G(); g.position.set(x, y, z); if (o.rot) g.rotation.set(...o.rot); parent.add(g);
+  const g = G(); g.position.set(x, y, z); if (o.rot) g.rotation.set(...o.rot); parent.add(g); g.userData.brick = true;   // ganzer Stein = ein Bruchstück
   P(g, RB(w, h, d, o.r ?? .03), color);
   if (o.studs !== false) {
     const nx = Math.max(1, Math.round(w / STUD)), nz = Math.max(1, Math.round(d / STUD));
