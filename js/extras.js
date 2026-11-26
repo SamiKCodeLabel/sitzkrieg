@@ -33,7 +33,7 @@ window.linkRules=function(root){
 function openRule(id){
   const card=document.getElementById(id); if(!card) return;
   const c=card.cloneNode(true), h=c.querySelector('h2'); const title=h?h.textContent:''; h?.remove(); c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
-  $('pop-k').textContent='Regelwerk'; $('pop-t').textContent=title; $('pop-d').hidden=true;
+  $('pop').classList.remove('feld','plain'); $('pop-k').textContent='Regelwerk'; $('pop-t').textContent=title; $('pop-d').hidden=true;
   $('pop-body').innerHTML=`<div class="pen-nav"><button type="button" class="sec" id="pen-rules" data-sec="${id}">📜 Im Regelwerk öffnen</button></div>`;
   $('pop-body').append(...c.childNodes); if(typeof markPen==='function') markPen($('pop-body'));
   $('pop').classList.remove('nohead'); $('pop').classList.toggle('wide',!!card.querySelector('table')); $('pop').hidden=false; $('pop-x').focus();
@@ -98,10 +98,9 @@ if(window.renderSpiel) renderSpiel();
     const oi=ms?ms.objectives.indexOf(x):-1, obj=oi>=0?ms.objInfo[oi]:null;
     const ex=ms&&ms.exts?ms.exts.find(e=>e.p===x):null;
     const f=(RULES.felder||{})[x.p.key]||{};
-    $('pop-k').textContent='Kartenfeld'; $('pop-t').textContent=x.p.name; $('pop-d').hidden=true; $('pop').classList.remove('wide','nohead','plain');
+    $('pop-k').textContent='Kartenfeld'; $('pop-t').textContent=x.p.name; $('pop-d').hidden=true; $('pop').classList.remove('wide','nohead','plain'); $('pop').classList.add('feld');
     if(!f.regel&&!obj&&!ex){ $('pop-body').innerHTML=''; $('pop').classList.add('plain'); $('pop').hidden=false; $('pop-x').focus(); return; }   // nichts Besonderes: nur der Name
-    const icon=EMOJI_IMG[x.p.icon.replace('️','')];
-    let h=`<div class="fi-head">${icon?`<img src="${icon}" alt="">`:''}<div><b>${x.p.biome==='b'?'Stadtfeld':'Grünes Feld'}</b> · belegt ${x.cells.length} Feld${x.cells.length>1?'er':''}</div></div>`;
+    let h='';
     if(f.regel) h+=`<p class="fi-rule">${f.regel}</p>`;
     if(obj){
       const row=(RULES.missionsziele.tabelle||[]).find(r=>r.name===obj.name);

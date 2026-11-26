@@ -173,7 +173,7 @@ function openAbil(name){
   $('pop-k').textContent='Generals-Fähigkeit'; $('pop-t').textContent='★ '+a.name; $('pop-d').textContent=a.text; $('pop-d').hidden=false;
   $('pop-body').innerHTML=`<div class="pop-crest">${crestSVG(a.name)}</div>`; $('pop').classList.remove('wide','nohead'); $('pop').hidden=false; $('pop-x').focus();
 }
-function closePop(){ $('pop').hidden=true; $('pop').classList.remove('plain'); popBack=null; }
+function closePop(){ $('pop').hidden=true; $('pop').classList.remove('plain','feld'); popBack=null; }
 document.addEventListener('click',e=>{ const b=e.target.closest('.gabil'); if(b){ openAbil(b.dataset.abil); } });
 document.addEventListener('keydown',e=>{ const b=e.target.closest&&e.target.closest('.gabil'); if(b&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); openAbil(b.dataset.abil); } if(e.key==='Escape') closePop(); });
 $('pop-x').onclick=closePop;

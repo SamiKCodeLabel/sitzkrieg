@@ -354,3 +354,4 @@ button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,
 #pop.plain #pop-body{display:none}
 #pop.plain .pop-card{min-width:0;padding-bottom:14px}
 #pop.plain #pop-t{margin-bottom:0;padding-right:40px}
+#pop.feld #pop-k{display:none}
