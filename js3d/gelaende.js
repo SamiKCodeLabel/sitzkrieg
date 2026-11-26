@@ -1,6 +1,6 @@
 // Gelände-Modelle der Kartenfelder (Klemmbaustein-Stil) – genutzt vom 3D-Spieltisch und von den Rundenende-Bildern
 import { THREE, brick, slope, plastic } from './modelle.js';
-const TERRAIN = { wald: 0x4f7a34, flach: 0x86a84a, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0xd9c591, wohn: 0x8fa357, graben: 0x6e5a3e, hafen: 0x3f6f8f, see: 0x4a86a8, strasse: 0x8b8a84, ruine: 0x7a6e62, kirche: 0x8d8478 };
+const TERRAIN = { wald: 0x4f7a34, flach: 0x86a84a, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0xd9c591, wohn: 0x8fa357, graben: 0x6e5a3e, hafen: 0x1f5fb0, see: 0x4a86a8, strasse: 0x8b8a84, ruine: 0x7a6e62, kirche: 0xa3a7a8 };
 const R = Math.random;
 
 // ---------- Gelände-Modelle (Mittelpunkt 0,0; Fläche w x d) ----------
@@ -110,18 +110,126 @@ function terrain(key, g, w, d) {
     case 'zug': train(g, w, d); break;
     case 'farm': farm(g); break;
     case 'turm': tower(g); break;
-    case 'bunker': bunker(g); break;
+    case 'bunker': bunker2(g); break;
     case 'strand': beach(g, w, d); break;
     case 'wohn': house(g, 0, -.1); tree(g, .55, .5, .7); break;
     case 'graben': trench(g, w, d); break;
-    case 'hafen': harbor(g, w, d); break;
+    case 'hafen': harbor2(g, w, d); break;
     case 'see': water(g, w, d); for (let i = 0; i < 5; i++) brick(g, .04, .3, .04, 0x5a7a2a, -.6 + R() * .2, .15, -.6 + i * .3, { studs: false }); break;
     case 'strasse': road(g, w, d); break;
     case 'ruine': ruin(g); break;
-    case 'kirche': church(g, w, d); break;
+    case 'kirche': church2(g, w, d); break;
   }
 }
 // Missionsziel-Fahne und Felderweiterung
+// ======== Nach Fotos der echten Klemmbaustein-Felder ========
+const LG = 0xa0a5a9, DGY = 0x5b6066, WHT2 = 0xf2f2ee, TANW = 0xd9c08a, TANW2 = 0xc8ab78, SLATE = 0x4e5458, OLIVE = 0x4d5530;
+function box(g, w, h, d, c, x, y, z, rx = 0, ry = 0, rz = 0) { return brick(g, w, h, d, c, x, y, z, { studs: false, rot: [rx, ry, rz] }); }
+function cyl(g, r, h, c, x, y, z, rx = 0, rz = 0, seg = 18) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), plastic(c)); m.position.set(x, y, z); m.rotation.set(rx, 0, rz); g.add(m); return m; }
+// Feldgeschütz als Ladung (schwarz)
+function cargoGun(g, x, y, z, ry = 0, s = 1) { const k = G(); k.position.set(x, y, z); k.rotation.y = ry; k.scale.setScalar(s); g.add(k); for (const sz of [-1, 1]) cyl(k, .09, .03, 0x1b1b1b, 0, .09, sz * .12, HALF); box(k, .32, .05, .05, 0x1b1b1b, -.12, .05, 0, 0, 0, .3); cyl(k, .03, .4, 0x1b1b1b, .12, .16, 0, 0, HALF - .25); box(k, .06, .14, .2, 0x1b1b1b, .02, .14, 0); }
+// ---- Hafen: Frachter, Kai mit Kettenzaun, roter Portalkran mit Container ----
+function harbor2(g, w, d) {
+  const along = w > d, n = G(); if (!along) n.rotation.y = HALF; g.add(n); const L = Math.max(w, d), D = Math.min(w, d);
+  // Kai hinten
+  const qz = -D / 2 + .26;
+  brick(n, L * .96, .18, .5, LG, 0, .09, qz);
+  for (let i = 0; i < 6; i++) { const a = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, .02, 16, 1, false, 0, Math.PI), plastic(0x2a2c2e)); a.rotation.set(HALF, 0, HALF); a.position.set(-L * .4 + i * L * .16, .06, qz + .255); n.add(a); }
+  for (let i = 0; i < 6; i++) { cyl(n, .025, .14, 0x1b1b1b, -L * .1 + i * .24, .25, qz + .2); cyl(n, .035, .03, 0x1b1b1b, -L * .1 + i * .24, .33, qz + .2); if (i < 5) { const ch = new THREE.Mesh(new THREE.TorusGeometry(.12, .008, 4, 16, Math.PI), plastic(0x1b1b1b)); ch.rotation.set(0, 0, Math.PI); ch.position.set(-L * .1 + i * .24 + .12, .3, qz + .2); ch.scale.y = .35; n.add(ch); } }
+  // Roter Portalkran auf dem Kai, Ausleger rot-weiß über das Wasser
+  const cx = -L * .3;
+  for (const sx of [-.32, .32]) { box(n, .14, 1.35, .14, 0xc4201c, cx + sx, .85, qz); box(n, .2, .1, .3, 0xc4201c, cx + sx, .22, qz); }
+  box(n, .78, .14, .16, 0xc4201c, cx, 1.55, qz);
+  for (let i = 0; i < 9; i++) box(n, .16, .14, .14, i % 2 ? WHT2 : 0xc4201c, cx, 1.68, qz - .1 + i * .14 - .4 + .5);
+  for (const sx of [-.07, .07]) { const l = cyl(n, .035, .03, 0xf2a01e, cx + sx, 1.77, qz + .1 + 8 * .14 - .4 + .5 - .05); }
+  cyl(n, .012, .45, 0x1b1b1b, cx, 1.38, qz + .45);
+  const ct = G(); ct.position.set(cx, .82, qz + .45); n.add(ct);                     // Container (Rahmen) mit Geschütz
+  box(ct, .56, .05, .42, 0xd8892a, 0, .3, 0); box(ct, .56, .05, .42, 0xd8892a, 0, -.04, 0);
+  for (const sx of [-.26, .26]) for (const sz of [-.19, .19]) box(ct, .04, .32, .04, 0xd8892a, sx, .13, sz);
+  cargoGun(ct, 0, -.01, 0, 0, .8);
+  // Frachter
+  const sh = G(); sh.position.set(.05, .04, D / 2 - .5); n.add(sh); const SL = L * .82;
+  box(sh, SL, .22, .62, 0x1f3d2c, 0, .13, 0);                                    // dunkelgrüner Rumpf
+  box(sh, SL, .05, .63, 0xe0601c, 0, .03, 0);                                    // orange Wasserlinie
+  box(sh, SL, .12, .64, WHT2, 0, .3, 0);                                         // weißes Schanzkleid
+  const bow = new THREE.Mesh(new THREE.CylinderGeometry(.33, .33, .34, 3), plastic(WHT2)); bow.rotation.y = Math.PI / 6 + Math.PI; bow.scale.set(1.5, 1, 1); bow.position.set(SL / 2 + .16, .2, 0); sh.add(bow);
+  const rail = new THREE.Mesh(new THREE.TorusGeometry(.3, .018, 6, 20, Math.PI), plastic(LG)); rail.rotation.set(-HALF, 0, -HALF); rail.position.set(SL / 2 + .02, .44, 0); rail.scale.set(1, 1.05, 1); sh.add(rail);
+  cyl(sh, .02, .55, LG, SL / 2 + .05, .62, 0); cyl(sh, .03, .04, 0xe8f4ff, SL / 2 + .05, .91, 0);
+  for (let i = 0; i < 9; i++) cyl(sh, .065, .13, OLIVE, SL / 2 - .2 - (i % 3) * .14, .43, -.15 + Math.floor(i / 3) * .15, 0, 0, 16);   // Fässer am Bug
+  box(sh, SL * .45, .03, .5, 0xe0601c, -.05, .37, 0);                           // Laderaum (orange)
+  box(sh, .06, .12, .58, WHT2, -.05, .42, 0);                                    // Trennbalken
+  cargoGun(sh, -.35, .39, -.05, .3, .7); cargoGun(sh, .25, .39, .08, -.4, .7);
+  for (const x of [-SL * .3, SL * .1]) for (const sz of [-1, 1]) box(sh, .1, .04, .06, LG, x, .38, sz * .3);   // Poller
+  // Aufbau hinten mit Brücke
+  const bx = -SL / 2 + .3;
+  brick(sh, .55, .4, .62, WHT2, bx, .56, 0, { studs: false });
+  box(sh, .56, .05, .63, 0x1f3d2c, bx, .5, 0); box(sh, .56, .03, .63, 0xe0601c, bx, .46, 0);
+  brick(sh, .5, .26, .58, WHT2, bx + .02, .89, 0);
+  for (let i = 0; i < 4; i++) box(sh, .02, .12, .1, 0x7fc4e0, bx + .27, .92, -.2 + i * .13);
+  for (let i = 0; i < 3; i++) cyl(sh, .04, .04, 0xe8f4ff, bx - .1 + i * .12, 1.04, .2);
+  cyl(sh, .03, .4, WHT2, bx - .1, 1.22, -.1); cyl(sh, .06, .06, WHT2, bx - .1, 1.44, -.03, HALF); cyl(sh, .06, .06, WHT2, bx - .1, 1.44, -.17, HALF);
+  box(sh, .12, .14, .1, 0x1b1b1b, bx - .12, 1.08, -.22);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.07, .022, 8, 18), plastic(0xf2a01e)); ring.position.set(bx + .1, .58, .32); sh.add(ring);
+}
+// ---- Bunker: grauer Beton, schräge Seiten, Risse, Schießscharte, Tarngrün, rostige Eisen ----
+function leaf(g, x, y, z, s = 1, ry = 0) { const sh = new THREE.Shape(); for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = (i % 2 ? .07 : .16) * s; sh[i ? 'lineTo' : 'moveTo'](Math.cos(a) * r * 1.3, Math.sin(a) * r); } const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .015, bevelEnabled: false }), plastic(0x2c5a34)); m.rotation.set(-HALF, 0, ry); m.position.set(x, y, z); g.add(m); return m; }
+function bunker2(g) {
+  const C1 = 0xa6abaf, C2 = 0x969ba0;
+  box(g, 1.0, .5, .95, C1, 0, .25, -.05);
+  slope(g, .28, .5, .95, C2, .64, .25, -.05, 0); slope(g, .28, .5, .95, C2, -.64, .25, -.05, Math.PI);   // schräge Seiten
+  box(g, 1.04, .08, .12, 0xb3b7ba, 0, .52, .46);                                   // Dachkante vorn
+  box(g, .56, .12, .03, 0x1e2022, 0, .34, .435);                                    // Schießscharte
+  box(g, .64, .04, .06, 0x8a8f94, 0, .42, .45); box(g, .64, .04, .06, 0x8a8f94, 0, .26, .45);
+  for (const sx of [-.3, .3]) box(g, .04, .2, .06, 0x8a8f94, sx, .34, .45);
+  box(g, .3, .22, .03, 0x2a2c2e, -.33, .11, .435);                                  // Eingang
+  // Dachplatten mit Rissen
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) box(g, .32, .06, .3, (i + j) % 2 ? C1 : 0xb3b7ba, -.33 + i * .33, .53, -.37 + j * .31);
+  for (const [x, z, r] of [[-.1, -.2, .6], [.2, .1, -.4], [-.3, .15, .2]]) box(g, .3, .005, .012, 0x3a3d40, x, .565, z, 0, r, 0);
+  leaf(g, .05, .57, -.05, 1.3, .4); leaf(g, -.38, .57, -.35, .7, 1.2); leaf(g, .4, .57, .25, .6, 2.1); leaf(g, .6, .3, -.4, .55, .7);
+  for (let i = 0; i < 3; i++) { const b = cyl(g, .018, .5, 0xa8521e, .38 + i * .05, .22, .5, .3, -.1, 8); }   // rostige Eisen
+  for (let i = 0; i < 4; i++) sandbag(g, -.2 + i * .17, .07, .72);
+}
+// ---- Kirche: Sandstein/Grau gemischt, Schieferdächer, Querschiff, Turm mit Uhr ----
+function mottled(g, w, h, d, x, y, z) {   // Mauer aus gemischten Steinen (sand, hellgrau)
+  brick(g, w, h, d, TANW, x, y, z, { studs: false });
+  const n = Math.round(w * h * 26 + d * h * 26);
+  for (let i = 0; i < n; i++) {
+    const onX = Math.random() < w / (w + d), sgn = Math.random() < .5 ? -1 : 1, c = [0xd2d5d6, 0xe4dcc4, TANW2, 0xbfc3c5][i % 4];
+    const ww = .1 + Math.random() * .12, hh = .06 + Math.random() * .04, yy = y - h / 2 + hh / 2 + Math.random() * (h - hh);
+    if (onX) box(g, ww, hh, .012, c, x + (Math.random() - .5) * (w - ww), yy, z + sgn * (d / 2 + .005));
+    else box(g, .012, hh, ww, c, x + sgn * (w / 2 + .005), yy, z + (Math.random() - .5) * (d - ww));
+  }
+}
+function gable(g, L, W, H, x, y, z, ry = 0) {   // Satteldach aus zwei Dachsteinen + Giebeldreiecke
+  const n = G(); n.position.set(x, y, z); n.rotation.y = ry; g.add(n);
+  for (const sz of [-1, 1]) slope(n, W / 2 + .05, H, L + .06, SLATE, 0, H / 2, sz * (W / 4 + .02), sz > 0 ? -HALF : HALF);
+  for (const sx of [-1, 1]) { const sh = new THREE.Shape(); sh.moveTo(-W / 2, 0); sh.lineTo(W / 2, 0); sh.lineTo(0, H); sh.closePath(); const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .04, bevelEnabled: false }), plastic(TANW)); m.rotation.y = HALF; m.position.set(sx * L / 2 - (sx > 0 ? .04 : 0), 0, 0); n.add(m); }
+  box(n, L + .1, .04, .06, 0x3a3f42, 0, H + .01, 0);
+}
+function archWin(g, x, y, z, ry, h = .3) { const n = G(); n.position.set(x, y, z); n.rotation.y = ry; g.add(n); box(n, .14, h, .015, 0x2a2c30, 0, 0, 0); const t = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, .015, 16, 1, false, 0, Math.PI), plastic(0x2a2c30)); t.rotation.set(HALF, 0, HALF); t.position.y = h / 2; n.add(t); }
+function church2(g, w, d) {
+  const along = w > d, n = G(); if (!along) n.rotation.y = HALF; g.add(n); const L = Math.max(w, d) * .78;
+  for (let i = 0; i < 14; i++) box(n, .14 + Math.random() * .2, .01, .08 + Math.random() * .1, [0x7e8488, 0xb8bcbf][i % 2], (Math.random() - .5) * w * .9, .005, (Math.random() - .5) * 1.3);
+  const H = .7, W = .78;
+  mottled(n, L, H, W, 0, H / 2, -.1);                                             // Langhaus
+  gable(n, L, W, .48, 0, H, -.1);
+  mottled(n, .6, H, 1.35, .25, H / 2, .05);                                       // Querschiff
+  gable(n, 1.35, .6, .44, .25, H, .05, HALF);
+  mottled(n, .5, .55, .35, .25, .275, .72); gable(n, .35, .5, .32, .25, .55, .72, HALF);   // Vorbau mit Giebel
+  archWin(n, .25, .2, .9, 0, .3);
+  for (let i = 0; i < 4; i++) { archWin(n, -L / 2 + .2 + i * .25, .38, -.1 + W / 2 + .012, 0, .28); archWin(n, -L / 2 + .2 + i * .25, .38, -.1 - W / 2 - .012, Math.PI, .28); }
+  for (let i = 0; i < 4; i++) box(n, .07, .5, .07, TANW2, -L / 2 + .08 + i * .3, .25, -.1 + W / 2 + .03);       // Strebepfeiler
+  // Turm über der Vierung
+  const tx = -.05, tz = -.1;
+  mottled(n, .5, 1.7, .5, tx, .85, tz);
+  for (const ry of [0, HALF, Math.PI, -HALF]) { const v = new THREE.Vector3(0, 0, .262).applyAxisAngle(new THREE.Vector3(0, 1, 0), ry); for (const o of [-.12, 0, .12]) { const p = new THREE.Vector3(o, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), ry); archWin(n, tx + v.x + p.x, 1.4, tz + v.z + p.z, ry, .26); } }
+  const clk = cyl(n, .1, .02, 0xf6f4ee, tx, 1.12, tz + .262, HALF, 0, 24); box(n, .012, .07, .005, 0x1b1b1b, tx, 1.14, tz + .275); box(n, .05, .01, .005, 0x1b1b1b, tx + .02, 1.12, tz + .275);
+  box(n, .56, .06, .56, 0xc8ccce, tx, 1.72, tz);
+  const sp = new THREE.Mesh(new THREE.ConeGeometry(.38, .9, 4), plastic(SLATE)); sp.position.set(tx, 2.2, tz); sp.rotation.y = Math.PI / 4; n.add(sp);
+  for (const sx of [-.24, .24]) for (const sz of [-.24, .24]) { const pn = new THREE.Mesh(new THREE.ConeGeometry(.05, .22, 4), plastic(0xc8ccce)); pn.position.set(tx + sx, 1.86, tz + sz); n.add(pn); }
+  for (const lx of [-L * .55, L * .45]) { cyl(n, .02, .75, 0x1b1b1b, lx, .38, .62); box(n, .14, .03, .03, 0x1b1b1b, lx + .06, .76, .62); cyl(n, .035, .06, 0xfff2b0, lx + .12, .72, .62); }
+}
+
 // Ein einzelnes Feld als Modell (Bauplatte + Gelände), z. B. für das Bild am Rundenende
 const BIG = { zug: 1, graben: 1, hafen: 1, kirche: 1 };
 export function fieldModel(key) {
