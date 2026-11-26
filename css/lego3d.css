@@ -75,3 +75,5 @@ canvas.turn3d{display:block;margin:0 auto}
 .fire-wrap canvas.fire3d{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
 @media (orientation:landscape) and (max-height:560px){ .fire-wrap.has3d{height:120px} }
 html:is(.lego3d,.lego3d-wait) .fire-wrap svg{visibility:hidden}
+/* Regelwerk-Bilder nur im Regelwerk – nicht in der Spielkarte oder im Popup (dort nur die wichtigen Infos) */
+.gcard .rw3d,.pop-card .rw3d{display:none!important}
