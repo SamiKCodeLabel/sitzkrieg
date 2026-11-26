@@ -223,3 +223,15 @@ button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,
   .slot-name .gabil,.gabil{font-size:.84rem;padding:2px 7px}
   .slot-tag,.info-tag{font-size:.8rem}
 }
+/* kompakter, damit mehr aufs Handy passt – aber gut erkennbar */
+.slot.inf .slot-art{height:96px}
+.slot.veh{grid-template-columns:30px 180px 1fr}
+.slot.veh .slot-art{height:92px}
+.slot{padding:6px 6px}
+@media (max-width:640px){
+  .slot,.slot.inf{grid-template-columns:22px 92px 1fr}
+  .slot.inf .slot-art{height:80px}
+  .slot.veh{grid-template-columns:22px 124px 1fr}
+  .slot.veh .slot-art{height:72px}
+  .slot{padding:4px 4px}
+}
