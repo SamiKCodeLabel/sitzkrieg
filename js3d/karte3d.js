@@ -50,9 +50,13 @@ function setup(box) {
   S3 = { r, scene, cam, ctl, box, board: null, dirty: true, flags: [] };
   // Antippen = Feld-Info (nur wenn nicht gezogen wurde)
   let down = null;
-  r.domElement.addEventListener('pointerdown', e => down = [e.clientX, e.clientY]);
-  r.domElement.addEventListener('pointerup', e => {
-    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+  // Erst beim echten Klick öffnen: bei 'pointerup' würde am Handy der nachfolgende Klick das Fenster gleich wieder schließen
+  let moved = 0, multi = false;
+  r.domElement.addEventListener('pointerdown', e => { if (e.isPrimary) { down = [e.clientX, e.clientY]; moved = 0; multi = false; } else multi = true; });
+  r.domElement.addEventListener('pointermove', e => { if (down && e.isPrimary) moved = Math.max(moved, Math.hypot(e.clientX - down[0], e.clientY - down[1])); });
+  r.domElement.addEventListener('click', e => {
+    if (!down || multi || Math.max(moved, Math.hypot(e.clientX - down[0], e.clientY - down[1])) > (e.pointerType === 'mouse' ? 6 : 14)) return;
+    down = null;
     const rc = new THREE.Raycaster(), b = r.domElement.getBoundingClientRect();
     rc.setFromCamera(new THREE.Vector2((e.clientX - b.left) / b.width * 2 - 1, -(e.clientY - b.top) / b.height * 2 + 1), cam);
     const hit = rc.intersectObjects(S3.board ? [S3.board] : [], true)[0]; if (!hit) return;
