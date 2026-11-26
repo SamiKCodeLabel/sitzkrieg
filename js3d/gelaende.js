@@ -1,6 +1,6 @@
 // Gelände-Modelle der Kartenfelder (Klemmbaustein-Stil) – genutzt vom 3D-Spieltisch und von den Rundenende-Bildern
 import { THREE, brick, slope, plastic } from './modelle.js';
-const TERRAIN = { wald: 0x4f7a34, flach: 0x86a84a, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0xd9c591, wohn: 0x8fa357, graben: 0x17765e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
+const TERRAIN = { wald: 0x4f7a34, flach: 0x186a56, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0x1667c8, wohn: 0x8fa357, graben: 0x17765e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
 const R = Math.random;
 
 // ---------- Gelände-Modelle (Mittelpunkt 0,0; Fläche w x d) ----------
@@ -106,12 +106,12 @@ function field(g) { for (let i = 0; i < 4; i++) bush(g, (R() - .5) * 1.1, (R() -
 function terrain(key, g, w, d) {
   switch (key) {
     case 'wald': for (let i = 0; i < 4; i++) tree(g, (i % 2 - .5) * .7 + (R() - .5) * .15, (Math.floor(i / 2) - .5) * .7 + (R() - .5) * .15, .9 + R() * .3); break;
-    case 'flach': field(g); break;
+    case 'flach': flat3(g, w, d); break;
     case 'zug': train(g, w, d); break;
     case 'farm': farm3(g); break;
     case 'turm': tower3(g); break;
     case 'bunker': bunker2(g); break;
-    case 'strand': beach(g, w, d); break;
+    case 'strand': beach3(g, w, d); break;
     case 'wohn': house3(g); break;
     case 'graben': trench3(g, w, d); break;
     case 'hafen': harbor2(g, w, d); break;
@@ -434,6 +434,54 @@ function trench3(g, w, d) {
   for (const [x, z, sc] of [[-hl + .15, -hs + .15, 1.1], [-hl + .2, hs - .15, 1], [hl - .25, hs - .15, 1.2], [hl - .55, hs - .12, 1], [L * .05, -hs + .1, .8]]) grass(n, x, z, sc).position.y = GH;
   for (const [x, z, c] of [[L * .05, hs - .12, 0xc8b48a], [L * .28, hs - .2, 0x3fb38f], [-L * .3, hs - .12, 0xc8b48a], [L * .4, -hs + .12, 0xc8b48a], [-L * .42, -hs + .12, 0x3fb38f]]) { const l = leaf(n, x, GH + .012, z, .45, R() * 6); l.material = plastic(c); }
   for (const [x, z] of [[-L * .35, hs - .1], [L * .15, hs - .1], [L * .45, -hs + .15], [-L * .05, hs - .1]]) { const t = new THREE.Mesh(new THREE.TorusGeometry(.03, .008, 6, 12, Math.PI * 1.3), plastic(0xb8e03a)); t.position.set(x, GH + .06, z); n.add(t); cyl(n, .007, .06, 0xb8e03a, x - .03, GH + .03, z); }
+}
+
+// ---- Flachland und Strand nach Fotos ----
+function frond(g, x, z, c, s = 1, ry = 0, y = .012, star = false) {   // Pflanzenblatt-Teil zum Hinlegen (Stiel mit Ästen und Ringenden)
+  const n = G(); n.position.set(x, y, z); n.rotation.y = ry; n.scale.setScalar(s); g.add(n);
+  const tip = (px, pz) => { const r = new THREE.Mesh(new THREE.TorusGeometry(.025, .011, 6, 12), plastic(c)); r.rotation.x = HALF; r.position.set(px, .012, pz); n.add(r); };
+  const arm = (a, len) => { box(n, len, .02, .028, c, Math.cos(a) * len / 2, .01, -Math.sin(a) * len / 2, 0, a, 0); tip(Math.cos(a) * len, -Math.sin(a) * len); };
+  if (star) { for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; arm(a, .2); const ex = Math.cos(a) * .12, ez = -Math.sin(a) * .12; for (const sd of [-1, 1]) { const b = a + sd * .9; box(n, .07, .02, .022, c, ex + Math.cos(b) * .035, .01, ez - Math.sin(b) * .035, 0, b, 0); tip(ex + Math.cos(b) * .07, ez - Math.sin(b) * .07); } } cyl(n, .035, .03, c, 0, .015, 0); return n; }
+  box(n, .34, .02, .03, c, 0, .01, 0); tip(.17, 0); tip(-.17, 0);
+  for (const [px, sd] of [[-.08, 1], [-.08, -1], [.04, 1], [.04, -1]]) { const a = sd * .8; box(n, .1, .02, .024, c, px + Math.cos(a) * .05, .01, -Math.sin(a) * .05, 0, a, 0); tip(px + Math.cos(a) * .1, -Math.sin(a) * .1); }
+  return n;
+}
+function sprout(g, x, z, y = .02) { for (const a of [-.5, .5]) { const t = cyl(g, .008, .09, 0x7a4a24, x + a * .03, y + .04, z, 0, a); } }
+function dot(g, x, z, c) { cyl(g, .028, .03, c, x, .02, z, 0, 0, 14); }
+function flat3(g, w, d) {
+  const hw = w / 2, hd = d / 2, P = (fx, fz) => [fx * hw, fz * hd];
+  const TL = 0xc8b48a, GL = 0x3fb36f;
+  for (const [fx, fz, c, sp] of [[-.55, -.75, TL, 0], [.2, -.6, TL, 1], [-.75, -.2, TL, 0], [.75, -.3, TL, 1], [.85, -.1, TL, 0], [-.85, .45, TL, 0], [.1, .55, TL, 1], [-.05, -.85, GL, 0], [-.3, -.4, GL, 1], [-.35, -.05, GL, 1], [-.1, .2, GL, 0]]) {
+    const [x, z] = P(fx, fz); const l = leaf(g, x, .015, z, .5, R() * 6); l.material = plastic(c); if (sp) sprout(g, x, z, .02); }
+  { const [x, z] = P(-.5, -.45); frond(g, x, z, 0x1b2a24, .9, .3, .012, true); }
+  { const [x, z] = P(-.55, .3); frond(g, x, z, 0x3fb06a, 1, .2, .012, true); }
+  { const [x, z] = P(.05, -.4); frond(g, x, z, 0x9fbfa0, .8, 2.4); }
+  { const [x, z] = P(.55, .85); frond(g, x, z, 0x9fbfa0, 1, 1.9); }
+  { const [x, z] = P(.25, -.2); frond(g, x, z, 0x1f8a6a, .8, 2.2); }
+  { const [x, z] = P(.55, .2); box(g, .4, .03, .26, 0x8a4a1c, x, .015, z, 0, -.15, 0); frond(g, x, z, 0x1f8a6a, .85, .4, .035); }
+  { const [x, z] = P(-.3, -.2); box(g, .26, .03, .16, 0xa89470, x, .015, z, 0, .3, 0); box(g, .1, .03, .06, 0xd9741a, x - .05, .045, z - .1, 0, .3, 0); box(g, .1, .05, .06, 0x1f8a6a, x, .05, z - .08, 0, .3, 0); }
+  for (const [fx, fz, c, a, b] of [[-.3, -.55, 0xf0a050, .12, .1], [.75, -.55, 0xd9741a, .06, .22], [-.55, -.05, 0x7a3e14, .14, .14], [.2, -.62, 0x1f8a6a, .2, .13], [-.1, .65, 0x2a9a7a, .2, .14], [.5, .6, 0x10302a, .1, .06], [-.15, .5, 0x8a3e1c, .06, .1]]) { const [x, z] = P(fx, fz); box(g, a, .025, b, c, x, .0125, z, 0, .25, 0); }
+  { const [x, z] = P(.45, -.15); cyl(g, .06, .025, 0x7a3e14, x, .0125, z, 0, 0, 16); }
+  for (const [fx, fz, c] of [[-.4, -.9, 0xc08ad8], [-.25, -.25, 0xc08ad8], [.2, -.75, 0xf2f2ee], [.1, -.4, 0xf2f2ee], [.6, -.45, 0xe8f040]]) { const [x, z] = P(fx, fz); dot(g, x, z, c); }
+}
+function beach3(g, w, d) {
+  const hw = w / 2 - .02, hd = d / 2 - .02, cell = .1;
+  const coast = z => .28 - z * .22 + Math.sin(z * 9) * .06;                 // Wasserlinie (rechts davon Wasser)
+  const grassEnd = z => -.12 + Math.sin(z * 5) * .03;
+  for (const [z0, z1, c] of [[-hd, 0, 0x4cb86a], [0, hd, 0x1f8a5e]]) box(g, grassEnd(0) + hw + .05, .03, z1 - z0, c, (-hw + grassEnd(0) + .05) / 2, .015, (z0 + z1) / 2);
+  for (let x = -hw + cell / 2; x < hw; x += cell) for (let z = -hd + cell / 2; z < hd; z += cell) {
+    if (x < grassEnd(z) + .05 || x > coast(z) + (R() - .5) * .06) continue;
+    const t = (x - grassEnd(z)) / Math.max(.1, coast(z) - grassEnd(z)), h = t < .2 || t > .8 ? .04 : (R() < .55 ? .08 : .04);
+    const c = (x > .05 && x < .25 && z > .05 && z < .3) ? 0xb8a477 : (R() < .15 ? 0xefe2bc : 0xe2d1a0);
+    brick(g, cell + .002, h, cell + .002, c, x, h / 2, z, { studs: R() < .8 });
+  }
+  slope(g, .12, .06, .2, 0xe2d1a0, -.1, .06, .12, 0); slope(g, .12, .06, .18, 0xe2d1a0, .35, .1, -.45, Math.PI);
+  // Pflanzen auf der Wiese
+  for (const [x, z, c, sp] of [[-.55, -.6, 0xc8b48a, 0], [-.4, -.35, 0xc8b48a, 1], [-.6, .2, 0xc8b48a, 0], [-.4, .3, 0x3fb36f, 0], [-.6, .6, 0x3fb36f, 0], [-.4, .6, 0xc8b48a, 0], [-.35, .1, 0xc8b48a, 1]]) { const l = leaf(g, x, .045, z, .45, R() * 6); l.material = plastic(c); if (sp) sprout(g, x, z, .05); }
+  frond(g, -.62, -.3, 0x1f7a6a, .7, .4, .04); frond(g, -.5, .4, 0x9fbfa0, .75, HALF, .04); frond(g, -.4, -.68, 0x1f7a6a, .55, 2.6, .04);
+  box(g, .2, .03, .14, 0x5a6a2a, -.45, .045, -.15, 0, .3, 0); box(g, .2, .03, .16, 0x5a6a2a, -.55, .045, -.02, 0, -.2, 0);
+  box(g, .14, .03, .14, 0x7a3e14, -.52, .045, -.48); box(g, .04, .03, .16, 0xd9741a, -.68, .045, -.1); box(g, .04, .03, .12, 0xd9741a, -.38, .045, -.7);
+  for (const [x, z] of [[-.6, .45], [-.32, -.55]]) box(g, .05, .04, .05, 0x10302a, x, .05, z, 0, .5, 0);
 }
 
 // Ein einzelnes Feld als Modell (Bauplatte + Gelände), z. B. für das Bild am Rundenende
