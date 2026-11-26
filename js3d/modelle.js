@@ -269,7 +269,7 @@ function soldier(side, kind = 'rif', opt = {}) {
   }
   }
   const u = g.userData;
-  const hold = (w, x, y, z, rx = 0) => { w.position.set(x, y, z); w.rotation.x = rx; body.add(w); u.weapon = w; return w; };
+  const hold = (w, x, y, z, rx = 0) => { w.position.set(x, y, z); w.rotation.x = rx; if (body.userData.glb) w.scale.setScalar(1.4); body.add(w); u.weapon = w; return w; };   // Waffen gut sichtbar
   switch (kind) {
     case 'flame': {
       for (const s of [-1, 1]) P(body, CY(.1, .1, .5, 18), 0x4b4b35, s * .12, .85, -.26);
@@ -289,14 +289,24 @@ function soldier(side, kind = 'rif', opt = {}) {
     }
     case 'mortar': {
       const m = G(); m.position.set(.6, 0, .4); body.add(m);
-      P(m, RB(.42, .04, .42, .01), DGR, 0, .035, 0);   // leicht über der Bauplatte (kein Flackern) P(m, CY(.075, .075, .74, 18), 0x4d5240, 0, .4, .06, -.55); P(m, CY(.015, .015, .5, 8), DGR, 0, .22, .3, .5);
+      P(m, RB(.42, .04, .42, .01), DGR, 0, .035, 0);   // leicht über der Bauplatte (kein Flackern)
+      P(m, CY(.075, .075, .74, 18), 0x4d5240, 0, .4, .06, -.55); P(m, CY(.015, .015, .5, 8), DGR, 0, .22, .3, .5);
+      if (body.userData.glb) m.scale.setScalar(1.3);
       u.mortar = m; m.userData.muzzle = new THREE.Vector3(0, .74, .38);
       u.armR = arm(body, 1, ARM, -1.8); u.armL = arm(body, -1, ARM, -.4);
       const sh = G(); P(sh, CY(.055, .055, .2, 14), 0x5b5b3e); P(sh, cached('shc', () => new THREE.ConeGeometry(.055, .1, 14)), 0x5b5b3e, 0, .15, 0); u.armR.userData.hand.add(sh); u.shell = sh; break;
     }
     case 'mine': {
-      const d = G(); P(d, CY(.018, .018, 1.0, 8), DGR); P(d, CY(.16, .16, .03, 24), 0x4d5240, 0, -.5, .05, .25); d.position.set(.28, .7, .5); d.rotation.x = .75; body.add(d); u.detector = d;
-      u.armR = arm(body, 1, ARM, -.9); u.armL = arm(body, -1, ARM, -.5); break;
+      u.armR = arm(body, 1, ARM, -1.25); u.armL = arm(body, -1, ARM, -.5);
+      g.updateMatrixWorld(true);
+      const hp = u.armR.userData.hand.localToWorld((u.armR.userData.hand.userData.clip || new THREE.Vector3(0, -.1, 0)).clone()); body.worldToLocal(hp);
+      const gp = new THREE.Vector3(hp.x + .06, .05, hp.z + .55), dir = gp.clone().sub(hp), len = dir.length();
+      const d = G(); d.position.copy(hp); d.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir.clone().normalize()); body.add(d);
+      P(d, CY(.022, .022, len, 10), DGR, 0, -len / 2, 0);                       // Stange
+      P(d, RB(.06, .14, .06, .015), BLK, 0, .02, 0);                             // Griff in der Hand
+      P(d, RB(.1, .07, .05, .015), 0x4d5240, 0, -.22, .04);                      // Anzeigekasten
+      const disc = P(d, CY(.17, .17, .035, 24), 0x4d5240, 0, -len, 0); disc.rotation.x = -Math.atan2(dir.z, -dir.y) * .9;
+      u.armR.userData.hand.attach(d); u.detector = d; break;
     }
     case 'mech': {
       u.armR = arm(body, 1, ARM, -2.4); u.armL = arm(body, -1, ARM, -.3);
@@ -324,7 +334,7 @@ function gripWeapon(g, u, kind) {           // Waffe so verschieben, dass der Gr
   const w = u.weapon; if (!w || !u.armR || w.parent !== u.body || kind === 'flame' || w.userData.shoulder) return;
   g.updateMatrixWorld(true);
   const clip = u.armR.userData.hand.localToWorld((u.armR.userData.hand.userData.clip || new THREE.Vector3(0, -.1, 0)).clone()); u.body.worldToLocal(clip);
-  w.position.copy(clip).sub((w.userData.grip || GRIP).clone().applyEuler(w.rotation));
+  w.position.copy(clip).sub((w.userData.grip || GRIP).clone().multiplyScalar(w.scale.x).applyEuler(w.rotation));
   g.updateMatrixWorld(true); u.armR.userData.hand.attach(w);
 }
 
