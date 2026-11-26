@@ -291,3 +291,59 @@ button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,
 @keyframes fxBomb{0%{opacity:1;transform:translateY(0)}100%{opacity:1;transform:translateY(46px)}}
 @media (orientation:landscape) and (max-height:560px){ .fx-boom{width:40px;height:40px;margin:-20px 0 0 -20px} .fx-fl{height:30px} }
 @media (prefers-reduced-motion:reduce){ .fxl,.gcard.fx-shake{display:none;animation:none!important} }
+
+/* ===== Generals-Effekte je Fähigkeit + Wiederholen per Antippen ===== */
+.gc-art{cursor:pointer}
+.gc-art.anim.replay svg.fig{animation-delay:0s!important}
+.fx-sp{background:var(--c,#ffd84a)}
+/* Aura: Ring um die Figur */
+.fx-aura{width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:4px solid var(--c,#e8c34a);box-shadow:0 0 18px var(--c,#e8c34a),inset 0 0 18px var(--c,#e8c34a);
+  transform:scale(var(--s));animation:fxAura .9s ease-out}
+@keyframes fxAura{0%{opacity:0;transform:scale(calc(var(--s)*.3))}30%{opacity:1}100%{opacity:0;transform:scale(calc(var(--s)*1.15))}}
+/* Strahlen hinter der Figur */
+.fx-ray{width:220px;height:220px;margin:-110px 0 0 -110px;border-radius:50%;z-index:-1;
+  background:repeating-conic-gradient(from 0deg,var(--c,#ffd84a) 0 10deg,transparent 10deg 24deg);
+  -webkit-mask:radial-gradient(closest-side,#000 40%,transparent 100%);mask:radial-gradient(closest-side,#000 40%,transparent 100%);animation:fxRay 1.1s ease-out}
+@keyframes fxRay{0%{opacity:0;transform:scale(.3) rotate(0)}30%{opacity:.75}100%{opacity:0;transform:scale(1.1) rotate(40deg)}}
+/* Vorrück-Pfeil */
+.fx-arrow{width:34px;height:20px;margin-top:-10px;background:#9b2d20;clip-path:polygon(0 25%,60% 25%,60% 0,100% 50%,60% 100%,60% 75%,0 75%);
+  filter:drop-shadow(0 0 2px #fff5c0);transform:rotate(var(--a));animation:fxArrow .7s ease-out}
+@keyframes fxArrow{0%{opacity:0;transform:rotate(var(--a)) translateX(-20px)}25%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(110px)}}
+/* Blitz */
+.fx-bolt{width:34px;height:70px;margin-left:-17px;background:#ffd84a;filter:drop-shadow(0 0 6px #fff2a0) drop-shadow(0 0 2px #1f1a14);
+  clip-path:polygon(55% 0,20% 52%,46% 52%,30% 100%,82% 40%,54% 40%,72% 0);animation:fxBolt .45s steps(2,end)}
+@keyframes fxBolt{0%{opacity:0}20%{opacity:1}40%{opacity:.2}60%{opacity:1}100%{opacity:0}}
+/* Fahne wird gesetzt */
+.fx-flag{width:30px;height:46px;margin-left:-2px;border-left:3px solid #5a3b1e;
+  background:linear-gradient(#9b2d20,#9b2d20) 3px 0/27px 18px no-repeat;animation:fxFlag .9s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes fxFlag{0%{opacity:0;transform:translateY(-40px)}30%{opacity:1;transform:translateY(4px)}45%{transform:none}85%{opacity:1}100%{opacity:0}}
+/* Sandsäcke türmen sich auf */
+.fx-bags{width:84px;height:22px;margin:-11px 0 0 -42px;
+  background:radial-gradient(ellipse 13px 8px at 14px 15px,#c9b47e 90%,transparent 100%),radial-gradient(ellipse 13px 8px at 42px 15px,#c9b47e 90%,transparent 100%),
+             radial-gradient(ellipse 13px 8px at 70px 15px,#c9b47e 90%,transparent 100%),radial-gradient(ellipse 13px 8px at 28px 6px,#b8a370 90%,transparent 100%),
+             radial-gradient(ellipse 13px 8px at 56px 6px,#b8a370 90%,transparent 100%);filter:drop-shadow(0 1px 0 #1f1a14);animation:fxBags 1s ease-out}
+@keyframes fxBags{0%{opacity:0;transform:translateY(16px) scaleY(.4)}30%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0}}
+/* Stern über dem Anführer */
+.fx-star{width:36px;height:36px;margin:-18px 0 0 -18px;background:#e8c34a;filter:drop-shadow(0 0 6px #fff2a0) drop-shadow(0 0 1px #1f1a14);
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation:fxStar .9s cubic-bezier(.2,.9,.3,1.3)}
+@keyframes fxStar{0%{opacity:0;transform:scale(.2) rotate(-90deg)}35%{opacity:1;transform:scale(1.2) rotate(0)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translateY(-10px)}}
+/* Bewegung der General-Figur je Fähigkeit */
+.g-monster svg.fig{animation:gMonster .7s ease-out!important}
+@keyframes gMonster{0%,100%{transform:none}30%{transform:scale(1.18)}45%{transform:scale(1.12) translateY(2%)}60%{transform:scale(1.15)}}
+.g-blitz svg.fig{animation:gBlitz .45s cubic-bezier(.2,.9,.3,1)!important}
+@keyframes gBlitz{0%{transform:translateX(-80%) skewX(-12deg);opacity:.4}70%{transform:translateX(4%) skewX(6deg);opacity:1}100%{transform:none}}
+.g-rage svg.fig,.g-blutrausch svg.fig{animation:gRage .7s linear!important}
+@keyframes gRage{0%,100%{transform:none}10%,30%,50%,70%,90%{transform:translateX(-2%) rotate(-2deg)}20%,40%,60%,80%{transform:translateX(2%) rotate(2deg)}}
+.g-verschanzen svg.fig,.g-besetzen svg.fig{animation:aCrouch .7s ease-in-out!important}
+.g-unsterblich svg.fig{animation:gImm 1s ease-in-out!important}
+@keyframes gImm{0%,100%{transform:none;filter:none}40%{transform:translateY(-6%);filter:drop-shadow(0 0 10px #ffe48a)}}
+.g-anfuhrer svg.fig,.g-feldherr svg.fig,.g-schussbefehl svg.fig{animation:gLead .6s ease-out!important}
+@keyframes gLead{0%,100%{transform:none}35%{transform:translateY(-8%) scale(1.06)}}
+.g-flankieren svg.fig,.g-kartograf svg.fig,.g-taktiker svg.fig{animation:gSide .7s ease-in-out!important}
+@keyframes gSide{0%,100%{transform:none}30%{transform:translateX(-6%)}65%{transform:translateX(6%)}}
+.g-erstschlag svg.fig{animation:aRecoil .35s ease-out!important}
+.g-veteran svg.fig{animation:aBurst .6s linear!important}
+.g-improvisieren svg.fig{animation:aWrench .7s ease-in-out!important}
+.g-unbarmherzig svg.fig{animation:aRecoil .4s ease-out!important}
+@media (prefers-reduced-motion:reduce){ [class*="g-"] svg.fig{animation:none!important} }
+.gc-art.anim:not(.replay)[class*="g-"] svg.fig{animation-delay:.26s!important}

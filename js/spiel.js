@@ -160,10 +160,27 @@ function cardHTML(c){
     <div class="gc-body">${body}</div>${notes?`<div class="gc-notes">${notes}</div>`:''}</div>`;
 }
 let lastCardKey=null;
+// Passende Kurz-Animation zur Einheit. replay=true: sofort (Bild angetippt), sonst nach dem Umdrehen.
+function playFx(gc,c,replay){
+  const art=gc&&gc.querySelector('.gc-art'); if(!art||!c) return;
+  art.classList.remove('anim','replay'); [...art.classList].filter(k=>k.startsWith('anim-')||k.startsWith('g-')).forEach(k=>art.classList.remove(k));
+  art.querySelectorAll('.fxl').forEach(n=>n.remove()); gc.classList.remove('fx-shake','flip-in'); void art.offsetWidth;
+  const kind=c.kind==='rif'?'rif':c.kind==='veh'?c.key:(c.unit?c.unit.key:''); if(!kind) return;
+  const abil=kind==='general'&&c.unit&&c.unit.abil?c.unit.abil.name:'';
+  art.classList.add('anim','anim-'+kind); if(replay) art.classList.add('replay');
+  if(abil) art.classList.add('g-'+abil.normalize('NFD').replace(/[^A-Za-z]/g,'').toLowerCase());
+  const fx=abil?(FX_GEN[abil]||FX.general):(FX[kind]||[]), base=replay?0:.26;
+  if(fx.length) art.insertAdjacentHTML('beforeend','<span class="fxl">'+fx.map(f=>fxEl(f,base)).join('')+'</span>');
+  if(FX_SHAKE.has(kind)||FX_SHAKE.has(abil)) gc.classList.add('fx-shake');
+  if(!replay) gc.classList.add('flip-in');
+  if(kind==='flieger'&&typeof Sounds!=='undefined') try{ setTimeout(()=>Sounds.play('plane'),replay?0:250); }catch(e){}
+}
+// Bild der Einheit antippen -> Animation nochmal
+document.addEventListener('click',e=>{ const a=e.target.closest('#tab-spiel .gcard .gc-art'); if(!a||S.end!==null||!S.cur) return; playFx(a.closest('.gcard'),S.cur,true); });
 // Effekt-Baukasten: t=Typ, x/y=Position in % des Bildbereichs, d=Verzögerung (s), weitere Werte je Typ
 // flash=Mündungsfeuer, tr=Leuchtspur (len=Länge %, a=Winkel°), boom=Explosion (s=Größe), smoke=Rauchwolke, cas=Patronenhülse,
 // fl=Flammenstrahl, sh=Geschoss im Bogen (dx/dy in px), sp=Funken, plus=Heil-Kreuz, dust=Staub, bomb=Bombe fällt
-function fxEl(f){ const st=`left:${f.x}%;top:${f.y}%;--d:${(f.d||0)+.26}s;--a:${f.a||0}deg;--l:${f.len||30}%;--s:${f.s||1};--dx:${f.dx||0}px;--dy:${f.dy||0}px`;
+function fxEl(f,base){ const st=`left:${f.x}%;top:${f.y}%;--d:${(f.d||0)+(base??.26)}s;--c:${f.c||'#ffd84a'};--a:${f.a||0}deg;--l:${f.len||30}%;--s:${f.s||1};--dx:${f.dx||0}px;--dy:${f.dy||0}px`;
   return `<i class="fx fx-${f.t}" style="${st}"></i>`; }
 const R=(n,fn)=>Array.from({length:n},(_,i)=>fn(i));
 const FX={
@@ -178,7 +195,7 @@ const FX={
   mech:[...R(10,i=>({t:'sp',x:62,y:16,d:i*.06,a:i*36})),{t:'smoke',x:60,y:10,d:.5}],
   medic:[{t:'plus',x:50,y:30,d:0,s:1.6},...R(5,i=>({t:'plus',x:30+i*10,y:60,d:.15+i*.1,s:.6}))],
   pzf:[{t:'smoke',x:20,y:58,d:0,s:1.4},{t:'smoke',x:12,y:64,d:.06},{t:'flash',x:70,y:44,d:0,s:1.2},{t:'tr',x:70,y:44,d:.03,len:26,a:-30},{t:'boom',x:94,y:18,d:.3,s:1.2},{t:'smoke',x:92,y:12,d:.45}],
-  general:[{t:'flash',x:68,y:18,d:.1},{t:'tr',x:70,y:18,d:.12,len:30,a:-20},{t:'boom',x:96,y:6,d:.3,s:.5}],
+  general:[{t:'flash',x:68,y:18,d:0},{t:'tr',x:70,y:18,d:.02,len:30,a:-20}],
   schwer:[{t:'flash',x:88,y:26,d:.05,s:1.6},{t:'tr',x:90,y:26,d:.07,len:20,a:0},{t:'smoke',x:86,y:20,d:.15,s:1.3},{t:'dust',x:30,y:86,d:0},{t:'dust',x:60,y:86,d:.05},{t:'cas',x:52,y:30,d:.2}],
   leicht:[{t:'flash',x:84,y:32,d:.05,s:1.2},{t:'tr',x:86,y:32,d:.07,len:20,a:0},{t:'smoke',x:82,y:26,d:.15},{t:'dust',x:40,y:86,d:0}],
   krad:[...R(4,i=>({t:'dust',x:18-i*4,y:84,d:i*.08})),...R(4,i=>({t:'flash',x:12,y:34,d:.4+i*.07,s:.7,a:180})),...R(4,i=>({t:'tr',x:10,y:34,d:.42+i*.07,len:20,a:180+8}))],
@@ -186,7 +203,27 @@ const FX={
   art:[{t:'flash',x:94,y:18,d:.05,s:2},{t:'smoke',x:90,y:14,d:.12,s:1.6},{t:'smoke',x:80,y:20,d:.2},{t:'dust',x:30,y:86,d:.08},{t:'dust',x:50,y:88,d:.1}],
   flieger:[{t:'bomb',x:44,y:56,d:.55},{t:'bomb',x:54,y:56,d:.65},{t:'boom',x:40,y:92,d:1.0,s:1.2},{t:'boom',x:62,y:92,d:1.1,s:1.2},{t:'smoke',x:50,y:82,d:1.2}]
 };
-const FX_SHAKE=new Set(['mg','schwer','art','grenade','mortar','pzf','shotgun','flieger']);
+const FX_SHAKE=new Set(['mg','schwer','art','grenade','mortar','pzf','shotgun','flieger','Monster','Rage','Unbarmherzig','Veteran','Erstschlag']);
+const PISTOL=[{t:'flash',x:68,y:18,d:0},{t:'tr',x:70,y:18,d:.02,len:30,a:-20}];
+const FX_GEN={
+  Besetzen:[{t:'flag',x:64,y:12,d:0},{t:'dust',x:60,y:86,d:.25},{t:'dust',x:40,y:88,d:.3},{t:'aura',x:50,y:56,d:.35,s:1.1}],
+  Kartograf:[{t:'arrow',x:8,y:78,d:0},{t:'arrow',x:16,y:58,d:.15},{t:'arrow',x:8,y:38,d:.3},{t:'arrow',x:16,y:18,d:.45}],
+  Feldherr:[{t:'ray',x:50,y:50,d:0,c:'#ffd84a'},...[22,36,64,78].map((x,i)=>({t:'flash',x,y:72,d:.25+i*.08,s:.7}))],
+  Taktiker:[{t:'arrow',x:14,y:30,d:0,a:30},{t:'arrow',x:14,y:70,d:.12,a:-30},{t:'boom',x:90,y:50,d:.5,s:.8}],
+  Improvisieren:[...Array.from({length:8},(_,i)=>({t:'sp',x:66,y:18,d:i*.05,a:i*45})),{t:'sp',x:40,y:60,d:.4,a:-40},{t:'sp',x:42,y:60,d:.45,a:20}],
+  Flankieren:[{t:'arrow',x:2,y:60,d:0},{t:'arrow',x:2,y:76,d:.08},{t:'arrow',x:98,y:60,d:.2,a:180},{t:'arrow',x:98,y:76,d:.28,a:180}],
+  Veteran:[...Array.from({length:6},(_,i)=>({t:'flash',x:66,y:30,d:i*.08,s:.9})),...Array.from({length:6},(_,i)=>({t:'tr',x:66,y:30,d:i*.08+.02,len:40,a:-10+(i%3)*5})),...Array.from({length:4},(_,i)=>({t:'cas',x:54,y:40,d:i*.1}))],
+  Unsterblich:[{t:'aura',x:50,y:55,d:0,s:1.3},{t:'aura',x:50,y:55,d:.25,s:1.6},{t:'plus',x:50,y:20,d:.3,s:1}],
+  Blutrausch:[...PISTOL,...Array.from({length:8},(_,i)=>({t:'sp',x:92,y:20,d:.15+i*.03,a:i*45,c:'#b0281c'})),{t:'plus',x:50,y:30,d:.45,s:.8}],
+  Monster:[{t:'dust',x:30,y:88,d:0,s:1.4},{t:'dust',x:70,y:88,d:.05,s:1.4},{t:'boom',x:50,y:90,d:.1,s:.9},{t:'aura',x:50,y:55,d:.15,s:1.5,c:'#b0281c'}],
+  Blitz:[{t:'bolt',x:72,y:2,d:0},{t:'bolt',x:24,y:6,d:.12},{t:'dust',x:30,y:86,d:.1},{t:'dust',x:20,y:86,d:.16}],
+  Schussbefehl:[...PISTOL,...[18,30,42].map((x,i)=>({t:'flash',x,y:74,d:.2+i*.1,s:.8})),...[18,30,42].map((x,i)=>({t:'tr',x,y:74,d:.22+i*.1,len:60,a:-6}))],
+  Erstschlag:[{t:'tr',x:100,y:22,d:.25,len:30,a:180},{t:'flash',x:68,y:18,d:0,s:1.4},{t:'tr',x:70,y:18,d:.01,len:40,a:-4},{t:'boom',x:96,y:16,d:.15,s:.7}],
+  Rage:[{t:'fl',x:44,y:40,d:0,a:-90,s:.7},{t:'fl',x:56,y:40,d:.1,a:-90,s:.6},{t:'smoke',x:50,y:8,d:.3},...PISTOL.map(f=>({...f,d:f.d+.3}))],
+  Verschanzen:[{t:'dust',x:30,y:84,d:0},{t:'dust',x:70,y:84,d:.1},{t:'bags',x:50,y:88,d:.15},{t:'aura',x:50,y:60,d:.3,s:1.1,c:'#cfc59c'}],
+  Anführer:[{t:'ray',x:50,y:45,d:0,c:'#ffd84a'},{t:'star',x:50,y:12,d:.15}],
+  Unbarmherzig:[...PISTOL,{t:'boom',x:90,y:20,d:.15,s:.8},{t:'boom',x:94,y:50,d:.3,s:.8},...Array.from({length:6},(_,i)=>({t:'sp',x:90,y:20,d:.2+i*.03,a:i*60,c:'#b0281c'}))]
+};
 function render(){
   const el=$('tab-spiel'); if(!el) return;
   if(S.sig!==sigNow()) reset();
@@ -203,16 +240,7 @@ function render(){
   const cardKey=S.round+'|'+S.deck.length+'|'+S.end;
   if(gc&&cardKey!==lastCardKey&&lastCardKey!==null){
     gc.classList.add('flip-in');
-    // Passende Kurz-Animation zur aufgedeckten Einheit (läuft nach dem Umdrehen)
-    const c=S.end===null?S.cur:null, art=gc.querySelector('.gc-art');
-    if(c&&art){
-      const kind=c.kind==='rif'?'rif':c.kind==='veh'?c.key:(c.unit?c.unit.key:'');
-      if(kind) art.classList.add('anim','anim-'+kind);
-      // Echte Effekte (Schüsse, Explosionen, Flammen …) je Einheit
-      const fx=FX[kind]||[]; if(fx.length) art.insertAdjacentHTML('beforeend','<span class="fxl">'+fx.map(fxEl).join('')+'</span>');
-      if(FX_SHAKE.has(kind)) gc.classList.add('fx-shake');
-      if(kind==='flieger'&&typeof Sounds!=='undefined') try{ setTimeout(()=>Sounds.play('plane'),250); }catch(e){}
-    }
+    if(S.end===null&&S.cur) playFx(gc,S.cur,false);
   }
   lastCardKey=cardKey;
   if(gc){
