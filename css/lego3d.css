@@ -79,3 +79,6 @@ html:is(.lego3d,.lego3d-wait) .fire-wrap svg{visibility:hidden}
 .gcard .rw3d,.pop-card .rw3d{display:none!important}
 /* Noch nicht berechnete 3D-Bilder: keine alten Zeichnungen zeigen, nur Platzhalter */
 html.lego3d :is(.slot-art,.mini,.pu-fig) svg.fig{visibility:hidden}
+/* Bildfeld der Spielkarte ist kein Armee-Kasten: kein Rahmen, kein harter Schatten (schwarzer Balken unter dem Modell) */
+.gc-art.army{border:0!important;box-shadow:none!important;border-radius:0!important}
+.re-art.army,.pu-fig.army{border:0!important;box-shadow:none!important}

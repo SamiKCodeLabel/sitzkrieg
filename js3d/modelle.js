@@ -280,7 +280,7 @@ function soldier(side, kind = 'rif', opt = {}) {
     case 'mg': hold(mgun(), .04, .8, .24, -.05); u.armL = arm(body, -1, ARM, -1.2, .2); u.armR = arm(body, 1, ARM, -.75); break;
     case 'shotgun': hold(shotgun(), .1, .98, .22, -.06); u.armL = arm(body, -1, ARM, -1.4, .25); u.armR = arm(body, 1, ARM, -1.0); break;
     case 'sniper': hold(rifle(1.15, true), .12, 1.14, .2, 0); u.armL = arm(body, -1, ARM, -1.55, .25); u.armR = arm(body, 1, ARM, -1.25); break;
-    case 'pzf': hold(panzerfaust(), 0, 0, 0, -.06); u.armR = arm(body, 1, ARM, -1.55); u.armL = arm(body, -1, ARM, -1.75, .25); break;   // Rohr in der rechten Hand, linke Hand stützt vorn
+    case 'pzf': { const w = hold(panzerfaust(), .36, 1.22, .02, -.03); w.userData.shoulder = true; u.armR = arm(body, 1, ARM, -2.4); u.armL = arm(body, -1, ARM, -.75); break; }   // Rohr auf der Schulter, rechte Hand hält es vorn von unten
     case 'grenade': {
       const r = rifle(); r.position.set(0, .82, -.3); r.rotation.set(-1.2, 0, .6); body.add(r);
       u.armR = arm(body, 1, ARM, -2.7); u.armL = arm(body, -1, ARM, -1.0, .2);
@@ -321,7 +321,7 @@ function soldier(side, kind = 'rif', opt = {}) {
 }
 const GRIP = new THREE.Vector3(0, -.08, -.08);
 function gripWeapon(g, u, kind) {           // Waffe so verschieben, dass der Griff genau in der rechten C-Hand liegt
-  const w = u.weapon; if (!w || !u.armR || w.parent !== u.body || kind === 'flame') return;
+  const w = u.weapon; if (!w || !u.armR || w.parent !== u.body || kind === 'flame' || w.userData.shoulder) return;
   g.updateMatrixWorld(true);
   const clip = u.armR.userData.hand.localToWorld((u.armR.userData.hand.userData.clip || new THREE.Vector3(0, -.1, 0)).clone()); u.body.worldToLocal(clip);
   w.position.copy(clip).sub((w.userData.grip || GRIP).clone().applyEuler(w.rotation));
