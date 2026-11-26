@@ -1,6 +1,6 @@
 // Gelände-Modelle der Kartenfelder (Klemmbaustein-Stil) – genutzt vom 3D-Spieltisch und von den Rundenende-Bildern
 import { THREE, brick, slope, plastic } from './modelle.js';
-const TERRAIN = { wald: 0x4f7a34, flach: 0x186a56, zug: 0x8a8a5a, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0x1667c8, wohn: 0x8fa357, graben: 0x17765e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
+const TERRAIN = { wald: 0x4f7a34, flach: 0x186a56, zug: 0x186a56, farm: 0x9cae5a, turm: 0x7f9a46, bunker: 0x7d8a5a, strand: 0x1667c8, wohn: 0x8fa357, graben: 0x17765e, hafen: 0x1f5fb0, see: 0x4caa52, strasse: 0x8b8a84, ruine: 0x7f8488, kirche: 0xa3a7a8 };
 const R = Math.random;
 
 // ---------- Gelände-Modelle (Mittelpunkt 0,0; Fläche w x d) ----------
@@ -107,7 +107,7 @@ function terrain(key, g, w, d) {
   switch (key) {
     case 'wald': for (let i = 0; i < 4; i++) tree(g, (i % 2 - .5) * .7 + (R() - .5) * .15, (Math.floor(i / 2) - .5) * .7 + (R() - .5) * .15, .9 + R() * .3); break;
     case 'flach': flat3(g, w, d); break;
-    case 'zug': train(g, w, d); break;
+    case 'zug': train3(g, w, d); break;
     case 'farm': farm3(g); break;
     case 'turm': tower3(g); break;
     case 'bunker': bunker2(g); break;
@@ -484,6 +484,58 @@ function beach3(g, w, d) {
   box(g, .2, .03, .14, 0x5a6a2a, -.45, .045, -.15, 0, .3, 0); box(g, .2, .03, .16, 0x5a6a2a, -.55, .045, -.02, 0, -.2, 0);
   box(g, .14, .03, .14, 0x7a3e14, -.52, .045, -.48); box(g, .04, .03, .16, 0xd9741a, -.68, .045, -.1); box(g, .04, .03, .12, 0xd9741a, -.38, .045, -.7);
   for (const [x, z] of [[-.6, .45], [-.32, -.55]]) box(g, .05, .04, .05, 0x10302a, x, .05, z, 0, .5, 0);
+}
+
+// ---- Zug nach Fotos: Gleis mit Schotterbett am Rand, schwarze Tenderlok mit rotem Fahrwerk, Prellbock aus Holz, Fässer ----
+const LOKB = 0x1c1e20, LOKR = 0xc8201c, RAIL = 0x8a8f94, SLEEP = 0x5a3418;
+function loco(g, x0, z0) {
+  const n = G(); n.position.set(x0, 0, z0); g.add(n);
+  box(n, 1.62, .1, .3, LOKR, 0, .13, 0);                                                       // roter Rahmen
+  for (const sz of [-1, 1]) {
+    for (const wx of [-.36, 0, .36]) { const wh = cyl(n, .1, .04, LOKR, wx, .11, sz * .17, HALF, 0, 22); cyl(n, .035, .05, 0x2a2a2a, wx, .11, sz * .19, HALF, 0, 10); for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI; box(n, .17, .012, .045, LOKR, wx, .11, sz * .175, 0, 0, a); } }
+    box(n, .86, .025, .02, LOKR, 0, .1, sz * .205);                                            // Kuppelstange
+    box(n, .32, .07, .12, LOKB, .58, .17, sz * .17); cyl(n, .05, .3, LOKR, .45, .17, sz * .23, 0, HALF);   // Zylinder + Kolbenstange
+    box(n, .04, .16, .07, LOKR, -.47, .12, sz * .2); for (const y of [.07, .13]) box(n, .02, .012, .07, LOKR, -.47, y, sz * .22);   // Leiter am Führerhaus
+  }
+  box(n, 1.7, .04, .46, LOKB, 0, .2, 0);                                                         // Umlauf
+  const boiler = cyl(n, .19, .98, LOKB, .3, .42, 0, 0, HALF, 26);
+  cyl(n, .2, .04, 0x2a2c2e, .8, .42, 0, 0, HALF, 26); cyl(n, .04, .05, 0x3a3c3e, .83, .42, 0, 0, HALF, 12);   // Rauchkammertür
+  for (const sz of [-1, 1]) { box(n, .78, .2, .09, LOKB, .25, .33, sz * .2); cyl(n, .008, .9, 0x0e0e0e, .32, .5, sz * .17, 0, HALF, 6); }   // Wasserkästen + Griffstange
+  cyl(n, .055, .2, LOKB, .68, .7, 0, 0, 0, 16); cyl(n, .07, .03, LOKB, .68, .8, 0, 0, 0, 16);                                        // Schornstein
+  for (const dx of [.2, .42]) { const dm = new THREE.Mesh(new THREE.SphereGeometry(.085, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), plastic(LOKB)); dm.position.set(dx, .6, 0); n.add(dm); cyl(n, .088, .06, LOKB, dx, .58, 0, 0, 0, 18); cyl(n, .02, .03, LOKB, dx, .69, 0, 0, 0, 10); }
+  box(n, .48, .42, .46, LOKB, -.42, .45, 0);                                                     // Führerhaus
+  box(n, .54, .05, .5, LOKB, -.42, .69, 0); box(n, .4, .04, .3, LOKB, -.42, .73, 0);
+  for (const sz of [-1, 1]) { box(n, .16, .14, .01, 0x9cc4d8, -.36, .53, sz * .232); box(n, .1, .05, .012, 0x111111, -.36, .38, sz * .233); box(n, .06, .02, .013, 0xe8e8e0, -.36, .38, sz * .234); }
+  for (const sz of [-1, 1]) box(n, .01, .12, .12, 0x9cc4d8, -.18, .55, sz * .12);
+  box(n, .24, .26, .46, LOKB, -.78, .35, 0);                                                     // Kohlenkasten
+  for (let i = 0; i < 9; i++) cyl(n, .03, .02, 0xa0a5a9, -.84 + (i % 3) * .06, .49, -.08 + Math.floor(i / 3) * .08, 0, 0, 10);
+  for (const ex of [-1, 1]) { box(n, .05, .07, .48, LOKR, ex * .87, .18, 0); for (const sz of [-1, 1]) { cyl(n, .016, .07, 0x2a2a2a, ex * .92, .18, sz * .16, 0, HALF, 8); cyl(n, .04, .015, 0x111111, ex * .96, .18, sz * .16, 0, HALF, 16); } }
+  for (const sz of [-1, 1]) cyl(n, .02, .02, 0xf2f2e8, .9, .28, sz * .15, 0, HALF, 10);        // Lampen
+  return n;
+}
+function train3(g, w, d) {
+  const along = w > d, L = Math.max(w, d), S = Math.min(w, d), n = G(); if (!along) n.rotation.y = HALF; g.add(n);
+  const hl = L / 2, hs = S / 2, tz = -hs + .3;
+  // Gleisbett, Schwellen, Schienen, lose graue Noppen daneben
+  brick(n, L - .02, .03, .5, 0xa0a5a9, 0, .015, tz);
+  for (let x = -hl + .08; x < hl - .05; x += .13) box(n, .07, .02, .4, SLEEP, x, .04, tz);
+  for (const sz of [-1, 1]) box(n, L - .04, .035, .03, RAIL, 0, .065, tz + sz * .13);
+  for (let i = 0; i < 26; i++) { const x = (R() - .5) * (L - .2), z = tz + .27 + R() * .25 * (R() < .6 ? .4 : 1); cyl(n, .03, .025, 0xa0a5a9, x, .0125, z, 0, 0, 12); }
+  loco(n, -.2, tz).position.y = .04;
+  // Prellbock aus Holzkisten am Gleisende, zwei Fässer
+  const px = hl - .28;
+  box(n, .1, .14, .46, 0x8a5a2c, px - .1, .11, tz); box(n, .04, .04, .5, 0xb88a4a, px - .15, .2, tz);
+  for (const [dx, dz, h] of [[.02, -.1, .12], [.02, .1, .16], [.14, -.05, .1], [.14, .14, .12], [.1, .32, .08], [.2, .3, .1]]) box(n, .12, h, .18, 0x8a5a2c, px + dx, h / 2 + .01, tz + dz);
+  for (const [bx, bz] of [[px - .05, tz + .42], [px + .08, tz + .44]]) { cyl(n, .055, .15, 0x4a5056, bx, .075, bz, 0, 0, 16); for (const y of [.03, .075, .12]) cyl(n, .058, .01, 0x2e3236, bx, y, bz, 0, 0, 16); }
+  { const p = G(); p.position.set(px - .16, .2, tz - .2); n.add(p); for (let k = 0; k < 4; k++) { const l = leaf(p, 0, 0, 0, .35, k); l.material = plastic(0x5a7a4a); l.rotation.x = -HALF + .8; } }
+  // Wiese wie Flachland
+  const zz = f => tz + .3 + f * (hs - tz - .35), xx = f => f * (hl - .1);
+  for (const [fx, fz, c, sp] of [[-.85, .2, 0xc8b48a, 0], [-.6, .05, 0xc8b48a, 1], [-.5, .6, 0xc8b48a, 0], [-.2, .9, 0xc8b48a, 1], [.15, .1, 0xc8b48a, 0], [.35, .7, 0xc8b48a, 1], [.8, .4, 0xc8b48a, 0], [.9, .9, 0xc8b48a, 0], [-.75, .5, 0x3fb36f, 0], [-.05, .4, 0x3fb36f, 0], [.6, .05, 0x3fb36f, 1], [.7, .6, 0x3fb36f, 0]]) { const x = xx(fx), z = zz(fz); const l = leaf(n, x, .015, z, .45, R() * 6); l.material = plastic(c); if (sp) sprout(n, x, z, .02); }
+  frond(n, xx(-.4), zz(.2), 0x1b3a30, .8, .4, .012, true); frond(n, xx(.3), zz(.85), 0x1b3a30, .8, 1.2, .012, true);
+  frond(n, xx(-.7), zz(.4), 0x3fb06a, .8, .2, .012, true); frond(n, xx(.45), zz(.35), 0x3fb06a, .8, .6, .012, true);
+  frond(n, xx(-.9), zz(.05), 0x9fbfa0, .6, 2.2);
+  for (const [fx, fz, a, b, fr] of [[-.15, .15, .45, .22, 1], [.75, .45, .3, .25, 1], [-.65, .2, .3, .1, 0], [.05, .55, .25, .16, 0], [-.9, .3, .1, .2, 0], [.85, .8, .1, .22, 0]]) { const x = xx(fx), z = zz(fz); box(n, a, .025, b, fr ? 0x9a5a22 : 0x6e3a1c, x, .0125, z); if (fr) frond(n, x, z, 0x1f8a6a, .65, .3, .04); }
+  box(n, .2, .025, .2, 0x3fc07a, xx(-.3), .0125, zz(.65)); dot(n, xx(-.45), zz(.55), 0xd8e030);
 }
 
 // Ein einzelnes Feld als Modell (Bauplatte + Gelände), z. B. für das Bild am Rundenende

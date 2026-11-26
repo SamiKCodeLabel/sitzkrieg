@@ -94,6 +94,7 @@ function build() {
     const plate = brick(g, w, .08, d, TERRAIN[x.p.key] || 0x86a84a, 0, -.04, 0); plate.traverse(o => o.receiveShadow = true);
     const t = G(); t.position.y = .025; g.add(t); terrain(x.p.key, t, w, d);
     if (x.p.key === 'strand' && g.position.x < 0) t.rotation.y = Math.PI;   // Wasser zum Kartenrand
+    if (x.p.key === 'zug') { const p = w > d ? g.position.z : g.position.x; if (p > .01) t.rotation.y = Math.PI; }   // Gleis zum Kartenrand
     if (x.p.key === 'kirche') { const p = w > d ? g.position.z : g.position.x; if (p > .01) t.rotation.y = Math.PI; }   // Kirchenportal zur Kartenmitte drehen
     t.traverse(o => { if (o.isMesh) o.castShadow = o.receiveShadow = true; });
     const oi = ms ? ms.objectives.indexOf(x) : -1, ex = ms && ms.exts ? ms.exts.find(e => e.p === x) : null;
