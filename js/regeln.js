@@ -8,20 +8,20 @@
 const RULES={
   // Regeln je Geländeart: Text eintragen, dann erscheint er beim Antippen des Feldes auf der Karte
  "felder": {
-  "wald": {"name": "Wald", "regel": ""},
+  "wald": {"name": "Wald", "regel": "Unwegsames Gelände (halbe Bewegung). Gibt Deckung und blockiert die Sichtlinie."},
   "flach": {"name": "Flachland", "regel": ""},
-  "zug": {"name": "Zug", "regel": ""},
-  "farm": {"name": "Farm", "regel": ""},
-  "turm": {"name": "Wachturm", "regel": ""},
-  "bunker": {"name": "Bunker", "regel": ""},
-  "strand": {"name": "Strand", "regel": ""},
-  "wohn": {"name": "Wohnhaus", "regel": ""},
-  "graben": {"name": "Graben", "regel": ""},
-  "hafen": {"name": "Hafen", "regel": ""},
-  "see": {"name": "See", "regel": ""},
+  "zug": {"name": "Zug", "regel": "Die Waggons geben Deckung und blockieren die Sichtlinie."},
+  "farm": {"name": "Farm", "regel": "Das Gebäude gibt Deckung und blockiert die Sichtlinie. Der Acker ist unwegsames Gelände (halbe Bewegung)."},
+  "turm": {"name": "Wachturm", "regel": "Gibt Deckung und ist eine erhöhte Position."},
+  "bunker": {"name": "Bunker", "regel": "Gibt Deckung und blockiert die Sichtlinie."},
+  "strand": {"name": "Strand", "regel": "Der Sand ist unwegsames Gelände (halbe Bewegung). Wasser ist unpassierbar."},
+  "wohn": {"name": "Wohnhaus", "regel": "Das Gebäude gibt Deckung und blockiert die Sichtlinie."},
+  "graben": {"name": "Graben", "regel": "Unwegsames Gelände (halbe Bewegung). Gibt Deckung."},
+  "hafen": {"name": "Hafen", "regel": "Wasser ist unpassierbar. Die Kisten geben Deckung."},
+  "see": {"name": "See", "regel": "Wasser ist unpassierbar."},
   "strasse": {"name": "Leere Straße", "regel": ""},
-  "ruine": {"name": "Ruine", "regel": ""},
-  "kirche": {"name": "Kirche", "regel": ""}
+  "ruine": {"name": "Ruine", "regel": "Unwegsames Gelände (halbe Bewegung). Gibt Deckung."},
+  "kirche": {"name": "Kirche", "regel": "Die Kirche gibt Deckung und blockiert die Sichtlinie. Der Kirchturm ist eine erhöhte Position."}
  },
  "armee": {
   "normal": {"spezialeinheiten": 6, "trupps": 6},
