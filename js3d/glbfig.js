@@ -13,7 +13,7 @@ function split(geo) {
   const p = geo.attributes.position, idx = geo.index.array, parts = { body: [], l: [], r: [] };
   for (let t = 0; t < idx.length; t += 3) {
     let x = 0, y = 0; for (let k = 0; k < 3; k++) { x += p.getX(idx[t + k]); y += p.getY(idx[t + k]); } x /= 3; y /= 3;
-    const arm = y < .38 && y > -.62 && Math.abs(x) > (y < -.45 ? .37 : torsoHalf(y) + .025);
+    const arm = y < .38 && y > -.62 && Math.abs(x) > (y > .12 ? .335 : y < -.45 ? .37 : torsoHalf(y) + .025);   // oben bleibt die Rumpfschulter am Körper
     (arm ? (x > 0 ? parts.r : parts.l) : parts.body).push(idx[t], idx[t + 1], idx[t + 2]);
   }
   const mk = list => { const g = new THREE.BufferGeometry(); for (const k of Object.keys(geo.attributes)) g.setAttribute(k, geo.attributes[k].clone()); g.setIndex(list); return g; };

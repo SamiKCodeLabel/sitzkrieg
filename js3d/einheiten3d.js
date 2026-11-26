@@ -1,16 +1,19 @@
 // Bindet die 3D-Klemmbaustein-Modelle in die App ein:
 //  1. Armee-Tab, Popups, Mini-Symbole: Standbilder der Modelle statt der SVG-Zeichnungen
 //  2. Spielkarte: lebende 3D-Szene mit Aktion + WebGL-Effekten (Mündungsfeuer, Explosion, Steinchen …)
-import { THREE, buildUnit, brick } from './modelle.js';
-import { photo, lights, frame, envFor } from './foto.js';
-import { Fx } from './effekte.js';
+import { cachedURL } from './bildspeicher.js';
+// Die 3D-Bibliothek (groß) wird erst nachgeladen: gespeicherte Bilder erscheinen vorher
+let THREE, buildUnit, brick, photo, lights, frame, Fx, heavyP = null;
+const heavy = () => heavyP || (heavyP = Promise.all([import('./modelle.js'), import('./foto.js'), import('./effekte.js'), import('./glbfig.js')])
+  .then(async ([m, f, e, gl]) => { await gl.GFREADY; ({ THREE, buildUnit, brick } = m); ({ photo, lights, frame } = f); ({ Fx } = e); }));   // erst wenn das Soldaten-Modell da ist
+const getPhoto = async (k, side, h) => (await cachedURL(k, side, h)) || (await heavy(), await photo(k, side, h));
 
 const KEYS = ['pzf', 'general', 'sniper', 'shotgun', 'mg', 'flame', 'grenade', 'mortar', 'mine', 'mech', 'medic', 'schwer', 'leicht', 'trans', 'art', 'krad', 'flieger'];
 const still = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
 // ---------- 1. Standbilder ----------
 const GENP = {};   // Standbilder der Generäle je Fähigkeit (werden bei Bedarf erzeugt)
-const genPhoto = (side, abil) => GENP[side + abil] || (GENP[side + abil] = photo('general:' + abil, side, 300));
+const genPhoto = (side, abil) => GENP[side + abil] || (GENP[side + abil] = getPhoto('general:' + abil, side, 300));
 // Generäle bekommen das Bild mit der Ausrüstung ihrer Fähigkeit
 function veteranFix(root = document) {
   root.querySelectorAll('.slot-art').forEach(a => {
@@ -23,7 +26,7 @@ for (const id of ['army-de', 'army-al']) { const el = document.getElementById(id
 async function swapArt() {
   const VEH = ['schwer', 'leicht', 'trans', 'art', 'krad', 'flieger'];
   for (const side of ['de', 'al']) {
-    const urls = await Promise.all([...KEYS, 'rif'].map(k => photo(k, side, VEH.includes(k) ? 260 : 300)));
+    const urls = await Promise.all([...KEYS, 'rif'].map(k => getPhoto(k, side, VEH.includes(k) ? 260 : 300)));
     KEYS.forEach((k, i) => { ART_FACTION[side][k] = `<img class="fig f3d${VEH.includes(k) ? ' veh' : ''}" src="${urls[i]}" alt="" draggable="false">`; if (side === 'de') ART[k] = ART_FACTION.de[k]; });
     RIFLEMAN_FACTION[side] = `<img class="fig f3d" src="${urls[KEYS.length]}" alt="" draggable="false">`;
   }
@@ -142,13 +145,14 @@ function loop() {
 
 // Nach jedem Neuzeichnen des Spiel-Tabs die Szene wieder einhängen
 function attach(play) {
+  if (!THREE) { heavy().then(() => attach(play)); return; }
   const art = document.querySelector('#tab-spiel .gcard .gc-art'); const c = window.spielGet && spielGet().cur, s = window.spielGet && spielGet();
   if (!art || !c || (s && s.end !== null)) { view = null; return; }
   if (view && view.art === art) { if (play) act(view); return; }
   const v = mount(art, c); if (v && (play || !still)) act(v);
 }
-const orig = window.playFx;
-window.playFx = function (gc, c, replay) { orig(gc, c, replay); attach(true); };
+// Bild antippen: Aktion der 3D-Szene erneut abspielen
+document.addEventListener('click', e => { const a = e.target.closest('#tab-spiel .gcard .gc-art'); if (a && view && view.art === a) act(view); });
 const tab = document.getElementById('tab-spiel');
 new MutationObserver(() => attach(false)).observe(tab, { childList: true });
 function refit() { const v = view; if (!v) return; const r = { width: v.art.clientWidth, height: v.art.clientHeight }; if (r.width < 10 || r.height < 10) return; R.setSize(r.width, r.height, false); frame(v.cam, v.stage, r.width / r.height, 1.02, new THREE.Vector3(0, .42, 1)); v.base = v.cam.position.clone(); }
