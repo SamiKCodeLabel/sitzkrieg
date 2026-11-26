@@ -1,0 +1,31 @@
+/* 3D-Klemmbaustein-Modelle: Standbilder statt SVG + lebende Szene auf der Spielkarte */
+img.fig.f3d{display:block;height:100%;width:auto;max-width:100%;object-fit:contain;-webkit-user-drag:none;user-select:none}
+.slot-art img.fig{max-height:100%}
+.slot-art.duo img.fig:only-of-type{width:auto}
+.slot-art.duo img.fig{width:auto;max-width:50%;height:100%}
+.slot-art.duo.five img.fig{width:28%;max-width:none;height:auto;flex:none;margin-left:-9%} .slot-art.duo.five img.fig:first-child{margin-left:0}
+.slot.veh .slot-art img.fig{width:100%;height:auto;max-height:100%}
+.mini img.fig{height:28px;width:auto;display:inline-block}
+.pu-fig img.fig{height:100%;width:auto}
+.gc-art img.fig{height:100%;width:auto}
+.gc-art.veh img.fig{width:min(320px,90%);height:auto}
+.gc-art.five img.fig{height:82%;margin-left:-14px} .gc-art.five img.fig:first-child{margin-left:0}
+/* Spielkarte: lebende 3D-Szene */
+.gc-art.has3d{height:190px!important;padding:0!important;position:relative;overflow:hidden!important;
+  background:radial-gradient(ellipse at 50% 85%,rgba(255,240,200,.18),transparent 70%)!important}
+.gc-art.has3d>img.fig,.gc-art.has3d>.fxl{display:none!important}
+.gc-art .live3d{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;cursor:pointer}
+.gc-art .gc-crest{z-index:2}
+.gcard.flip-in .gc-art.has3d .live3d{animation:none}
+@media (max-width:640px){ .gc-art.has3d{height:170px!important} }
+@media (orientation:landscape) and (max-height:560px){ .gc-art.has3d{height:auto!important;min-height:110px;max-height:none!important} }
+/* 3D-Spieltisch im Karte-Tab */
+#map3d{display:none;position:relative;width:100%;height:min(62vh,560px);margin:0 auto;border-radius:6px;overflow:hidden;touch-action:none;
+  background:radial-gradient(ellipse at 50% 40%,rgba(255,240,200,.14),transparent 70%),linear-gradient(#2a2e20,#15170f);box-shadow:inset 0 0 40px rgba(0,0,0,.6)}
+#map3d canvas{position:absolute;inset:0;display:block;width:100%!important;height:100%!important}
+body.map3d-on #map3d{display:block}
+body.map3d-on #map{position:absolute!important;left:-9999px;visibility:hidden}
+@media (max-width:640px){ #map3d{height:72vh} }
+.v3d-sw{position:absolute;z-index:8;top:-13px;right:-8px;padding:3px 10px!important;font-size:.78rem!important;line-height:1.2;border-radius:12px!important;letter-spacing:.06em;
+  background:linear-gradient(#6b7540,#454d27)!important;color:#f3ecd2!important;border:2px solid #c9bf8e!important;box-shadow:0 2px 6px rgba(0,0,0,.5)!important;text-transform:none}
+#map3d .v3d-sw{top:8px;right:8px}

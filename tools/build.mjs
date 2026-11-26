@@ -18,7 +18,7 @@ let errors = 0;
 const fail = msg => { console.error('✗ ' + msg); errors++; };
 
 // 1. Syntax
-for (const f of list('js')) {
+for (const f of [...list('js'), ...list('js3d')]) {
   try { execFileSync(process.execPath, ['--check', rel(f)], { stdio: 'pipe' }); }
   catch (e) { fail(`${f}: ${String(e.stderr).split('\n').slice(0, 4).join(' ')}`); }
 }
@@ -28,11 +28,12 @@ const pages = ['index.html', 'digital.html'];
 const refs = new Set();
 for (const p of pages) {
   const html = readFileSync(rel(p), 'utf8');
-  for (const m of html.matchAll(/(?:src|href)="((?:css|js|assets)\/[^"?#]+)/g)) refs.add(m[1]);
+  for (const m of html.matchAll(/(?:src|href)="((?:css|js|js3d|vendor|assets)\/[^"?#]+)/g)) refs.add(m[1]);
 }
-for (const f of [...list('css'), ...list('js')]) {
+for (const f of [...list('css'), ...list('js'), ...list('js3d')]) {
   const txt = readFileSync(rel(f), 'utf8');
-  for (const m of txt.matchAll(/(?:\.\.\/)?(assets\/[A-Za-z0-9_\-./]+\.(?:woff2|mp3|svg|png))/g)) refs.add(m[1]);
+  for (const m of txt.matchAll(/(?:\.\.\/)?(assets\/[A-Za-z0-9_\-./]+\.(?:woff2|mp3|svg|png|glb))/g)) refs.add(m[1]);
+  for (const m of txt.matchAll(/from '\.\.\/(vendor\/[^']+)'/g)) refs.add(m[1]);   // 3D-Module: eingebundene Bibliotheken
 }
 for (const r of refs) if (!existsSync(rel(r))) fail(`fehlt: ${r}`);
 
@@ -40,24 +41,24 @@ if (errors) { console.error(`\nBuild abgebrochen (${errors} Fehler).`); process.
 
 // 3. Fingerabdrücke in die Seiten schreiben
 const fp = {};
-for (const f of [...list('css'), ...list('js')]) fp[f] = hash(readFileSync(rel(f)));
+for (const f of [...list('css'), ...list('js'), ...list('js3d')]) fp[f] = hash(readFileSync(rel(f)));
 for (const p of pages) {
   const html = readFileSync(rel(p), 'utf8');
-  const out = html.replace(/((?:src|href)=")((?:css|js)\/[^"?#]+)(?:\?v=[0-9a-f]+)?"/g, (_, a, f) => fp[f] ? `${a}${f}?v=${fp[f]}"` : `${a}${f}"`);
+  const out = html.replace(/((?:src|href)=")((?:css|js|js3d)\/[^"?#]+)(?:\?v=[0-9a-f]+)?"/g, (_, a, f) => fp[f] ? `${a}${f}?v=${fp[f]}"` : `${a}${f}"`);
   if (out !== html) writeFileSync(rel(p), out);
 }
 
 // 4. Service Worker
 const offline = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './reroll.mp4',
-  ...Object.keys(fp).map(f => `./${f}?v=${fp[f]}`), ...list('assets/fonts'), ...list('assets/sounds'), ...list('assets/symbole')]
+  ...Object.keys(fp).map(f => `./${f}?v=${fp[f]}`), ...list('js3d'), ...list('vendor').filter(f => f.endsWith('.js')), ...list('assets/fonts'), ...list('assets/sounds'), ...list('assets/symbole'), ...list('assets/modelle')]
   .map(f => f.startsWith('./') ? f : './' + f);
-const assetHash = [...list('assets/fonts'), ...list('assets/sounds'), ...list('assets/symbole')].map(f => hash(readFileSync(rel(f)))).join();   // auch geänderte Bilder/Töne erzwingen eine neue Version
+const assetHash = [...list('assets/fonts'), ...list('assets/sounds'), ...list('assets/symbole'), ...list('assets/modelle'), ...list('vendor')].map(f => hash(readFileSync(rel(f)))).join();   // auch geänderte Bilder/Töne erzwingen eine neue Version
 const version = hash(readFileSync(rel('index.html')) + readFileSync(rel('digital.html')) + JSON.stringify(fp) + assetHash + offline.join());
 let sw = readFileSync(rel('sw.js'), 'utf8');
 sw = sw.replace(/const CACHE = '[^']*';/, `const CACHE = 'sitzkrieg-${version}';`)
        .replace(/const FILES = \[[\s\S]*?\];/, `const FILES = ${JSON.stringify(offline, null, 0)};`);
 writeFileSync(rel('sw.js'), sw);
 
-console.log(`✓ ${list('js').length} JS-Dateien ohne Syntaxfehler`);
+console.log(`✓ ${list('js').length + list('js3d').length} JS-Dateien ohne Syntaxfehler`);
 console.log(`✓ ${refs.size} Verweise gefunden, alle vorhanden`);
 console.log(`✓ Cache-Version sitzkrieg-${version}, ${offline.length} Dateien offline verfügbar`);

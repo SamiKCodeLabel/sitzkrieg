@@ -18,7 +18,10 @@ Am Handy in Chrome öffnen → Menü ⋮ → „App installieren“.
 | `js/spiel.js` | Aktivierungsdeck und Rundenende |
 | `js/lobby.js` | Online-Lobby (PeerJS) |
 | `js/wuerfel.js`, `js/sounds.js`, `js/musik.js`, `js/neuwurf.js`, `js/extras.js`, `js/symbole.js` | Würfel, Töne, Musik, Neu-Würfeln, Regel-Popups/Suche/Seitenwahl, Symbolbilder |
-| `css/` | Schriften, Grundlook, App, Spiel-Tab (inkl. Zeitungscomic-Stil) |
+| `js3d/` | 3D im Klemmbaustein-Stil (Three.js): Figuren und Fahrzeuge (`modelle.js`, `glbfig.js`), lebende Spielkarte mit Effekten (`einheiten3d.js`, `effekte.js`), 3D-Spieltisch (`karte3d.js`) |
+| `vendor/` | Three.js 0.170 (MIT) und GSAP 3.12 – lokal, damit alles offline läuft |
+| `assets/modelle/soldat.glb` | Soldaten-Modell (Grundlage aller Infanterie-Figuren), Nutzung erlaubt |
+| `css/` | Schriften, Grundlook, App, Spiel-Tab, Comic-Seitendesign (`krass.css`), 3D (`lego3d.css`) |
 | `assets/` | Schriften, Sounds, Symbole als einzelne Dateien |
 | `tools/build.mjs` | Prüft und versioniert vor dem Hochladen |
 

@@ -1,0 +1,147 @@
+/* ================= SITZKRIEG – KRASS-OPTIK (Vorschau) =================
+   Kriegscomic-Heft: Tuschekonturen, harte Comic-Schatten, Druckpapier, Rauch im Hintergrund.
+   Reine Optik-Schicht, wird als letztes geladen. */
+:root{--ink-k:#0b0c07;--hard:4px 4px 0 var(--ink-k);--hard-s:3px 3px 0 var(--ink-k)}
+
+/* ---------- Hintergrund: Rauch-Canvas, Vignette, Filmkorn ---------- */
+#krass-bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;filter:blur(1px)}
+main{position:relative;z-index:1}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 120% 90% at 50% 45%,transparent 45%,rgba(0,0,0,.55) 100%)}
+body::after{content:"";position:fixed;inset:-50%;z-index:9000;pointer-events:none;opacity:.10;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .9s steps(5) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+@media (prefers-reduced-motion:reduce){body::after{animation:none}}
+
+/* Hauptblatt: wie ein Comicheft-Panel, Rauch scheint leicht durch */
+main{border:3px solid var(--ink-k)!important;border-radius:3px!important;
+  box-shadow:0 0 0 2px #c9b878,0 0 0 5px var(--ink-k),8px 10px 0 5px rgba(0,0,0,.55),0 20px 60px rgba(0,0,0,.7)!important}
+html[data-theme="dark"] main{background:
+   repeating-linear-gradient(0deg,rgba(170,190,120,.05) 0 1px,transparent 1px 24px),
+   repeating-linear-gradient(90deg,rgba(170,190,120,.05) 0 1px,transparent 1px 24px),
+   radial-gradient(ellipse at 50% 0%,rgba(230,190,110,.13),transparent 60%),
+   radial-gradient(ellipse at 50% 120%,rgba(200,60,30,.12),transparent 60%),
+   rgba(30,34,22,.84)!important;
+  box-shadow:0 0 0 2px #6d6440,0 0 0 5px var(--ink-k),8px 10px 0 5px rgba(0,0,0,.55),0 20px 60px rgba(0,0,0,.8),inset 0 0 90px rgba(0,0,0,.6)!important}
+html:not([data-theme="dark"]) main{background:
+   radial-gradient(ellipse at 50% 35%,rgba(255,250,230,.6),transparent 70%),
+   radial-gradient(ellipse at 0 0,rgba(90,60,20,.3),transparent 40%),
+   radial-gradient(ellipse at 100% 100%,rgba(90,60,20,.3),transparent 40%),
+   rgba(221,210,173,.93)!important}
+
+/* ---------- Titel: Schlagzeile mit Tusche ---------- */
+h1{font-size:clamp(2rem,9vw,3.4rem)!important;letter-spacing:.12em!important;line-height:1!important;margin:6px 0 10px!important;
+   color:#e9dcae!important;-webkit-text-stroke:1.6px var(--ink-k);paint-order:stroke fill;
+   text-shadow:3px 3px 0 var(--ink-k),5px 5px 0 #8a2b1d,0 0 26px rgba(255,170,80,.18)!important;
+   transform:rotate(-1.5deg)}
+html:not([data-theme="dark"]) h1{color:#f3e7bf!important;text-shadow:3px 3px 0 var(--ink-k),5px 5px 0 #9b2d20!important}
+h1::before,h1::after{color:#e0573f!important;-webkit-text-stroke:1px var(--ink-k);text-shadow:2px 2px 0 var(--ink-k)!important}
+@media (max-width:640px){ h1{font-size:2.15rem!important;letter-spacing:.08em!important;padding:0 44px!important} }
+
+/* Untertitel = roter Stempel, schlägt bei jedem Tab-Wechsel neu auf */
+.sub{border:3px solid var(--stamp)!important;outline:1.5px solid var(--stamp);outline-offset:2px;opacity:.95!important;
+     padding:4px 16px!important;font-size:1rem!important;letter-spacing:.28em!important;transform:rotate(-4deg)!important;
+     -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.55' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+             mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.55' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 1.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.sub.stamp-in{animation:stampIn .32s cubic-bezier(.3,1.6,.5,1)}
+@keyframes stampIn{0%{transform:rotate(-14deg) scale(2.2);opacity:0}60%{transform:rotate(-3deg) scale(.92);opacity:1}100%{transform:rotate(-4deg) scale(1)}}
+
+/* ---------- Knöpfe: Tuschekontur + harter Comic-Schatten, sinken beim Drücken ein ---------- */
+button:not(.gp-next):not(.pop-x):not(.wf){border:2.5px solid var(--ink-k)!important;box-shadow:var(--hard-s)!important;
+  transition:transform .07s ease-out,box-shadow .07s ease-out,filter .1s!important}
+button:not(.gp-next):not(.pop-x):not(.wf):not(:disabled):active{transform:translate(3px,3px)!important;box-shadow:0 0 0 var(--ink-k)!important}
+button.big,#gen{font-size:1.25rem!important;letter-spacing:.12em!important;
+  background:repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 6px,transparent 6px 12px),linear-gradient(#77823f,#454d22)!important;
+  color:#fbf2d0!important;text-shadow:2px 2px 0 var(--ink-k);box-shadow:5px 5px 0 var(--ink-k)!important}
+#gen.charging{box-shadow:5px 5px 0 var(--ink-k),0 0 18px rgba(220,60,30,.65)!important}
+html[data-theme="dark"] button.sec{background:linear-gradient(#41472f,#2b2f1f)!important}
+#theme,#net-btn,.vol-btn{border-radius:50%!important}
+
+/* Tabs: Karteireiter, aktiver steht hervor */
+.tabs{gap:6px!important;max-width:520px!important}
+.tabs button{border-radius:6px 6px 2px 2px!important;padding:10px 4px!important;font-size:.85rem!important}
+.tabs button.on{transform:translateY(-4px) rotate(-1deg);
+  background:repeating-linear-gradient(-45deg,rgba(255,255,255,.06) 0 5px,transparent 5px 10px),linear-gradient(#8f3a26,#5b1f12)!important;
+  color:#fff1d6!important;text-shadow:1px 1px 0 var(--ink-k);box-shadow:4px 6px 0 var(--ink-k)!important}
+.tabs button.on:active{transform:translateY(-1px)!important}
+@media (max-width:640px){ .tabs{grid-template-columns:repeat(4,1fr)!important} .tabs button{font-size:.72rem!important;letter-spacing:.04em!important;padding:10px 2px!important} }
+
+/* ---------- Armee: Fraktionsköpfe mit Speedlines, Panels mit Tusche ---------- */
+.army{border:3px solid var(--ink-k)!important;box-shadow:6px 6px 0 var(--ink-k)!important;border-radius:2px}
+.army-head{position:relative;overflow:hidden;padding:12px 12px!important;border-bottom:3px solid var(--ink-k)!important;
+  background:repeating-conic-gradient(from 0deg at 34px 50%,rgba(255,240,200,.13) 0 3deg,transparent 3deg 9deg),
+             linear-gradient(100deg,var(--fc1) 30%,var(--fc2))!important}
+.army-head::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 40%,rgba(0,0,0,.35))}
+.army-head>*{position:relative;z-index:1}
+.army-head h3{font-size:1.45rem!important;letter-spacing:.14em!important;color:#fff4d4;-webkit-text-stroke:.8px var(--ink-k);paint-order:stroke fill;text-shadow:2px 2px 0 var(--ink-k)}
+.army.de{--fc1:#6e7c8c;--fc2:#252b33} .army.al{--fc1:#77833e;--fc2:#272c14}
+html[data-theme="dark"] .army.de{--fc1:#5d6b7a;--fc2:#1b2026} html[data-theme="dark"] .army.al{--fc1:#66713a;--fc2:#1d210f}
+.emblem{border:3px solid var(--ink-k)!important;box-shadow:2px 2px 0 var(--ink-k);width:46px!important;height:46px!important}
+.slot-no{font-size:1.15rem!important;border:2px solid currentColor!important;transform:rotate(-3deg);background:transparent!important}
+.slot{border-bottom:2px dashed rgba(120,110,70,.45)!important}
+.slot-name{font-size:1.08rem!important;letter-spacing:.07em!important}
+html[data-theme="dark"] .slot-name{color:#efe3b4!important;text-shadow:1px 1px 0 var(--ink-k)}
+.slot-art svg.fig{filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45))}
+
+/* ---------- Karte: Kartentisch mit Metallrahmen, plastische Felder ---------- */
+#map{padding:10px!important;gap:4px!important;border:3px solid var(--ink-k)!important;border-radius:4px!important;
+  background:
+    radial-gradient(circle at 9px 9px,#d8cf9e 0 2.5px,#3c3a25 3px 4px,transparent 4.5px),
+    radial-gradient(circle at calc(100% - 9px) 9px,#d8cf9e 0 2.5px,#3c3a25 3px 4px,transparent 4.5px),
+    radial-gradient(circle at 9px calc(100% - 9px),#d8cf9e 0 2.5px,#3c3a25 3px 4px,transparent 4.5px),
+    radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#d8cf9e 0 2.5px,#3c3a25 3px 4px,transparent 4.5px),
+    linear-gradient(135deg,#5a5638,#2a2918 50%,#4a4730)!important;
+  box-shadow:0 0 0 2px #8f8556,6px 7px 0 2px var(--ink-k),0 18px 40px rgba(0,0,0,.6)!important}
+.cell{border:2px solid var(--ink-k)!important;border-radius:3px!important;
+  box-shadow:inset 0 2px 0 rgba(255,250,220,.28),inset 0 -4px 0 rgba(0,0,0,.32),inset 0 0 22px rgba(0,0,0,.35)!important}
+.cell::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,240,200,.22),transparent 60%)}
+.cell .ic{filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45))!important;position:relative;z-index:1}
+.cell .nm{position:relative;z-index:1;color:#fbf3d6;-webkit-text-stroke:.6px var(--ink-k);paint-order:stroke fill;text-shadow:1px 1px 0 var(--ink-k)}
+.cell .id{border:2px solid var(--ink-k)!important;box-shadow:1px 1px 0 var(--ink-k)}
+html[data-theme="dark"] .cell{filter:brightness(.92) saturate(1.05)!important}
+
+/* ---------- Spielkarte: Strahlenkranz hinter der Einheit ---------- */
+.gcard{border:3px solid var(--ink-k)!important;border-radius:6px!important;box-shadow:0 0 0 3px #c9b878,0 0 0 6px var(--ink-k),9px 11px 0 4px rgba(0,0,0,.6)!important}
+.gc-top{border-bottom:3px solid var(--ink-k)!important;
+  background:repeating-conic-gradient(from 0deg at 26px 50%,rgba(255,240,200,.14) 0 3deg,transparent 3deg 9deg),linear-gradient(100deg,var(--fc1),var(--fc2))!important;
+  text-shadow:2px 2px 0 var(--ink-k)}
+.gcard.de{--fc1:#6e7c8c;--fc2:#252b33} .gcard.al{--fc1:#77833e;--fc2:#272c14}
+.gc-art{overflow:hidden!important}
+.gc-art::before{content:"";position:absolute;inset:-60% -20% -10%;z-index:-1;pointer-events:none;
+  background:repeating-conic-gradient(from 0deg at 50% 78%,var(--burst,rgba(155,45,32,.22)) 0 5deg,transparent 5deg 12deg);
+  -webkit-mask:radial-gradient(circle at 50% 78%,#000 10%,transparent 62%);mask:radial-gradient(circle at 50% 78%,#000 10%,transparent 62%);
+  animation:burstSpin 40s linear infinite}
+.gcard.de .gc-art{--burst:rgba(70,100,140,.28)} .gcard.al .gc-art{--burst:rgba(110,130,40,.3)}
+@keyframes burstSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.gc-art::before{animation:none}}
+.gc-art svg.fig{filter:drop-shadow(3px 4px 0 rgba(0,0,0,.4))}
+.gc-name{font-size:1.75rem!important;letter-spacing:.08em!important;-webkit-text-stroke:.8px var(--ink-k);paint-order:stroke fill;text-shadow:2px 2px 0 rgba(0,0,0,.35)}
+.gc-abil{border:3px solid var(--ink-k)!important;box-shadow:4px 4px 0 var(--ink-k)!important;transform:rotate(-1deg)!important}
+.gc-abil .ga-h{background:repeating-linear-gradient(-45deg,rgba(255,255,255,.07) 0 5px,transparent 5px 10px),var(--stamp)!important;border-bottom:2px solid var(--ink-k)}
+.gp-next{border:3px solid var(--ink-k)!important;box-shadow:0 0 0 3px #c9b878,0 0 0 6px var(--ink-k),5px 7px 0 5px rgba(0,0,0,.6)!important}
+
+/* ---------- Popups schlagen wie ein Comic-Panel auf ---------- */
+.pop-card,.net-pop,.mu-pop,#dice-pop{border:3px solid var(--ink-k)!important;box-shadow:7px 8px 0 var(--ink-k),0 20px 50px rgba(0,0,0,.6)!important;border-radius:4px!important}
+.pop-card{animation:panelSlam .26s cubic-bezier(.25,1.5,.5,1)!important}
+.net-pop:not([hidden]){animation:panelSlam .22s cubic-bezier(.25,1.5,.5,1)}
+@keyframes panelSlam{0%{transform:scale(.6) rotate(-4deg);opacity:0}70%{transform:scale(1.03) rotate(.6deg);opacity:1}100%{transform:none}}
+.pop-card h3{font-size:1.6rem!important;-webkit-text-stroke:.6px var(--ink-k);paint-order:stroke fill}
+#dice-pop.dp-de{box-shadow:0 0 0 3px #8fb0d0,7px 8px 0 3px var(--ink-k),0 0 22px rgba(110,150,200,.5)!important}
+#dice-pop.dp-al{box-shadow:0 0 0 3px #b9c766,7px 8px 0 3px var(--ink-k),0 0 22px rgba(170,190,80,.5)!important}
+
+/* ---------- Regelwerk & Einstellungen: Panels ---------- */
+.rcard,details,.sgroup{border:3px solid var(--ink-k)!important;box-shadow:5px 5px 0 var(--ink-k)!important;border-radius:3px!important}
+.rcard h2{-webkit-text-stroke:.5px var(--ink-k);paint-order:stroke fill;letter-spacing:.08em}
+
+/* Korrekturen */
+html[data-theme] .tabs button.sec.on,html[data-theme] .seg button.sec.on{transform:translateY(-4px) rotate(-1deg);
+  background:repeating-linear-gradient(-45deg,rgba(255,255,255,.06) 0 5px,transparent 5px 10px),linear-gradient(#a3442b,#5b1f12)!important;
+  color:#fff1d6!important;text-shadow:1px 1px 0 var(--ink-k);box-shadow:4px 6px 0 var(--ink-k)!important}
+html[data-theme] .seg button.sec.on{transform:none}
+.armies{padding-right:6px;padding-bottom:6px}
+.armies{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+@media (max-width:640px){ .armies{grid-template-columns:minmax(0,1fr)!important} .slot-name{font-size:1rem!important;letter-spacing:.05em!important} }
+/* Startkanten-Bänder brauchen ihren Innenabstand, sonst ragen sie auf die Felder */
+#map.has-edges{padding:24px!important}
+@media (max-width:640px){ #map.has-edges{padding:21px!important} }
