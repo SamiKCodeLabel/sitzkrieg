@@ -887,6 +887,8 @@ html[data-theme="dark"] .re-ort{color:#a9a486}
 
   /* Popup */
   .gabil{cursor:pointer}
+  .gab-crest{display:inline-block;width:15px;vertical-align:-4px;margin-right:4px} .gab-crest svg{display:block;width:100%;height:auto}
+  .pop-crest{width:64px;margin:6px auto 0;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))} .pop-crest svg{display:block;width:100%;height:auto}
   .gabil:hover,.gabil:focus-visible{background:var(--stamp);color:#f6efd8;outline:none}
   .modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,12,6,.6);backdrop-filter:blur(2px)}
   .modal[hidden]{display:none}
@@ -2166,7 +2168,7 @@ function renderArmy(side){
         <span><span class="slot-name">${u.name}</span><br><span class="slot-tag">Fahrzeug</span> <span class="info-tag">ⓘ Werte</span></span></li>`
       :`<li class="slot inf" data-squad="${i}" data-side="${side}" role="button" tabindex="0" title="Waffenwerte anzeigen" style="animation-delay:${i*45}ms">
         <span class="slot-no">${i+1}</span><span class="slot-art duo">${u.units.length?u.units.map(x=>A[x.key]).join(''):RIF+RIF}</span>
-        <span><span class="slot-name">${u.units.length?u.units.map(x=>x.abil?`${x.name} <span class="gabil" role="button" tabindex="0" data-abil="${x.abil.name}" title="Erklärung anzeigen">★ ${x.abil.name}</span>`:x.name).join('<br>'):'Gewehrschützen'}</span><br><span class="slot-tag">${rifOf(u)?'Trupp':'Spezialeinheit'}</span> <span class="info-tag">ⓘ Waffen</span>
+        <span><span class="slot-name">${u.units.length?u.units.map(x=>x.abil?`${x.name} <span class="gabil" role="button" tabindex="0" data-abil="${x.abil.name}" title="Erklärung anzeigen"><span class="gab-crest">${crestSVG(x.abil.name)}</span>${x.abil.name}</span>`:x.name).join('<br>'):'Gewehrschützen'}</span><br><span class="slot-tag">${rifOf(u)?'Trupp':'Spezialeinheit'}</span> <span class="info-tag">ⓘ Waffen</span>
         ${rifOf(u)?`<span class="squad"><b>${u.units.length?'+ ':''}${rifOf(u)} Gewehrschützen</b><span class="men">${('<span class="mini">'+RIF+'</span>').repeat(rifOf(u))}</span></span>`:''}</span></li>`).join('')}</ol>`;
 }
 // Faire Armeen: beide Seiten bekommen dieselben Fahrzeuge
@@ -2223,7 +2225,7 @@ syncGenButtons();
 function openAbil(name){
   const a=GEN_ABIL.find(x=>x.name===name); if(!a) return;
   $('pop-k').textContent='Generals-Fähigkeit'; $('pop-t').textContent='★ '+a.name; $('pop-d').textContent=a.text; $('pop-d').hidden=false;
-  $('pop-body').innerHTML=''; $('pop').classList.remove('wide','nohead'); $('pop').hidden=false; $('pop-x').focus();
+  $('pop-body').innerHTML=`<div class="pop-crest">${crestSVG(a.name)}</div>`; $('pop').classList.remove('wide','nohead'); $('pop').hidden=false; $('pop-x').focus();
 }
 function closePop(){ $('pop').hidden=true; popBack=null; }
 document.addEventListener('click',e=>{ const b=e.target.closest('.gabil'); if(b){ openAbil(b.dataset.abil); } });
@@ -2304,7 +2306,7 @@ function openSquad(side,idx){
     const names = u.abil && u.abil.name==='Veteran' ? ['Nahkampfwaffe','Maschinengewehr'] : (WEAPONS_OF[u.key]||[]);
     const sec=EXTRA_SECTION[u.key] && document.querySelector('#'+EXTRA_SECTION[u.key]+' p');
     html+=`<section class="pu-unit"><div class="pu-head"><span class="pu-fig army ${side}">${A[u.key]}</span>
-      <h4>${u.name}${u.abil?` <span class="gabil" role="button" tabindex="0" data-abil="${u.abil.name}">★ ${u.abil.name}</span>`:''}</h4></div>
+      <h4>${u.name}${u.abil?` <span class="gabil" role="button" tabindex="0" data-abil="${u.abil.name}"><span class="gab-crest">${crestSVG(u.abil.name)}</span>${u.abil.name}</span>`:''}</h4></div>
       ${weaponTable(names)}${sec?`<p class="pu-note">${sec.textContent}</p>`:''}
       ${u.abil?`<p class="pu-note"><b>${u.abil.name}:</b> ${u.abil.text}</p>`:''}</section>`;
   }
