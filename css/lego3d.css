@@ -82,3 +82,6 @@ html.lego3d :is(.slot-art,.mini,.pu-fig) svg.fig{visibility:hidden}
 /* Bildfeld der Spielkarte ist kein Armee-Kasten: kein Rahmen, kein harter Schatten (schwarzer Balken unter dem Modell) */
 .gc-art.army{border:0!important;box-shadow:none!important;border-radius:0!important}
 .re-art.army,.pu-fig.army{border:0!important;box-shadow:none!important}
+/* „Im Regelwerk öffnen“ wird nicht mehr gebraucht */
+#pen-rules{display:none!important}
+.pen-nav:not(:has(#pen-back)){display:none!important}
