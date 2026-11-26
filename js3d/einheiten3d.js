@@ -59,7 +59,7 @@ function mount(art, c) {
   const box = new THREE.Box3().setFromObject(root), sz = box.getSize(new THREE.Vector3());
   const x0 = box.min.x - .3, x1 = box.max.x + 1.4, zc = (box.min.z + box.max.z) / 2;
   const pw = Math.ceil((x1 - x0) / .2) * .2, pd = Math.ceil((Math.max(sz.z, 1.0) + .5) / .2) * .2;
-  brick(stage, pw, .08, pd, c.side === 'de' ? 0x7f8c4a : 0x6f8a46, (x0 + x1) / 2, -.04, zc);
+  brick(stage, pw, .08, pd, c.side === 'de' ? 0x9a9d9b : 0x6f8a46, (x0 + x1) / 2, -.04, zc);
   const hit = new THREE.Vector3(box.max.x + .85, .05, zc + .15);   // Einschlagstelle rechts auf der Platte
   art.classList.add('has3d');
   const w = Math.max(120, art.clientWidth), h = Math.max(80, art.clientHeight);   // Layoutgröße: unabhängig von der Umdreh-Animation
