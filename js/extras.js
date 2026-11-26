@@ -111,8 +111,6 @@ if(window.renderSpiel) renderSpiel();
       const fe=(RULES.felderweiterungen||[]).find(e=>e.name===ex.name);
       h+=`<h4 class="fi-h">${ex.icon} Felderweiterung: ${ex.name}</h4><p>${fe?fe.effekt:''}${fe&&fe.link?` <span class="rlink" data-r="${fe.link}" role="button" tabindex="0">Regeln</span>`:''}</p>`;
     }
-    if(!obj&&!ex&&(RULES.missionsziele.felder||[]).includes(x.p.key)) h+=`<p class="fi-note">Auf diesem Feld können flexible Missionsziele und Felderweiterungen erscheinen – diesmal ist hier keins.</p>`;
-    if(!f.regel&&!obj&&!ex) h+=`<p class="fi-note">Für dieses Gelände stehen im Regelwerk keine Sonderregeln.</p>`;
     $('pop-k').textContent='Kartenfeld'; $('pop-t').textContent=x.p.name; $('pop-d').hidden=true;
     $('pop-body').innerHTML=h; if(window.linkRules) linkRules($('pop-body'));
     $('pop').classList.remove('wide','nohead'); $('pop').hidden=false; $('pop-x').focus();

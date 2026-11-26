@@ -205,3 +205,21 @@ button.sec:not(:disabled):active,button.big:not(:disabled):not(.gp-next):active,
 .fi-head{display:flex;align-items:center;gap:12px;margin:2px 0 8px} .fi-head img{width:56px;height:56px}
 .fi-h{margin:12px 0 4px;font-family:var(--head);text-transform:uppercase;letter-spacing:.05em;color:var(--stamp)}
 .fi-note{font-size:.88rem;opacity:.85} .fi-rule{font-weight:600}
+
+/* ===== Armee-Liste: Größen ausbalanciert – Fahrzeuge nie kleiner als Soldaten, größere Schrift, einheitlich ===== */
+.slot.inf .slot-art{height:112px}
+.slot.veh{grid-template-columns:30px 220px 1fr}
+.slot.veh .slot-art{height:112px}
+.slot.veh .slot-art svg.fig{width:100%;height:auto;max-height:100%}
+.slot-name,.slot.inf .slot-name{font-size:1.22rem;line-height:1.15}
+.slot-name .gabil,.gabil{font-size:.92rem;padding:2px 8px}
+.slot-tag,.info-tag{font-size:.86rem;padding:1px 7px;margin-top:5px}
+@media (max-width:640px){
+  .slot,.slot.inf{grid-template-columns:22px 108px 1fr;gap:8px}
+  .slot.inf .slot-art{height:100px}
+  .slot.veh{grid-template-columns:22px 150px 1fr}
+  .slot.veh .slot-art{height:90px}
+  .slot-name,.slot.inf .slot-name{font-size:1.06rem}
+  .slot-name .gabil,.gabil{font-size:.84rem;padding:2px 7px}
+  .slot-tag,.info-tag{font-size:.8rem}
+}
