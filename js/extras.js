@@ -99,8 +99,9 @@ if(window.renderSpiel) renderSpiel();
     const ex=ms&&ms.exts?ms.exts.find(e=>e.p===x):null;
     const f=(RULES.felder||{})[x.p.key]||{};
     $('pop-k').textContent='Kartenfeld'; $('pop-t').textContent=x.p.name; $('pop-d').hidden=true; $('pop').classList.remove('wide','nohead','plain'); $('pop').classList.add('feld');
-    if(!f.regel&&!obj&&!ex){ $('pop-body').innerHTML=''; $('pop').classList.add('plain'); $('pop').hidden=false; $('pop-x').focus(); return; }   // nichts Besonderes: nur der Name
-    let h='';
+    const icon=EMOJI_IMG[x.p.icon.replace('️','')], img=icon?`<div class="fi-head"><img src="${icon}" alt=""></div>`:'';
+    if(!f.regel&&!obj&&!ex){ $('pop-body').innerHTML=img; $('pop').classList.add('plain'); $('pop').hidden=false; $('pop-x').focus(); return; }   // nichts Besonderes: nur der Name
+    let h=img;
     if(f.regel) h+=`<p class="fi-rule">${f.regel}</p>`;
     if(obj){
       const row=(RULES.missionsziele.tabelle||[]).find(r=>r.name===obj.name);
