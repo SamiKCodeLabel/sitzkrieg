@@ -487,9 +487,9 @@
   .slot .slot-art svg.fig g{stroke-width:1.15}
   .slot-art svg.fig{max-height:100%}
   .slot{grid-template-columns:30px 136px 1fr}
-  .slot.inf .slot-art{height:116px}
-  .slot.veh .slot-art{height:76px}
-  @media (max-width:640px){ .slot{grid-template-columns:26px 110px 1fr} .slot.inf .slot-art{height:100px} .slot.veh .slot-art{height:64px} }
+  .slot.inf .slot-art{height:144px}
+  .slot.veh .slot-art{height:84px}
+  @media (max-width:640px){ .slot{grid-template-columns:24px 124px 1fr} .slot.inf .slot-art{height:128px} .slot.veh .slot-art{height:70px} }
   .mini svg.fig{width:14px;height:20px}
   html[data-theme="dark"] svg.fig .sh{fill:rgba(0,0,0,.45)}
   html[data-theme="dark"] svg.fig g{stroke:#0d0e09}
