@@ -151,6 +151,18 @@ function attach(play) {
   if (view && view.art === art) { if (play) act(view); return; }
   const v = mount(art, c); if (v && (play || !still)) act(v);
 }
+// Rundenende: Missionsziel-Felder als 3D-Modell, Flakgeschütz in 3D
+function roundEnd() {
+  const ic = document.querySelector('#tab-spiel .gcard.rend .re-ic'); if (!ic || ic.dataset.d3) return; ic.dataset.d3 = '1';
+  const name = (ic.parentElement.querySelector('.gc-name')?.textContent || '').replace('⚑', '').trim();
+  const emo = ic.querySelector('.re-emo'), flak = ic.querySelector('.re-art.flak');
+  const p = typeof PIECES !== 'undefined' ? PIECES.find(x => x.name === name) : null;
+  const put = (el, key) => getPhoto(key, 'de', 260).then(u => { if (el.isConnected) el.innerHTML = `<img class="fig f3d veh" src="${u}" alt="" draggable="false">`; });
+  if (emo && p) put(emo, 'feld:' + p.key);
+  if (flak) put(flak, 'flak');
+}
+new MutationObserver(roundEnd).observe(document.getElementById('tab-spiel'), { childList: true });
+
 // Bild antippen: Aktion der 3D-Szene erneut abspielen
 document.addEventListener('click', e => { const a = e.target.closest('#tab-spiel .gcard .gc-art'); if (a && view && view.art === a) act(view); });
 const tab = document.getElementById('tab-spiel');

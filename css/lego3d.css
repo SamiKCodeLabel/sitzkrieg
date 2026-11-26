@@ -40,3 +40,9 @@ html.lego3d-wait .slot-art,html.lego3d-wait .gc-art{background:radial-gradient(e
 .gcard.fx-shake:has(.gc-art.has3d){animation:flipIn .28s cubic-bezier(.2,.7,.3,1) both}
 .gcard.fx-shake.no-flip:has(.gc-art.has3d){animation:none}
 @media (prefers-reduced-motion:reduce){ .gcard.fx-shake{display:block!important} }
+
+/* Rundenende: 3D-Bilder (Feld-Modelle, Fahrzeuge) in fester Höhe */
+.re-ic{height:150px!important;align-items:center!important}
+.re-ic :is(.re-emo,.re-art){display:flex;height:100%;align-items:center;justify-content:center}
+.re-ic img.fig{height:100%!important;width:auto!important;max-width:min(300px,100%)!important;object-fit:contain}
+@media (orientation:landscape) and (max-height:560px){ .re-ic{height:70px!important} }

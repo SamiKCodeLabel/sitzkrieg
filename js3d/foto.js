@@ -2,6 +2,7 @@
 import { THREE, buildUnit } from './modelle.js';
 import { GFREADY } from './glbfig.js';
 import { cachedURL, saveFig } from './bildspeicher.js';
+import { fieldModel } from './gelaende.js';
 import { RoomEnvironment } from '../vendor/RoomEnvironment.js';
 const ENVS = new WeakMap();
 export function envFor(r) { if (!ENVS.has(r)) { const pm = new THREE.PMREMGenerator(r); ENVS.set(r, pm.fromScene(new RoomEnvironment(), .04).texture); } return ENVS.get(r); }
@@ -50,11 +51,11 @@ export async function photo(key, side, h = 300) {
 }
 async function render(key, side, h) {
   await GFREADY;
-  const g = buildUnit(key, side), type = g.userData.type, a = ASPECT[type];
-  if (type === 'inf') g.rotation.y = .55; else g.rotation.y = type === 'air' ? -.35 : -.25;
+  const field = key.startsWith('feld:'), g = field ? fieldModel(key.slice(5)) : buildUnit(key, side), type = g.userData.type, a = ASPECT[type];
+  if (type === 'inf') g.rotation.y = .55; else g.rotation.y = field ? -.3 : type === 'air' ? -.35 : -.25;
   const r = renderer(); const scene = new THREE.Scene(); lights(scene, r); scene.add(g);
   const cam = new THREE.PerspectiveCamera(26, a);
-  frame(cam, g, a, type === 'inf' ? 1.1 : 1.0, type === 'inf' ? new THREE.Vector3(.15, .3, 1.3) : new THREE.Vector3(.25, .5, 1.25));
+  frame(cam, g, a, type === 'inf' ? 1.1 : 1.0, type === 'inf' ? new THREE.Vector3(.15, .3, 1.3) : field ? new THREE.Vector3(.2, .75, 1.1) : new THREE.Vector3(.25, .5, 1.25));
   const w = Math.round(h * a);
   r.setPixelRatio(2); r.setSize(w, h, false); r.setClearColor(0, 0); r.render(scene, cam);
   return await new Promise(res => r.domElement.toBlob(res, 'image/png'));
