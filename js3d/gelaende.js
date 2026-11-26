@@ -128,7 +128,8 @@ const LG = 0xa0a5a9, DGY = 0x5b6066, WHT2 = 0xf2f2ee, TANW = 0xd9c08a, TANW2 = 0
 let ZF = 0;
 function box(g, w, h, d, c, x, y, z, rx = 0, ry = 0, rz = 0) { if (h < .05 && y < .15) y += .0015 + (ZF++ % 9) * .0011;   // flache Fliesen leicht versetzt, damit nichts auf gleicher Höhe flackert
   return brick(g, w, h, d, c, x, y, z, { studs: false, rot: [rx, ry, rz] }); }
-function cyl(g, r, h, c, x, y, z, rx = 0, rz = 0, seg = 18) { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), plastic(c)); m.position.set(x, y, z); m.rotation.set(rx, 0, rz); g.add(m); return m; }
+function cyl(g, r, h, c, x, y, z, rx = 0, rz = 0, seg = 18) { if (!rx && !rz && h < .05 && y < .15) y += .0015 + (ZF++ % 9) * .0011;   // flache Rundteile leicht versetzt (kein Flackern)
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), plastic(c)); m.position.set(x, y, z); m.rotation.set(rx, 0, rz); g.add(m); return m; }
 // Feldgeschütz als Ladung (schwarz)
 function cargoGun(g, x, y, z, ry = 0, s = 1) { const k = G(); k.position.set(x, y, z); k.rotation.y = ry; k.scale.setScalar(s); g.add(k); for (const sz of [-1, 1]) cyl(k, .09, .03, 0x1b1b1b, 0, .09, sz * .12, HALF); box(k, .32, .05, .05, 0x1b1b1b, -.12, .05, 0, 0, 0, .3); cyl(k, .03, .4, 0x1b1b1b, .12, .16, 0, 0, HALF - .25); box(k, .06, .14, .2, 0x1b1b1b, .02, .14, 0); }
 // ---- Hafen: Frachter, Kai mit Kettenzaun, roter Portalkran mit Container ----
@@ -476,7 +477,7 @@ function beach3(g, w, d) {
     if (x < grassEnd(z) + .05 || x > coast(z) + (R() - .5) * .06) continue;
     const t = (x - grassEnd(z)) / Math.max(.1, coast(z) - grassEnd(z)), h = t < .2 || t > .8 ? .04 : (R() < .55 ? .08 : .04);
     const c = (x > .05 && x < .25 && z > .05 && z < .3) ? 0xb8a477 : (R() < .15 ? 0xefe2bc : 0xe2d1a0);
-    brick(g, cell + .002, h, cell + .002, c, x, h / 2, z, { studs: R() < .8 });
+    brick(g, cell - .004, h, cell - .004, c, x, h / 2, z, { studs: R() < .8 });
   }
   slope(g, .12, .06, .2, 0xe2d1a0, -.1, .06, .12, 0); slope(g, .12, .06, .18, 0xe2d1a0, .35, .1, -.45, Math.PI);
   // Pflanzen auf der Wiese

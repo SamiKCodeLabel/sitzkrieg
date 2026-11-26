@@ -37,7 +37,7 @@ function tag(text, bg, fg = '#fff') {
 // ---------- Szene ----------
 let S3 = null;
 function setup(box) {
-  const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });   // Bild bleibt stehen, auch wenn nur bei Bewegung gezeichnet wird
+  const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true, logarithmicDepthBuffer: true });   // Bild bleibt stehen, auch wenn nur bei Bewegung gezeichnet wird
   r.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.NeutralToneMapping; r.toneMappingExposure = .95;
   r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
   box.appendChild(r.domElement);
