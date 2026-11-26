@@ -1,49 +1,46 @@
 // ===================== Spiel-Tab: Befehlsdeck (Normal) =====================
 (function(){
-// Deck je Armee: Gewehrschützen und Spezial laut DECKS, dazu je 1× jedes Fahrzeug, das die Armee wirklich hat
-// Aktivierungen pro Armee und Runde (siehe Regelwerk: Rundenaktivierungen)
-const DECKS={'3x6':{rif:4,spec:3},'3x8':{rif:6,spec:4}};
-const S={round:1,deck:[],cur:null,newRound:false,sig:'',end:null,played:[]};   // played: diese Runde schon aufgedeckte Fahrzeuge   // end: Seite des Rundenende-Bildschirms (null = normale Karten)
+// Deck: JEDE Einheit der Armee kommt pro Runde genau 1 mal dran (jeder Gewehrschützen-Trupp, jede Spezialeinheit, jedes Fahrzeug)
+const S={round:1,deck:[],cur:null,newRound:false,sig:'',end:null,played:[]};   // played: IDs der Einheiten, die diese Runde schon dran waren   // end: Seite des Rundenende-Bildschirms (null = normale Karten)
 const sigNow=()=>$('size').value;   // Deck startet nur neu bei neuer Größe ohne eigenes Deck oder beim Gedrückthalten von „Neue Karte“
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-// Abwechselnd Deutsche und Alliierte: jede Seite wird für sich gemischt, dann im Reißverschluss zusammengelegt.
-// Wer anfängt, wird je Runde ausgelost. Hat eine Seite mehr Karten, kommen deren letzte Karten am Ende hintereinander.
-function buildDeck(){
-  const per={};
-  for(const side of ['de','al']){
-    const d=[];
-    const D=DECKS[$('size').value]||DECKS['3x6'];
-    for(let i=0;i<D.rif;i++) d.push({side,kind:'rif'});
-    for(let i=0;i<D.spec;i++) d.push({side,kind:'spec'});
-    for(const v of (armies[side]||[]).filter(x=>x.veh)) d.push({side,kind:'veh',key:v.key});
-    per[side]=shuffle(d);
+// Alle Karten einer Seite aus der Armee (feste ID je Einheit, damit Neu-Würfeln mitten in der Runde sauber abgeglichen werden kann)
+function armyCards(side){
+  const out=[], cnt={}, sl=armies[side]||[];
+  const nRif=sl.filter(x=>!x.veh&&x.rif).length; let r=0;
+  for(const x of sl){
+    let c;
+    if(x.veh) c={side,kind:'veh',key:x.key};
+    else if(x.rif){ r++; c={side,kind:'rif',n:r,of:nRif}; }
+    else if(x.units&&x.units.length) c={side,kind:'spec',unit:x.units[0]};
+    else continue;
+    const base=c.kind==='veh'?'v:'+c.key:c.kind==='rif'?'r':'s:'+c.unit.key; cnt[base]=(cnt[base]||0)+1;
+    c.id=side+':'+base+'#'+cnt[base]; out.push(c);
   }
-  const order=Math.random()<.5?['de','al']:['al','de'], out=[];
-  while(per.de.length||per.al.length) for(const s of order) if(per[s].length) out.push(per[s].shift());
   return out;
 }
+// Abwechselnd Deutsche und Alliierte: jede Seite wird für sich gemischt, dann im Reißverschluss zusammengelegt.
+function zip(per,first){ const out=[]; let nx=first; while(per.de.length||per.al.length){ if(per[nx].length) out.push(per[nx].shift()); nx=nx==='de'?'al':'de'; } return out; }
+function buildDeck(){ return zip({de:shuffle(armyCards('de')),al:shuffle(armyCards('al'))}, Math.random()<.5?'de':'al'); }
 function reset(){ S.round=1; S.deck=buildDeck(); S.cur=null; S.newRound=false; S.end=null; S.played=[]; S.sig=sigNow(); takeCard(); }   // erste Karte liegt gleich offen: wer drückt, gibt ab
-// Jedes Fahrzeug jeder Armee kommt in jeder Runde genau 1 mal dran: fehlende Fahrzeugkarten werden in den Rest des Decks gemischt,
-// Karten von Fahrzeugen, die es nicht mehr gibt, fliegen raus.
-function syncVeh(){
-  const have=new Set(), played=new Set(S.played||[]);
-  S.deck=S.deck.filter(c=>{ if(c.kind!=='veh') return true; const ok=(armies[c.side]||[]).some(v=>v.veh&&v.key===c.key); if(ok) have.add(c.side+':'+c.key); return ok; });
-  for(const side of ['de','al']) for(const v of (armies[side]||[]).filter(x=>x.veh)){
-    const id=side+':'+v.key; if(have.has(id)||played.has(id)) continue;
-    S.deck.splice(Math.floor(Math.random()*(S.deck.length+1)),0,{side,kind:'veh',key:v.key});
-  }
-  // Wieder streng abwechselnd sortieren (Reihenfolge innerhalb jeder Seite bleibt), Start mit der Seite, die nicht gerade offen liegt
-  const per={de:S.deck.filter(c=>c.side==='de'),al:S.deck.filter(c=>c.side==='al')};
-  let nx=S.cur?(S.cur.side==='de'?'al':'de'):(S.deck[0]?S.deck[0].side:'de'); const out=[];
-  while(per.de.length||per.al.length){ if(per[nx].length) out.push(per[nx].shift()); nx=nx==='de'?'al':'de'; }
-  S.deck=out;
+// Armee hat sich geändert: Deck abgleichen – wer diese Runde schon dran war, kommt nicht nochmal; fehlende Einheiten werden eingemischt,
+// Einheiten, die es nicht mehr gibt, fliegen raus.
+function syncDeck(){
+  const played=new Set(S.played||[]); if(S.cur&&S.cur.id) played.add(S.cur.id);
+  const want=[...armyCards('de'),...armyCards('al')].filter(c=>!played.has(c.id));
+  const wantById=new Map(want.map(c=>[c.id,c]));
+  const kept=S.deck.filter(c=>c.id&&wantById.has(c.id)).map(c=>wantById.get(c.id));
+  const keptIds=new Set(kept.map(c=>c.id));
+  for(const c of want) if(!keptIds.has(c.id)) kept.splice(Math.floor(Math.random()*(kept.length+1)),0,c);
+  const per={de:kept.filter(c=>c.side==='de'),al:kept.filter(c=>c.side==='al')};
+  S.deck=zip(per, S.cur?(S.cur.side==='de'?'al':'de'):(kept[0]?kept[0].side:'de'));
 }
 const objList=()=>{ const ms=typeof missionSetup==='function'?missionSetup():null; return ms&&ms.objInfo?ms.objInfo:[]; };
 window.spielReset=()=>{ reset(); render(); };
 // Armeen neu gewürfelt: Deck und Runde bleiben. Fahrzeugkarten von Fahrzeugen, die es nicht mehr gibt, fliegen raus;
 // neue Fahrzeuge kommen ab der nächsten Runde ins Deck.
 window.spielArmies=()=>{ if(S.sig!==sigNow()) return render();
-  if(S.end===null) syncVeh(); render(); };
+  if(S.end===null) syncDeck(); render(); };
 function draw(){
   if($('sp-next')&&$('sp-next').disabled) return;
   if(S.sig!==sigNow()) reset();
@@ -58,8 +55,9 @@ function draw(){
   takeCard(); render(); if(window.netChanged) netChanged();
 }
 function takeCard(){
-  const c=S.deck.shift(); if(!c){ S.cur=null; return; } if(c.kind==='veh') S.played.push(c.side+':'+c.key);
-  if(c.kind==='spec'){   // Spezial: zufällig eine der einzelnen Spezialeinheiten dieser Armee
+  const c=S.deck.shift(); if(!c){ S.cur=null; return; }
+  if(c.id) S.played.push(c.id);
+  if(c.kind==='spec'&&!c.unit){   // alter Spielstand ohne feste Einheit: zufällig eine Spezialeinheit
     const sp=(armies[c.side]||[]).filter(x=>!x.veh&&x.units&&x.units.length&&!(x.rif));
     const sl=sp[Math.floor(Math.random()*sp.length)]; c.unit=sl?sl.units[0]:null;
   }
@@ -135,7 +133,7 @@ function cardHTML(c){
   const A=ART_FACTION[c.side]||ART, RIF=RIFLEMAN_FACTION[c.side]||RIFLEMAN, F=FACTIONS[c.side];
   let art='', name='', sub='', body='', notes='', artCls='';
   if(c.kind==='rif'){
-    art=RIF.repeat(RIFLEMEN); artCls='five'; name='Gewehrschützen';
+    art=RIF.repeat(RIFLEMEN); artCls='five'; name='Gewehrschützen'; if(c.n) sub=`Trupp ${c.n} von ${c.of}`;
     body=weaponTable(['Gewehr']);
   } else if(c.kind==='spec'){
     const u=c.unit;
@@ -162,6 +160,13 @@ function cardHTML(c){
     <div class="gc-body">${body}</div>${notes?`<div class="gc-notes">${notes}</div>`:''}</div>`;
 }
 let lastCardKey=null;
+const FX_WORD={rif:'VORWÄRTS!',sniper:'PENG!',shotgun:'BAMM!',mg:'RATATATA!',flame:'WUUUSCH!',grenade:'WUMMS!',mortar:'FUMP!',mine:'KLICK.',
+  mech:'KLONG!',medic:'SANI!',pzf:'ZISCH-BUMM!',schwer:'KAWUMM!',leicht:'BUMM!',krad:'BRRRMM!',trans:'TÖFF-TÖFF!',art:'KA-BOOM!',flieger:'WIIIUUU!'};
+const FX_GEN={Besetzen:'HALTEN!',Kartograf:'HIER LANG!',Feldherr:'ANGRIFF!',Taktiker:'PLAN B!',Improvisieren:'GEHT SCHON!',Flankieren:'UMGEHEN!',
+  Veteran:'ALTE SCHULE!',Unsterblich:'NICHT HEUTE!',Blutrausch:'MEHR!',Monster:'ROOAAR!',Blitz:'ZACK!',Schussbefehl:'FEUER FREI!',
+  Erstschlag:'ZU LANGSAM!',Rage:'GRRRR!',Verschanzen:'EINGRABEN!',Anführer:'MIR NACH!',Unbarmherzig:'KEINE GNADE!'};
+const FX_SHAKE=new Set(['mg','schwer','art','grenade','mortar','pzf','shotgun']);
+const FX_SMOKE=new Set(['schwer','leicht','art','mortar','pzf','krad','trans']);
 function render(){
   const el=$('tab-spiel'); if(!el) return;
   if(S.sig!==sigNow()) reset();
@@ -183,6 +188,11 @@ function render(){
     if(c&&art){
       const kind=c.kind==='rif'?'rif':c.kind==='veh'?c.key:(c.unit?c.unit.key:'');
       if(kind) art.classList.add('anim','anim-'+kind);
+      // Comic-Lautwort in gezackter Sprechblase (General: je nach Fähigkeit)
+      const word=kind==='general'&&c.unit&&c.unit.abil?(FX_GEN[c.unit.abil.name]||'ACHTUNG!'):FX_WORD[kind];
+      if(word){ art.insertAdjacentHTML('beforeend',`<span class="fx-word fx-${kind}"><span>${word}</span></span>`); }
+      if(FX_SHAKE.has(kind)) gc.classList.add('fx-shake');
+      if(FX_SMOKE.has(kind)) art.insertAdjacentHTML('beforeend','<span class="fx-smoke"><i></i><i></i><i></i></span>');
       if(kind==='flieger'&&typeof Sounds!=='undefined') try{ setTimeout(()=>Sounds.play('plane'),250); }catch(e){}
     }
   }
