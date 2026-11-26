@@ -165,7 +165,7 @@ function mgun() {
   for (let i = 0; i < 6; i++) P(g, RB(.03, .05, .035, .008), GOLD, .09, -.06 - i * .045, .1 - i * .02);
   g.userData.muzzle = new THREE.Vector3(0, .02, .93); return g;
 }
-function panzerfaust() { const g = G(); P(g, CY(.04, .04, .88, 14), 0x6a6a45, 0, 0, 0, HALF); P(g, SP(.1), 0x4b4b35, 0, 0, .48); P(g, cached('pzc', () => new THREE.ConeGeometry(.1, .16, 16)), 0x4b4b35, 0, 0, .62, HALF); g.userData.muzzle = new THREE.Vector3(0, 0, .72); g.userData.back = new THREE.Vector3(0, 0, -.46); return g; }
+function panzerfaust() { const g = G(); g.userData.grip = new THREE.Vector3(0, -.045, -.05); P(g, CY(.04, .04, .88, 14), 0x6a6a45, 0, 0, 0, HALF); P(g, SP(.1), 0x4b4b35, 0, 0, .48); P(g, cached('pzc', () => new THREE.ConeGeometry(.1, .16, 16)), 0x4b4b35, 0, 0, .62, HALF); g.userData.muzzle = new THREE.Vector3(0, 0, .72); g.userData.back = new THREE.Vector3(0, 0, -.46); return g; }
 function pistol() { const g = G(); g.userData.grip = new THREE.Vector3(0, -.06, 0); P(g, RB(.045, .11, .055, .012), BLK, 0, -.05, 0, -.2); P(g, RB(.045, .055, .18, .012), DGR, 0, .02, .06); g.userData.muzzle = new THREE.Vector3(0, .02, .16); return g; }
 
 // ---------- Minifigur ----------
@@ -280,7 +280,7 @@ function soldier(side, kind = 'rif', opt = {}) {
     case 'mg': hold(mgun(), .04, .8, .24, -.05); u.armL = arm(body, -1, ARM, -1.2, .2); u.armR = arm(body, 1, ARM, -.75); break;
     case 'shotgun': hold(shotgun(), .1, .98, .22, -.06); u.armL = arm(body, -1, ARM, -1.4, .25); u.armR = arm(body, 1, ARM, -1.0); break;
     case 'sniper': hold(rifle(1.15, true), .12, 1.14, .2, 0); u.armL = arm(body, -1, ARM, -1.55, .25); u.armR = arm(body, 1, ARM, -1.25); break;
-    case 'pzf': hold(panzerfaust(), .3, 1.2, .06, -.04); u.armL = arm(body, -1, ARM, -1.5, .3); u.armR = arm(body, 1, ARM, -1.35); break;
+    case 'pzf': hold(panzerfaust(), 0, 0, 0, -.06); u.armR = arm(body, 1, ARM, -1.55); u.armL = arm(body, -1, ARM, -1.75, .25); break;   // Rohr in der rechten Hand, linke Hand stützt vorn
     case 'grenade': {
       const r = rifle(); r.position.set(0, .82, -.3); r.rotation.set(-1.2, 0, .6); body.add(r);
       u.armR = arm(body, 1, ARM, -2.7); u.armL = arm(body, -1, ARM, -1.0, .2);
@@ -321,7 +321,7 @@ function soldier(side, kind = 'rif', opt = {}) {
 }
 const GRIP = new THREE.Vector3(0, -.08, -.08);
 function gripWeapon(g, u, kind) {           // Waffe so verschieben, dass der Griff genau in der rechten C-Hand liegt
-  const w = u.weapon; if (!w || !u.armR || w.parent !== u.body || kind === 'pzf' || kind === 'flame') return;
+  const w = u.weapon; if (!w || !u.armR || w.parent !== u.body || kind === 'flame') return;
   g.updateMatrixWorld(true);
   const clip = u.armR.userData.hand.localToWorld((u.armR.userData.hand.userData.clip || new THREE.Vector3(0, -.1, 0)).clone()); u.body.worldToLocal(clip);
   w.position.copy(clip).sub((w.userData.grip || GRIP).clone().applyEuler(w.rotation));
