@@ -10,14 +10,15 @@ const SHOULDER = new THREE.Vector3(.37, .24, 0);
 
 function torsoHalf(y) { return .245 + (.35 - y) / .8 * .09; }
 function split(geo) {
-  const p = geo.attributes.position, idx = geo.index.array, parts = { body: [], l: [], r: [] };
+  const p = geo.attributes.position, idx = geo.index.array, parts = { body: [], l: [], r: [], head: [], legs: [], torso: [] };
   for (let t = 0; t < idx.length; t += 3) {
     let x = 0, y = 0; for (let k = 0; k < 3; k++) { x += p.getX(idx[t + k]); y += p.getY(idx[t + k]); } x /= 3; y /= 3;
     const arm = y < .38 && y > -.62 && Math.abs(x) > (y > .12 ? .335 : y < -.45 ? .37 : torsoHalf(y) + .025);   // oben bleibt die Rumpfschulter am Körper
     (arm ? (x > 0 ? parts.r : parts.l) : parts.body).push(idx[t], idx[t + 1], idx[t + 2]);
+    if (!arm) (y > .4 ? parts.head : y < -.5 ? parts.legs : parts.torso).push(idx[t], idx[t + 1], idx[t + 2]);   // für das Auseinanderfallen
   }
   const mk = list => { const g = new THREE.BufferGeometry(); for (const k of Object.keys(geo.attributes)) g.setAttribute(k, geo.attributes[k].clone()); g.setIndex(list); return g; };
-  return { body: mk(parts.body), r: mk(parts.r), l: mk(parts.l) };
+  return { body: mk(parts.body), r: mk(parts.r), l: mk(parts.l), pieces: [mk(parts.legs), mk(parts.torso), mk(parts.head)] };
 }
 // Hand = unterster Teil des Arms
 function handCenter(geo) {
@@ -39,7 +40,7 @@ function faction(base, side, arm = false) {
         vec3 c = diffuseColor.rgb; float L = dot(c, vec3(.299,.587,.114));
         bool green = c.g > c.r * 1.05 && c.g > c.b * 1.1;
         bool skin = c.r > c.g * 1.12 && c.r > c.b * 1.35;
-        bool chest = uArm == 0 ? (vOP.z > .05 && abs(vOP.x) < .25 && vOP.y > -.45 && vOP.y < .4) : (vOP.y > -.47);
+        bool chest = uArm == 0 ? (vOP.y > -.5 && vOP.y < .4) : (vOP.y > -.47);   // Rumpf rundum (Brust, Schultern, Rücken) und Ärmel bekleiden
         vec3 tgt = (uArm == 0 && vOP.y > .62) ? uHelm : uUni;
         if (green) c = tgt * (.35 + L * 1.9);
         else if (skin && chest) c = uUni * (.55 + L * 1.1);
@@ -59,9 +60,9 @@ export const GFREADY = (async () => {
     const shR = SHOULDER.clone(), shL = SHOULDER.clone().setX(-SHOULDER.x);
     const hR = handCenter(sp.r).sub(shR), hL = handCenter(sp.l).sub(shL);
     sp.r.translate(-shR.x, -shR.y, -shR.z); sp.l.translate(-shL.x, -shL.y, -shL.z);
-    for (const g of [sp.body, sp.r, sp.l]) g.computeBoundingSphere();
+    for (const g of [sp.body, sp.r, sp.l, ...sp.pieces]) g.computeBoundingSphere();
     const mats = { de: faction(mesh.material, 'de'), al: faction(mesh.material, 'al'), mod: mesh.material }, armMats = { de: faction(mesh.material, 'de', true), al: faction(mesh.material, 'al', true) };
-    Object.assign(GF, { armMats, body: sp.body, armR: sp.r, armL: sp.l, shR, shL, hR, hL, mats, ok: true });
+    Object.assign(GF, { armMats, pieces: sp.pieces, body: sp.body, armR: sp.r, armL: sp.l, shR, shL, hR, hL, mats, ok: true });
   } catch (e) { console.warn('Soldaten-Modell nicht geladen', e); }
   return GF;
 })();

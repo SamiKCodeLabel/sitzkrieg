@@ -235,11 +235,12 @@ function soldier(side, kind = 'rif', opt = {}) {
   let h;
   if (GF.ok && side !== 'mod') {
     const mat = GF.mats[side]; body.userData.glb = mat; body.userData.glbArm = GF.armMats[side];
-    const bm = new THREE.Mesh(GF.body, mat); bm.scale.setScalar(GS); bm.position.y = GS; bm.castShadow = true; body.add(bm);
+    for (const pg of GF.pieces) { const bm = new THREE.Mesh(pg, mat); bm.scale.setScalar(GS); bm.position.y = GS; bm.castShadow = true; body.add(bm); }   // Beine, Rumpf, Kopf einzeln
     h = G(); h.position.y = GS + .66 * GS; body.add(h); g.userData.head = h;
     if (side === 'de' && !gen) { P(h, SP(.27, 0, Math.PI * 2, 0, HALF), c.helm, 0, .1, -.01).scale.set(1, .95, 1.02); P(h, CY(.27, .32, .12, 32), c.helm, 0, .07, -.04); }
     else if (gen) headwear(h, side, kind);
     if (kind === 'medic' || kind === 'mine') headwear(h, side, kind === 'medic' ? 'medic-only' : kind);
+    if (!gen) glbGear(body, side, kind);
   } else {
   // Beine
   P(body, RB(.6, .1, .3, .02), LEG, 0, .45, 0);
@@ -288,7 +289,7 @@ function soldier(side, kind = 'rif', opt = {}) {
     }
     case 'mortar': {
       const m = G(); m.position.set(.6, 0, .4); body.add(m);
-      P(m, RB(.42, .04, .42, .01), DGR, 0, .02, 0); P(m, CY(.075, .075, .74, 18), 0x4d5240, 0, .4, .06, -.55); P(m, CY(.015, .015, .5, 8), DGR, 0, .22, .3, .5);
+      P(m, RB(.42, .04, .42, .01), DGR, 0, .035, 0);   // leicht über der Bauplatte (kein Flackern) P(m, CY(.075, .075, .74, 18), 0x4d5240, 0, .4, .06, -.55); P(m, CY(.015, .015, .5, 8), DGR, 0, .22, .3, .5);
       u.mortar = m; m.userData.muzzle = new THREE.Vector3(0, .74, .38);
       u.armR = arm(body, 1, ARM, -1.8); u.armL = arm(body, -1, ARM, -.4);
       const sh = G(); P(sh, CY(.055, .055, .2, 14), 0x5b5b3e); P(sh, cached('shc', () => new THREE.ConeGeometry(.055, .1, 14)), 0x5b5b3e, 0, .15, 0); u.armR.userData.hand.add(sh); u.shell = sh; break;
@@ -325,6 +326,31 @@ function gripWeapon(g, u, kind) {           // Waffe so verschieben, dass der Gr
   const clip = u.armR.userData.hand.localToWorld((u.armR.userData.hand.userData.clip || new THREE.Vector3(0, -.1, 0)).clone()); u.body.worldToLocal(clip);
   w.position.copy(clip).sub((w.userData.grip || GRIP).clone().applyEuler(w.rotation));
   g.updateMatrixWorld(true); u.armR.userData.hand.attach(w);
+}
+
+// ---------- Ausrüstung der Soldaten (Modell-Figuren) ----------
+function glbGear(body, side, kind) {
+  const de = side === 'de', K = 0x1e1c19, LTH = de ? 0x4a3a28 : 0x8a7a4e, WEB = de ? 0x1e1c19 : 0xb39b6a;
+  const pack = kind !== 'flame' && kind !== 'mine';
+  if (pack) {                                                                                   // Tornister / Rucksack
+    P(body, RB(.36, .34, .14, .04), LTH, 0, .86, -.25);
+    P(body, RB(.3, .05, .02, .01), WEB, 0, .96, -.325); P(body, RB(.05, .3, .02, .01), WEB, -.1, .86, -.325);
+    if (de) { P(body, RB(.07, .26, .03, .01), 0x6e7270, .12, .86, -.33, 0, 0, .1); P(body, RB(.14, .1, .025, .01), 0x6e7270, .14, .72, -.34); }   // Spaten
+    else P(body, cached('roll', () => new THREE.CapsuleGeometry(.065, .3, 6, 12)), 0x6f6a48, 0, 1.06, -.25, 0, 0, HALF);   // Schlafrolle
+  }
+  for (const sx of [-1, 1]) P(body, RB(.05, .36, .02, .01), WEB, sx * .13, .84, .2, 0, 0, sx * -.1);   // Trageriemen vorn
+  if (de) {
+    for (const sx of [-1, 1]) for (let i = 0; i < 3; i++) P(body, RB(.065, .09, .06, .015), K, sx * (.08 + i * .07), .58, .2);   // Patronentaschen
+    const gm = P(body, CY(.065, .065, .26, 16), 0x5f6650, .14, .52, -.2, 0, 0, .25);                // Gasmaskenbüchse
+    for (let i = 0; i < 3; i++) P(gm, CY(.068, .068, .012, 16), 0x4e5442, 0, -.08 + i * .08, 0);
+    P(body, RB(.16, .14, .07, .03), 0x6a6448, -.2, .5, -.06);                                       // Brotbeutel
+    P(body, CY(.05, .05, .13, 14), 0x3a3a30, -.2, .52, -.16); P(body, CY(.02, .02, .03, 8), K, -.2, .6, -.16);   // Feldflasche
+  } else {
+    for (let i = 0; i < 4; i++) P(body, RB(.08, .1, .06, .015), WEB, -.15 + i * .1, .58, .2);       // Magazintaschen
+    P(body, CY(.055, .055, .14, 14), 0x5a5a3a, -.21, .52, -.12); P(body, CY(.02, .02, .03, 8), K, -.21, .61, -.12);   // Feldflasche
+    P(body, RB(.1, .09, .06, .02), WEB, .2, .55, -.1); P(body, RB(.03, .03, .005, .004), RED, .2, .56, -.068);   // Verbandstasche
+    if (!pack) {} else { P(body, RB(.07, .24, .03, .01), 0x6e7270, -.12, .7, -.33); }
+  }
 }
 
 // ---------- Generäle: Ausrüstung passend zur Fähigkeit ----------

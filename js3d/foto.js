@@ -27,7 +27,11 @@ export function frame(cam, obj, aspect, pad = 1.08, dir = new THREE.Vector3(.9, 
   const box = new THREE.Box3().setFromObject(obj, true), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3());
   cam.aspect = aspect;
   let dist = Math.max(s.x, s.y, s.z) * 2.2, tgt = c.clone();
-  const pts = []; for (let i = 0; i < 8; i++) pts.push(new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z));
+  // Eckpunkte der einzelnen Teile statt eines großen Kastens: kein leerer Rand über der Figur
+  const pts = []; obj.updateMatrixWorld(true);
+  obj.traverse(o => { if (!o.isMesh || o.isInstancedMesh || !o.visible || !o.geometry) return; if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+    const b = o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld); for (let i = 0; i < 8; i++) pts.push(new THREE.Vector3(i & 1 ? b.max.x : b.min.x, i & 2 ? b.max.y : b.min.y, i & 4 ? b.max.z : b.min.z)); });
+  if (!pts.length) for (let i = 0; i < 8; i++) pts.push(new THREE.Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z));
   const nd = dir.clone().normalize();
   for (let it = 0; it < 6; it++) {           // Abstand und Mitte anpassen, bis das Modell genau ins Bild passt
     cam.position.copy(tgt).add(nd.clone().multiplyScalar(dist)); cam.lookAt(tgt); cam.near = dist / 30; cam.far = dist * 8; cam.updateProjectionMatrix(); cam.updateMatrixWorld();
